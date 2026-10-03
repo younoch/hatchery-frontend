@@ -1,0 +1,1040 @@
+<title>Hatchery Water Entry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+Bengali:wght@400;500;600&display=swap">
+<style>
+  /* Layout: one phone-sized compact screen beside a spec panel; the panel stacks under the screen at phone width.
+     Spacing and radius come only from the scale below; pages never set their own margins (layout classes own them). */
+  :root {
+    --bg: #F3F6F7;
+    --surface: #FFFFFF;
+    --surface-2: #EAF0F2;
+    --fg: #171717;
+    --muted: #525252;
+    --line: #D9E1E4;
+    --primary: #0E7490;
+    --primary-ink: #FFFFFF;
+    --accent-text: #0E7490;
+    --primary-soft: #E1F5F9;
+    --ok: #15803D;
+    --ok-soft: #E3F5E9;
+    --warn: #B45309;
+    --warn-soft: #FDF0DC;
+    --bad: #C81E1E;
+    --bad-soft: #FCE8E8;
+    --focus: #0891B2;
+
+    --font-sans: 'Inter', 'Noto Sans Bengali', system-ui, sans-serif;
+
+    /* spacing scale: five steps only */
+    --s-1: 4px;   /* inside a component */
+    --s-2: 8px;   /* related items, minimum gap between tappables */
+    --s-3: 12px;  /* fields in a group, card padding */
+    --s-4: 16px;  /* page gutter, sheet padding */
+    --s-6: 24px;  /* between sections */
+    --pad-page: var(--s-4);
+    --gap-field: var(--s-3);
+    --gap-section: var(--s-6);
+
+    /* radius scale: three steps */
+    --r-ctl: 10px;
+    --r-card: 12px;
+    --r-sheet: 20px;
+
+    /* compact type scale, coarse pointer (phone) */
+    --fs-body: 0.9375rem;
+    --fs-label: 0.875rem;
+    --fs-cap: 0.75rem;
+    --fs-h2: 1.125rem;
+    --fs-h1: 1.25rem;
+    --lh: 1.45;
+
+    /* control sizes: visual size and touch size are separate */
+    --control-h: 2.75rem;   /* fields, primary actions: 44px */
+    --small-h: 2rem;        /* secondary inline actions: 32px visual, 44px touch */
+    --hit: 6px;             /* extra touch area added above and below a small control */
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0C1519; --surface: #142126; --surface-2: #1B2D33; --fg: #EDF3F4; --muted: #9FB3B8;
+      --line: #26393F; --primary: #0E7490; --primary-ink: #FFFFFF; --accent-text: #4CC9E4;
+      --primary-soft: #123640; --ok: #4ADE80; --ok-soft: #14301E; --warn: #F5B547; --warn-soft: #3A2A10;
+      --bad: #FF8A8A; --bad-soft: #3C1A1A; --focus: #4CC9E4;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0C1519; --surface: #142126; --surface-2: #1B2D33; --fg: #EDF3F4; --muted: #9FB3B8;
+    --line: #26393F; --primary: #0E7490; --primary-ink: #FFFFFF; --accent-text: #4CC9E4;
+    --primary-soft: #123640; --ok: #4ADE80; --ok-soft: #14301E; --warn: #F5B547; --warn-soft: #3A2A10;
+    --bad: #FF8A8A; --bad-soft: #3C1A1A; --focus: #4CC9E4;
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    padding-inline: 16px;
+    padding-block: 24px 40px;
+  }
+  button, input, select { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  .stage {
+    max-width: 960px;
+    margin-inline: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 390px) minmax(0, 1fr);
+    gap: 40px;
+    align-items: start;
+  }
+  @media (max-width: 800px) {
+    .stage { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+    .app { margin-inline: auto; }
+  }
+
+  /* ---------- app screen ---------- */
+  .app {
+    width: 100%;
+    max-width: 390px;
+    height: 740px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    overflow: hidden;
+    font-size: var(--fs-body);
+    line-height: var(--lh);
+  }
+  .app[data-lang="bn"] {
+    --fs-body: 1rem;
+    --fs-label: 0.9375rem;
+    --fs-cap: 0.8125rem;
+    --fs-h2: 1.1875rem;
+    --fs-h1: 1.3125rem;
+    --lh: 1.6;
+  }
+
+  .appbar {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--s-2);
+    min-height: 56px;
+    padding: var(--s-3) var(--s-3) var(--s-3) var(--pad-page);
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+  }
+  .appbar h1 { margin: 0; font-size: var(--fs-h1); font-weight: 600; line-height: 1.3; text-wrap: balance; min-width: 0; }
+  .appbar-actions { display: flex; align-items: center; gap: var(--s-2); flex-shrink: 0; }
+
+  /* small control: 32px to look at, 44px to tap */
+  .chip-btn, .btn-sm {
+    position: relative;
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+    min-height: var(--small-h); padding: 0 var(--s-3);
+    border: 1px solid var(--line); border-radius: 999px;
+    background: var(--surface); font-size: var(--fs-cap); font-weight: 500;
+  }
+  .chip-btn::after, .btn-sm::after { content: ''; position: absolute; inset: calc(var(--hit) * -1) calc(var(--s-1) * -1); }
+  .btn-sm { border-radius: var(--r-ctl); color: var(--accent-text); font-weight: 600; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+  .chip-btn[aria-pressed="true"] .dot { background: var(--warn); }
+  .lang-btn { min-width: 2.75rem; }
+
+  .offline-banner {
+    display: flex; gap: var(--s-2); align-items: flex-start;
+    padding: var(--s-2) var(--pad-page); background: var(--warn-soft); color: var(--warn);
+    font-size: var(--fs-cap); line-height: 1.45; border-bottom: 1px solid var(--line);
+  }
+  .offline-banner svg { margin-top: 2px; }
+
+  .subtabs {
+    display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-1);
+    margin: var(--s-3) var(--pad-page) 0; padding: var(--s-1);
+    background: var(--surface-2); border-radius: var(--r-card);
+  }
+  .subtabs button {
+    position: relative; min-height: var(--small-h); border: 0; border-radius: var(--r-ctl); background: transparent;
+    font-size: var(--fs-label); font-weight: 500; color: var(--muted);
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+  }
+  .subtabs button::after { content: ''; position: absolute; inset: calc(var(--hit) * -1) 0; }
+  .subtabs button[aria-selected="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+  .count {
+    min-width: 1.25rem; padding: 0 var(--s-2); border-radius: 999px; background: var(--warn-soft); color: var(--warn);
+    font-size: var(--fs-cap); font-weight: 600; line-height: 1.4; text-align: center;
+  }
+
+  /* page wrapper and layout components: the only places that set spacing */
+  .scroll { flex: 1; overflow-y: auto; padding: var(--s-3) var(--pad-page) var(--s-4); }
+  .stack { display: flex; flex-direction: column; gap: var(--gap-section); }
+  .section { display: grid; gap: var(--s-2); }
+  .sec-title { margin: 0; }
+  .sec-head {
+    width: 100%; min-height: var(--control-h); padding: 0; border: 0; background: transparent;
+    display: flex; align-items: center; justify-content: space-between; gap: var(--s-2);
+    font-size: var(--fs-label); font-weight: 600; text-align: left;
+  }
+  .sec-head .chev { color: var(--muted); transition: transform .15s ease; }
+  .sec-head[aria-expanded="true"] .chev { transform: rotate(90deg); }
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap-field); }
+  .field { min-width: 0; display: flex; flex-direction: column; gap: var(--s-1); }
+  .field--wide { grid-column: 1 / -1; }
+  .field > label { font-size: var(--fs-label); font-weight: 500; }
+  .control {
+    display: flex; align-items: center; min-width: 0;
+    height: var(--control-h);
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-ctl);
+  }
+  .control:focus-within { border-color: var(--focus); outline: 2px solid var(--focus); outline-offset: 0; }
+  .control input, .control select {
+    flex: 1; min-width: 0; height: 100%; border: 0; background: transparent; padding: 0 var(--s-3); outline: none; border-radius: var(--r-ctl);
+  }
+  .control select { appearance: none; }
+  .control .unit { padding-right: var(--s-3); color: var(--muted); font-size: var(--fs-label); flex-shrink: 0; }
+  /* unit picker: a native select shaped like the unit label, full field height so it is easy to tap */
+  .unit-wrap { position: relative; display: flex; align-items: center; height: 100%; flex-shrink: 0; color: var(--muted); }
+  .unit-wrap::after {
+    content: ''; position: absolute; right: var(--s-3); top: 50%; width: 5px; height: 5px; margin-top: -4px;
+    border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); pointer-events: none;
+  }
+  .control .unit-select {
+    flex: none; width: auto; min-width: 3.25rem; padding: 0 1.5rem 0 var(--s-2);
+    color: inherit; font-size: var(--fs-label); text-align-last: right; cursor: pointer;
+    border-left: 1px solid var(--line); border-radius: 0 var(--r-ctl) var(--r-ctl) 0; background: var(--surface-2);
+  }
+  .control .unit-select:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+  .control[data-invalid="true"] { border-color: var(--bad); }
+  .control[data-invalid="true"]:focus-within { outline-color: var(--bad); }
+  input[type="datetime-local"], input[type="date"], input[type="time"] { color-scheme: inherit; font-variant-numeric: tabular-nums; }
+  .num { font-variant-numeric: tabular-nums; }
+  .err { display: none; margin: 0; gap: var(--s-1); align-items: flex-start; color: var(--bad); font-size: var(--fs-cap); line-height: 1.4; }
+  .err[data-show="true"] { display: flex; }
+  .err svg { margin-top: 1px; flex-shrink: 0; }
+
+  .savebar {
+    position: relative;
+    padding: var(--s-2) var(--pad-page); background: var(--surface); border-top: 1px solid var(--line);
+  }
+  /* status message floats above the bar so the bar itself stays slim */
+  .status-line {
+    position: absolute; left: var(--pad-page); right: var(--pad-page); bottom: calc(100% + var(--s-2)); z-index: 2;
+    padding: var(--s-2) var(--s-3); border: 1px solid var(--line); border-radius: var(--r-ctl);
+    background: var(--surface); color: var(--fg); font-size: var(--fs-cap); box-shadow: 0 2px 8px rgba(0,0,0,.12);
+  }
+  .status-line:empty { display: none; }
+  .primary-btn {
+    height: var(--control-h); border: 0; border-radius: var(--r-ctl);
+    background: var(--primary); color: var(--primary-ink); font-weight: 600; font-size: var(--fs-body);
+  }
+  .primary-btn:active { filter: brightness(0.92); }
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2); }
+  .cancel-btn {
+    height: var(--control-h); border: 1px solid var(--bad); border-radius: var(--r-ctl);
+    background: transparent; color: var(--bad); font-weight: 600; font-size: var(--fs-body);
+  }
+  .cancel-btn:active { background: var(--bad-soft); }
+
+  /* card list */
+  .cards { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: var(--s-3);
+    display: grid; gap: var(--s-2);
+  }
+  .card-top { display: flex; justify-content: space-between; align-items: center; gap: var(--s-2); }
+  .card-top .when { font-size: var(--fs-label); font-weight: 500; min-width: 0; }
+  .card-top .tank { color: var(--muted); font-weight: 400; }
+  .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-2); margin: 0; }
+  .metrics div { min-width: 0; }
+  .metrics dt { font-size: var(--fs-cap); color: var(--muted); margin: 0; }
+  .metrics dd { margin: 0; font-size: var(--fs-label); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .metrics dd small { font-weight: 400; color: var(--muted); font-size: var(--fs-cap); }
+  .metrics.two-rows { row-gap: var(--s-3); }
+  .card-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--s-2); }
+  .card-note { margin: 0; font-size: var(--fs-cap); color: var(--bad); min-width: 0; }
+  .card-title { margin: 0; font-size: var(--fs-label); font-weight: 600; }
+  .sample { font-weight: 400; color: var(--muted); font-size: var(--fs-cap); }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: var(--s-1); padding: 0 var(--s-2); border-radius: 999px;
+    font-size: var(--fs-cap); font-weight: 600; white-space: nowrap; line-height: 1.6;
+  }
+  .badge.synced { background: var(--ok-soft); color: var(--ok); }
+  .badge.pending, .badge.syncing { background: var(--warn-soft); color: var(--warn); }
+  .badge.failed { background: var(--bad-soft); color: var(--bad); }
+
+  .tabbar {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    background: var(--surface); border-top: 1px solid var(--line);
+    padding: var(--s-1) var(--s-1) calc(var(--s-1) + env(safe-area-inset-bottom, 0px));
+  }
+  .tabbar button {
+    min-height: 3.5rem; border: 0; background: transparent; color: var(--muted);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    font-size: var(--fs-cap); font-weight: 500; border-radius: var(--r-ctl);
+  }
+  .tabbar button[aria-current="page"], .tabbar button[data-on="true"], .tabbar button[aria-expanded="true"] { color: var(--accent-text); }
+  .tabbar button[aria-current="page"] .ico, .tabbar button[data-on="true"] .ico, .tabbar button[aria-expanded="true"] .ico { background: var(--primary-soft); }
+  .ico { display: grid; place-items: center; width: 3rem; height: 1.75rem; border-radius: 999px; }
+
+  svg.i { width: 1.25rem; height: 1.25rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+  svg.s { width: 0.8125rem; height: 0.8125rem; }
+
+  /* more sheet: floats above the always-visible tab bar */
+  .sheet-wrap {
+    position: absolute; left: 0; right: 0; top: 0;
+    bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+    z-index: 5;
+  }
+  .scrim { position: absolute; inset: 0; background: rgba(8, 20, 24, 0.5); opacity: 0; transition: opacity .2s ease; border: 0; width: 100%; padding: 0; }
+  .sheet {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 68%; max-height: 100%;
+    display: flex; flex-direction: column;
+    background: var(--surface); border-radius: var(--r-sheet) var(--r-sheet) 0 0; border-top: 1px solid var(--line);
+    transform: translateY(100%); transition: transform .22s ease;
+  }
+  .sheet-wrap.open .scrim { opacity: 1; }
+  .sheet-wrap.open .sheet { transform: translateY(0); }
+  .grab { width: 36px; height: 4px; border-radius: 2px; background: var(--line); margin: var(--s-2) auto 0; flex-shrink: 0; }
+  .sheet-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s-2); padding: var(--s-2) var(--s-2) var(--s-1) var(--pad-page); flex-shrink: 0; }
+  .sheet-head h2 { margin: 0; font-size: var(--fs-h2); font-weight: 600; line-height: 1.3; }
+  .ready { display: inline-flex; align-items: center; gap: var(--s-1); margin-top: var(--s-1); font-size: var(--fs-cap); color: var(--ok); font-weight: 500; }
+  .icon-btn {
+    width: var(--control-h); height: var(--control-h); border: 0; border-radius: var(--r-ctl); background: transparent;
+    display: grid; place-items: center; color: var(--muted); flex-shrink: 0;
+  }
+  .sheet-body { overflow-y: auto; padding: var(--s-1) var(--pad-page) var(--s-4); display: grid; gap: var(--s-4); }
+  .grp-title { margin: 0 0 var(--s-2); font-size: var(--fs-cap); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .app[data-lang="bn"] .grp-title { letter-spacing: 0; text-transform: none; }
+  .tiles { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-2); }
+  .tile {
+    width: 100%; min-height: 4.5rem; padding: var(--s-2) 2px; border: 1px solid var(--line); border-radius: var(--r-card); background: var(--surface);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--s-1);
+    font-size: var(--fs-cap); font-weight: 500; line-height: 1.3; text-align: center;
+  }
+  .tile .tico { width: 2rem; height: 2rem; border-radius: var(--r-ctl); background: var(--primary-soft); color: var(--accent-text); display: grid; place-items: center; }
+  .tile:active { background: var(--surface-2); }
+  .rows { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: var(--r-card); overflow: hidden; }
+  .row {
+    width: 100%; min-height: var(--control-h); padding: 0 var(--s-3); border: 0; border-bottom: 1px solid var(--line); background: var(--surface);
+    display: flex; align-items: center; gap: var(--s-3); font-size: var(--fs-body); text-align: left;
+  }
+  .rows li:last-child .row { border-bottom: 0; }
+  .row .grow { flex: 1; min-width: 0; }
+  .row .chev { color: var(--muted); }
+  .row.danger { color: var(--bad); }
+
+  /* notifications: bell in the app bar, list in the same bottom-sheet pattern as More */
+  .bell { width: var(--small-h); padding: 0; }
+  .bell-count {
+    position: absolute; top: -4px; right: -4px; min-width: 1.125rem; height: 1.125rem; padding: 0 var(--s-1);
+    display: grid; place-items: center; border-radius: 999px; background: var(--primary); color: var(--primary-ink);
+    font-size: var(--fs-cap); font-weight: 600; line-height: 1; border: 2px solid var(--surface); box-sizing: content-box;
+  }
+  .bell-count[hidden] { display: none; }
+  .head-actions { display: flex; align-items: center; gap: var(--s-2); }
+  .notif-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }
+  .notif {
+    width: 100%; min-height: var(--control-h); padding: var(--s-3); text-align: left;
+    display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; gap: var(--s-3); align-items: start;
+    border: 1px solid var(--line); border-radius: var(--r-card); background: var(--surface);
+  }
+  .notif[data-unread="true"] { background: var(--primary-soft); }
+  .n-ico { width: 2rem; height: 2rem; border-radius: var(--r-ctl); display: grid; place-items: center; }
+  .n-ico.warn { background: var(--warn-soft); color: var(--warn); }
+  .n-ico.bad { background: var(--bad-soft); color: var(--bad); }
+  .n-ico.ok { background: var(--ok-soft); color: var(--ok); }
+  .n-ico.review { background: var(--surface-2); color: var(--accent-text); }
+  .n-title { margin: 0; font-size: var(--fs-label); font-weight: 600; }
+  .n-body { margin: 0; font-size: var(--fs-label); color: var(--muted); }
+  .n-side { display: flex; flex-direction: column; align-items: flex-end; gap: var(--s-2); }
+  .n-time { font-size: var(--fs-cap); color: var(--muted); white-space: nowrap; }
+  .n-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); }
+  .n-dot[hidden] { display: none; }
+
+  /* ---------- spec panel ---------- */
+  .notes { min-width: 0; font-size: 14px; line-height: 1.6; }
+  .notes h2 { margin: 0 0 var(--s-1); font-size: 20px; line-height: 1.3; text-wrap: balance; }
+  .notes .lede { margin: 0 0 var(--s-4); color: var(--muted); max-width: 60ch; }
+  .notes h3 { margin: var(--s-6) 0 var(--s-2); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .notes ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; max-width: 62ch; }
+  .tbl-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-card); background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: left; padding: var(--s-2) var(--s-3); border-bottom: 1px solid var(--line); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  td.wrap { white-space: normal; min-width: 14rem; }
+  th { font-weight: 600; color: var(--muted); font-size: 12px; background: var(--surface-2); }
+  tr:last-child td { border-bottom: 0; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<main class="stage">
+  <section class="app" id="app" data-lang="bn" aria-label="Hatchery app screen">
+    <header class="appbar">
+      <h1 id="pageTitle" data-i="title">পানির মান</h1>
+      <div class="appbar-actions">
+        <button class="chip-btn bell" id="bellBtn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="notifSheet" aria-label="বিজ্ঞপ্তি">
+          <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 7 3 9H3c0-2 3-2 3-9zM10 21a2 2 0 0 0 4 0"/></svg>
+          <span class="bell-count" id="bellCount" aria-hidden="true">3</span>
+        </button>
+        <button class="chip-btn" id="netBtn" type="button" aria-pressed="false">
+          <span class="dot" aria-hidden="true"></span><span id="netLabel">অনলাইন</span>
+        </button>
+        <button class="chip-btn lang-btn" id="langBtn" type="button" aria-label="Language">EN</button>
+      </div>
+    </header>
+
+    <div class="offline-banner" id="offBanner" role="status" hidden>
+      <svg class="i s" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg>
+      <span data-i="offlineBanner"></span>
+    </div>
+
+    <div class="subtabs" id="subtabs" role="tablist">
+      <button type="button" role="tab" id="tabNew" aria-selected="true" aria-controls="paneNew"><span data-i="tabNew">নতুন এন্ট্রি</span></button>
+      <button type="button" role="tab" id="tabHist" aria-selected="false" aria-controls="paneHist"><span data-i="tabHist">ইতিহাস</span><span class="count" id="pendCount" hidden>0</span></button>
+    </div>
+
+    <!-- water: new entry -->
+    <div class="scroll" id="paneNew" role="tabpanel" aria-labelledby="tabNew">
+      <form id="form" novalidate>
+        <div class="field-grid">
+          <div class="field field--wide">
+            <label for="f-at" data-i="recordedAt">পরীক্ষার সময়</label>
+            <div class="control"><input id="f-at" type="datetime-local" required></div>
+          </div>
+          <div class="field field--wide">
+            <label for="f-tank" data-i="tank">ট্যাঙ্ক / পুকুর</label>
+            <div class="control">
+              <select id="f-tank">
+                <option value="A1">Tank A1</option><option value="A2">Tank A2</option>
+                <option value="B1">Tank B1</option><option value="P3" data-i-opt="pond3">Pond 3</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="f-ph">pH</label>
+            <div class="control"><input id="f-ph" class="num" inputmode="decimal" autocomplete="off" placeholder="8.1" aria-describedby="e-ph"></div>
+            <p class="err" id="e-ph"></p>
+          </div>
+          <div class="field">
+            <label for="f-t" data-i="temp">তাপমাত্রা</label>
+            <div class="control"><input id="f-t" class="num" inputmode="decimal" autocomplete="off" placeholder="29.5" aria-describedby="e-t"><span class="unit-wrap"><select class="unit-select" id="u-t" data-i-label="uT" aria-label="তাপমাত্রার একক"><option>°C</option><option>°F</option></select></span></div>
+            <p class="err" id="e-t"></p>
+          </div>
+          <div class="field">
+            <label for="f-sal" data-i="salinity">লবণাক্ততা</label>
+            <div class="control"><input id="f-sal" class="num" inputmode="decimal" autocomplete="off" placeholder="22" aria-describedby="e-sal"><span class="unit-wrap"><select class="unit-select" id="u-sal" data-i-label="uS" aria-label="লবণাক্ততার একক"><option>ppt</option><option>ppm</option></select></span></div>
+            <p class="err" id="e-sal"></p>
+          </div>
+          <div class="field">
+            <label for="f-o2" data-i="oxygen">অক্সিজেন (O₂)</label>
+            <div class="control"><input id="f-o2" class="num" inputmode="decimal" autocomplete="off" placeholder="5.4" aria-describedby="e-o2"><span class="unit-wrap"><select class="unit-select" id="u-o2" data-i-label="uO" aria-label="অক্সিজেনের একক"><option>mg/L</option><option>ppm</option></select></span></div>
+            <p class="err" id="e-o2"></p>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- water: history -->
+    <div class="scroll" id="paneHist" role="tabpanel" aria-labelledby="tabHist" hidden>
+      <ul class="cards" id="cards"></ul>
+    </div>
+
+    <!-- batch: the heavy screen (stress test) -->
+    <div class="scroll" id="paneBatch" hidden>
+      <form id="batchForm" novalidate>
+        <div class="stack">
+          <section class="section">
+            <div class="card">
+              <h2 class="card-title"><span data-i="sumTitle">চলমান ব্যাচ</span> <span class="sample" data-i="sample">(নমুনা তথ্য)</span></h2>
+              <dl class="metrics two-rows">
+                <div><dt data-i="mAge">বয়স</dt><dd>12 <small data-i="uDays">দিন</small></dd></div>
+                <div><dt data-i="mAlive">বেঁচে আছে</dt><dd>86 <small>%</small></dd></div>
+                <div><dt data-i="mFed">আজ খাওয়ানো</dt><dd>4 <small data-i="uTimes">বার</small></dd></div>
+                <div><dt data-i="mCount">সংখ্যা</dt><dd>120,000</dd></div>
+                <div><dt>pH</dt><dd>8.1</dd></div>
+                <div><dt data-i="mTemp">তাপমাত্রা</dt><dd>29.5 <small>°C</small></dd></div>
+                <div><dt data-i="mSal">লবণাক্ততা</dt><dd>22 <small>ppt</small></dd></div>
+                <div><dt data-i="mO2">O₂</dt><dd>5.4 <small>mg/L</small></dd></div>
+              </dl>
+            </div>
+          </section>
+
+          <section class="section">
+            <h3 class="sec-title"><button class="sec-head" type="button" aria-expanded="true" aria-controls="sec-id"><span data-i="secId">পরিচয়</span><svg class="i chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></h3>
+            <div class="field-grid" id="sec-id">
+              <div class="field"><label for="b-no" data-i="fBatchNo">ব্যাচ নং</label><div class="control"><input id="b-no" value="B-2610-03" autocomplete="off"></div></div>
+              <div class="field"><label for="b-sp" data-i="fSpecies">প্রজাতি</label><div class="control"><select id="b-sp"><option data-i="speciesShrimp">চিংড়ি</option></select></div></div>
+              <div class="field"><label for="b-tank" data-i="tank">ট্যাঙ্ক / পুকুর</label><div class="control"><select id="b-tank"><option>Tank A1</option><option>Tank A2</option><option>Tank B1</option><option data-i-opt="pond3">Pond 3</option></select></div></div>
+              <div class="field"><label for="b-start" data-i="fStart">শুরুর তারিখ</label><div class="control"><input id="b-start" type="date" value="2026-09-21"></div></div>
+            </div>
+          </section>
+
+          <section class="section">
+            <h3 class="sec-title"><button class="sec-head" type="button" aria-expanded="true" aria-controls="sec-water"><span data-i="secWater">পানির মান</span><svg class="i chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></h3>
+            <div class="field-grid" id="sec-water">
+              <div class="field"><label for="b-ph">pH</label><div class="control"><input id="b-ph" class="num" inputmode="decimal" placeholder="8.1"></div></div>
+              <div class="field"><label for="b-t" data-i="temp">তাপমাত্রা</label><div class="control"><input id="b-t" class="num" inputmode="decimal" placeholder="29.5"><span class="unit">°C</span></div></div>
+              <div class="field"><label for="b-sal" data-i="salinity">লবণাক্ততা</label><div class="control"><input id="b-sal" class="num" inputmode="decimal" placeholder="22"><span class="unit">ppt</span></div></div>
+              <div class="field"><label for="b-o2" data-i="oxygen">অক্সিজেন (O₂)</label><div class="control"><input id="b-o2" class="num" inputmode="decimal" placeholder="5.4"><span class="unit">mg/L</span></div></div>
+            </div>
+          </section>
+
+          <section class="section">
+            <h3 class="sec-title"><button class="sec-head" type="button" aria-expanded="true" aria-controls="sec-feed"><span data-i="secFeed">খাদ্য</span><svg class="i chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></h3>
+            <div class="field-grid" id="sec-feed">
+              <div class="field"><label for="b-ft" data-i="fFeedType">খাবারের ধরন</label><div class="control"><select id="b-ft"><option data-i="feed1">ফিড 1</option><option data-i="feed2">ফিড 2</option><option data-i="feed3">ফিড 3</option></select></div></div>
+              <div class="field"><label for="b-amt" data-i="fAmount">পরিমাণ</label><div class="control"><input id="b-amt" class="num" inputmode="decimal" placeholder="250"><span class="unit">g</span></div></div>
+              <div class="field"><label for="b-times" data-i="fTimes">দিনে কতবার</label><div class="control"><input id="b-times" class="num" inputmode="numeric" placeholder="4"><span class="unit" data-i="uTimes">বার</span></div></div>
+              <div class="field"><label for="b-last" data-i="fLastFed">শেষ খাওয়ানো</label><div class="control"><input id="b-last" type="time" value="06:30"></div></div>
+            </div>
+          </section>
+
+          <section class="section">
+            <h3 class="sec-title"><button class="sec-head" type="button" aria-expanded="false" aria-controls="sec-more"><span data-i="secMore">আরও তথ্য</span><svg class="i chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></h3>
+            <div class="field-grid" id="sec-more" hidden>
+              <div class="field"><label for="b-nh3" data-i="fAmmonia">অ্যামোনিয়া</label><div class="control"><input id="b-nh3" class="num" inputmode="decimal" placeholder="0.1"><span class="unit">mg/L</span></div></div>
+              <div class="field"><label for="b-no2" data-i="fNitrite">নাইট্রাইট</label><div class="control"><input id="b-no2" class="num" inputmode="decimal" placeholder="0.05"><span class="unit">mg/L</span></div></div>
+              <div class="field"><label for="b-alk" data-i="fAlk">ক্ষারত্ব</label><div class="control"><input id="b-alk" class="num" inputmode="decimal" placeholder="120"><span class="unit">mg/L</span></div></div>
+              <div class="field field--wide"><label for="b-note"><span data-i="fNote">মন্তব্য</span> <span class="sample" data-i="optional">(ঐচ্ছিক)</span></label><div class="control"><input id="b-note" autocomplete="off"></div></div>
+            </div>
+          </section>
+        </div>
+      </form>
+    </div>
+
+    <div class="savebar" id="saveBar">
+      <div class="status-line" id="statusLine" role="status" aria-live="polite"></div>
+      <div class="btn-row">
+        <button class="cancel-btn" id="cancelBtn" type="button" data-i="cancel">বাতিল</button>
+        <button class="primary-btn" id="saveBtn" type="submit" form="form" data-i="save">সেভ করুন</button>
+      </div>
+    </div>
+
+    <div class="sheet-wrap" id="sheetWrap" hidden>
+      <button class="scrim" id="scrim" type="button" tabindex="-1" aria-hidden="true"></button>
+      <div class="sheet" id="moreSheet" role="dialog" aria-modal="true" aria-labelledby="moreTitle">
+        <div class="grab" aria-hidden="true"></div>
+        <div class="sheet-head">
+          <div>
+            <h2 id="moreTitle" data-i="moreTitle">আরও</h2>
+            <span class="ready"><svg class="i s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><span data-i="ready">অফলাইনের জন্য তৈরি</span></span>
+          </div>
+          <button class="icon-btn" id="closeSheet" type="button" data-i-label="close" aria-label="বন্ধ করুন">
+            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+        <div class="sheet-body">
+          <section>
+            <h3 class="grp-title" data-i="grpProd">উৎপাদন</h3>
+            <ul class="tiles">
+              <li><button class="tile" type="button" id="tileBatch"><span class="tico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5"/></svg></span><span data-i="mBatch">ব্যাচ</span></button></li>
+              <li><button class="tile" type="button"><span class="tico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c3.5 0 6 5 6 9a6 6 0 0 1-12 0c0-4 2.5-9 6-9z"/></svg></span><span data-i="mHatch">হ্যাচিং</span></button></li>
+              <li><button class="tile" type="button"><span class="tico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12c3-5 8-6 12-3l5-2v10l-5-2c-4 3-9 2-12-3z"/></svg></span><span data-i="mLarvae">লার্ভা</span></button></li>
+              <li><button class="tile" type="button"><span class="tico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 11h16"/></svg></span><span data-i="mTanks">ট্যাঙ্ক</span></button></li>
+            </ul>
+          </section>
+          <section>
+            <h3 class="grp-title" data-i="grpAcc">হিসাব</h3>
+            <ul class="tiles">
+              <li><button class="tile" type="button"><span class="tico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8zM7.5 7.5v.01"/></svg></span><span data-i="mSales">বিক্রি</span></button></li>
+              <li><button class="tile" type="button"><span class="tico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l2-3h12M16 14h2"/></svg></span><span data-i="mExpense">খরচ</span></button></li>
+              <li><button class="tile" type="button"><span class="tico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="8" r="3.5"/><path d="M16 20v-1a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v1"/></svg></span><span data-i="mBuyers">ক্রেতা</span></button></li>
+              <li><button class="tile" type="button"><span class="tico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></span><span data-i="mReports">রিপোর্ট</span></button></li>
+            </ul>
+          </section>
+          <section>
+            <h3 class="grp-title" data-i="grpApp">অ্যাপ</h3>
+            <ul class="rows">
+              <li><button class="row" type="button"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg><span class="grow" data-i="setDesktop">ডেস্কটপ ভিউ</span><svg class="i chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></li>
+              <li><button class="row" type="button"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg><span class="grow" data-i="setUsers">ব্যবহারকারী</span><svg class="i chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></li>
+              <li><button class="row danger" type="button"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h5M15 8l4 4-4 4M19 12H9"/></svg><span class="grow" data-i="setLogout">লগআউট</span></button></li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div class="sheet-wrap" id="notifWrap" hidden>
+      <button class="scrim" type="button" tabindex="-1" aria-hidden="true"></button>
+      <div class="sheet" id="notifSheet" role="dialog" aria-modal="true" aria-labelledby="notifTitle">
+        <div class="grab" aria-hidden="true"></div>
+        <div class="sheet-head">
+          <div>
+            <h2 id="notifTitle" data-i="notifTitle">বিজ্ঞপ্তি</h2>
+            <span class="sample" data-i="notifSample">নমুনা বিজ্ঞপ্তি</span>
+          </div>
+          <div class="head-actions">
+            <button class="btn-sm" id="markAll" type="button" data-i="markAll">সব পড়া হয়েছে</button>
+            <button class="icon-btn" id="closeNotif" type="button" data-i-label="close" aria-label="বন্ধ করুন">
+              <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="sheet-body">
+          <ul class="notif-list" id="notifList"></ul>
+        </div>
+      </div>
+    </div>
+
+    <nav class="tabbar" aria-label="Main">
+      <button type="button"><span class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span data-i="navHome">হোম</span></button>
+      <button type="button" id="navWater" aria-current="page"><span class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg></span><span data-i="navWater">পানির মান</span></button>
+      <button type="button"><span class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M6 10v7a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3v-7M8 10a4 4 0 0 1 8 0"/></svg></span><span data-i="navFeed">খাদ্য</span></button>
+      <button type="button"><span class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4zM3 7l9 4 9-4M12 11v10"/></svg></span><span data-i="navStock">স্টক</span></button>
+      <button type="button" id="moreBtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="moreSheet"><span class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></svg></span><span data-i="navMore">আরও</span></button>
+    </nav>
+  </section>
+
+  <aside class="notes">
+    <h2>Compact spacing and size rules</h2>
+    <p class="lede">ফোনে "আরও" চাপুন, তারপর "ব্যাচ"। এটা ১৬ field-এর ভারী screen, এই scale সামলায় কি না দেখার জন্য। পানির মান screen-এ ফিরতে নিচের "পানির মান" চাপুন। ভাষা বদলাতে EN চাপুন।</p>
+
+    <h3>Spacing scale (only these five)</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Token</th><th>px</th><th>Used for</th></tr></thead>
+        <tbody>
+          <tr><td><code>s-1</code></td><td>4</td><td class="wrap">Inside a component: label to input, icon to text</td></tr>
+          <tr><td><code>s-2</code></td><td>8</td><td class="wrap">Related items, minimum gap between tappable things, list gap</td></tr>
+          <tr><td><code>s-3</code></td><td>12</td><td class="wrap">Fields in a group, card padding</td></tr>
+          <tr><td><code>s-4</code></td><td>16</td><td class="wrap">Page gutter, sheet padding</td></tr>
+          <tr><td><code>s-6</code></td><td>24</td><td class="wrap">Between sections</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Radius and control sizes</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Element</th><th>Looks</th><th>Touch area</th></tr></thead>
+        <tbody>
+          <tr><td>Field, primary and cancel button</td><td>44px</td><td>44px</td></tr>
+          <tr><td>Section header (collapsible)</td><td>44px</td><td>44px</td></tr>
+          <tr><td>Sub-tab, chip, small inline button</td><td>32px</td><td>44px (invisible padding)</td></tr>
+          <tr><td>Tab bar item</td><td>56px</td><td>56px</td></tr>
+          <tr><td>Radius</td><td colspan="2">control 10, card 12, sheet 20</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Rules</h3>
+    <ul>
+      <li>ফোনে সর্বোচ্চ দুই কলাম। ছোট মান জোড়ায়, লম্বা লেখা পুরো প্রস্থে।</li>
+      <li>Section-এর মাঝে 24px, section-এর ভেতরে field-এর মাঝে 12px। এই দুটি মান পুরো app-এ একই।</li>
+      <li>Spacing লেখে layout component (<code>.stack</code>, <code>.section</code>, <code>.field-grid</code>), page নয়। Page শুধু এগুলো সাজায়।</li>
+      <li>কম ব্যবহৃত field "আরও তথ্য" section-এ ভাঁজ করা থাকে। বেশি field হলে ছোট না করে section বাড়ে।</li>
+      <li>Unit বদল: field-এর ডানের ছোট ঘরে চাপলে তালিকা খোলে (তাপমাত্রা °C/°F, লবণাক্ততা ppt/ppm, O₂ mg/L/ppm)। লেখা মান নিজে রূপান্তর হয়, সীমা ও নমুনা মানও বদলায়। ডেটা সবসময় °C, ppt, mg/L-এ জমা হয়, unit শুধু দেখা ও লেখার সুবিধা।</li>
+      <li>বিজ্ঞপ্তি: ওপরের বারে ঘণ্টা আইকন, প্রতিটি screen-এ আছে। চাপলে "আরও"-এর মতোই নিচ থেকে sheet ওঠে। নতুন বিজ্ঞপ্তির সংখ্যা ঘণ্টায় দেখায়, চাপলে পড়া হয়ে যায়। এখানকার চারটি বিজ্ঞপ্তি নমুনা, কোন ঘটনায় আসল বিজ্ঞপ্তি যাবে তা পরে ঠিক হবে।</li>
+      <li>ছোট chip আর বোতাম দেখতে 32px, কিন্তু অদৃশ্য padding-এ 44px স্পর্শ। পাশের gap কমপক্ষে 8px, তাই এলাকা মেলে না।</li>
+    </ul>
+
+    <h3>Type scale (phone)</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Element</th><th>English</th><th>Bangla</th></tr></thead>
+        <tbody>
+          <tr><td>Page title</td><td>20px</td><td>21px</td></tr>
+          <tr><td>Body / input text</td><td>15px</td><td>16px</td></tr>
+          <tr><td>Label / card metric</td><td>14px</td><td>15px</td></tr>
+          <tr><td>Caption / badge</td><td>12px</td><td>13px</td></tr>
+          <tr><td>Line-height</td><td>1.45</td><td>1.6</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Stress screen: দেখার বিষয়</h3>
+    <ul>
+      <li>প্রথম screen-এ কতটা দেখা যায়, আর scroll করা বিরক্তিকর লাগে কি না।</li>
+      <li>"আরও তথ্য" খুললে ও বাংলায় লম্বা লেবেল ভেঙে পড়ে কি না।</li>
+      <li>8-metric card ছোট ফোনে ঠাসাঠাসি দেখায় কি না।</li>
+      <li>ব্যাচ screen-এর সব মান এখানে নমুনা। সেভ করলে কিছু জমা হয় না।</li>
+    </ul>
+  </aside>
+</main>
+
+<script>
+(function () {
+  var D = {
+    bn: {
+      title: 'পানির মান', titleBatch: 'ব্যাচ', tabNew: 'নতুন এন্ট্রি', tabHist: 'ইতিহাস', recordedAt: 'পরীক্ষার সময়', tank: 'ট্যাঙ্ক / পুকুর',
+      temp: 'তাপমাত্রা', salinity: 'লবণাক্ততা', oxygen: 'অক্সিজেন (O₂)', save: 'সেভ করুন', saveBatch: 'ব্যাচ সেভ করুন',
+      cancel: 'বাতিল', cancelled: 'বাতিল করা হয়েছে, লেখা মুছে গেছে।',
+      uT: 'তাপমাত্রার একক', uS: 'লবণাক্ততার একক', uO: 'অক্সিজেনের একক',
+      notifTitle: 'বিজ্ঞপ্তি', notifSample: 'নমুনা বিজ্ঞপ্তি', markAll: 'সব পড়া হয়েছে',
+      bellLabel: function (n) { return n ? 'বিজ্ঞপ্তি, ' + n + 'টি নতুন' : 'বিজ্ঞপ্তি, নতুন কিছু নেই'; },
+      agoMin: function (n) { return n + ' মিনিট আগে'; }, agoHr: function (n) { return n + ' ঘণ্টা আগে'; },
+      n1t: 'O₂ কম: Tank A2', n1b: '3.2 mg/L পাওয়া গেছে।',
+      n2t: 'এন্ট্রি সার্ভার নেয়নি', n2b: 'Tank B1-এর গতকালের এন্ট্রি, O₂ সীমার বাইরে। ঠিক করে পাঠান।',
+      n3t: 'যাচাই দরকার', n3b: 'একটি এন্ট্রি 30 দিনের বেশি দেরিতে সিঙ্ক হয়েছে।',
+      n4t: 'সিঙ্ক সম্পূর্ণ', n4b: '2টি এন্ট্রি সার্ভারে পৌঁছেছে।',
+      online: 'অনলাইন', offline: 'অফলাইন',
+      offlineBanner: 'ইন্টারনেট নেই। সেভ করা এন্ট্রি ফোনে থাকবে, ইন্টারনেট এলে নিজে নিজে সিঙ্ক হবে।',
+      navHome: 'হোম', navWater: 'পানির মান', navFeed: 'খাদ্য', navStock: 'স্টক', navMore: 'আরও',
+      pond3: 'পুকুর 3',
+      moreTitle: 'আরও', ready: 'অফলাইনের জন্য তৈরি', close: 'বন্ধ করুন',
+      grpProd: 'উৎপাদন', grpAcc: 'হিসাব', grpApp: 'অ্যাপ',
+      mBatch: 'ব্যাচ', mHatch: 'হ্যাচিং', mLarvae: 'লার্ভা', mTanks: 'ট্যাঙ্ক',
+      mSales: 'বিক্রি', mExpense: 'খরচ', mBuyers: 'ক্রেতা', mReports: 'রিপোর্ট',
+      setDesktop: 'ডেস্কটপ ভিউ', setUsers: 'ব্যবহারকারী', setLogout: 'লগআউট',
+      sumTitle: 'চলমান ব্যাচ', sample: '(নমুনা তথ্য)', mAge: 'বয়স', mAlive: 'বেঁচে আছে', mFed: 'আজ খাওয়ানো', mCount: 'সংখ্যা',
+      uDays: 'দিন', uTimes: 'বার',
+      secId: 'পরিচয়', secWater: 'পানির মান', secFeed: 'খাদ্য', secMore: 'আরও তথ্য',
+      fBatchNo: 'ব্যাচ নং', fSpecies: 'প্রজাতি', speciesShrimp: 'চিংড়ি', fStart: 'শুরুর তারিখ',
+      fFeedType: 'খাবারের ধরন', feed1: 'ফিড 1', feed2: 'ফিড 2', feed3: 'ফিড 3', fAmount: 'পরিমাণ', fTimes: 'দিনে কতবার', fLastFed: 'শেষ খাওয়ানো',
+      fAmmonia: 'অ্যামোনিয়া', fNitrite: 'নাইট্রাইট', fAlk: 'ক্ষারত্ব', fNote: 'মন্তব্য', optional: '(ঐচ্ছিক)',
+      savedDemo: 'এটা নমুনা screen, কিছু সেভ হয়নি।',
+      required: 'মান লিখুন',
+      range: function (a, b) { return a + ' থেকে ' + b + ' এর মধ্যে লিখুন'; },
+      savedOnline: 'সেভ হয়েছে, সিঙ্ক হচ্ছে।', savedOffline: 'সেভ হয়েছে। ফোনে আছে, ইন্টারনেট এলে সিঙ্ক হবে।',
+      pending: 'সিঙ্ক বাকি', syncing: 'সিঙ্ক হচ্ছে', synced: 'সিঙ্ক হয়েছে', failed: 'ব্যর্থ',
+      failNote: 'সার্ভার নেয়নি: O₂ মান 0–20 mg/L এর বাইরে।', fix: 'ঠিক করে পাঠান',
+      mTemp: 'তাপমাত্রা', mSal: 'লবণাক্ততা', mO2: 'O₂', today: 'আজ', yesterday: 'গতকাল',
+      months: ['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'],
+      langBtn: 'EN'
+    },
+    en: {
+      title: 'Water Quality', titleBatch: 'Batch', tabNew: 'New entry', tabHist: 'History', recordedAt: 'Tested at', tank: 'Tank / pond',
+      temp: 'Temperature', salinity: 'Salinity', oxygen: 'Oxygen (O₂)', save: 'Save', saveBatch: 'Save batch',
+      cancel: 'Cancel', cancelled: 'Cancelled. What you typed was cleared.',
+      uT: 'Temperature unit', uS: 'Salinity unit', uO: 'Oxygen unit',
+      notifTitle: 'Notifications', notifSample: 'Sample notifications', markAll: 'Mark all read',
+      bellLabel: function (n) { return n ? 'Notifications, ' + n + ' new' : 'Notifications, none new'; },
+      agoMin: function (n) { return n + ' min ago'; }, agoHr: function (n) { return n + ' h ago'; },
+      n1t: 'Low O₂: Tank A2', n1b: 'Reading was 3.2 mg/L.',
+      n2t: 'Entry rejected by server', n2b: 'Yesterday’s Tank B1 entry has O₂ outside the range. Fix it and resend.',
+      n3t: 'Needs review', n3b: 'One entry synced more than 30 days late.',
+      n4t: 'Sync complete', n4b: '2 entries reached the server.',
+      online: 'Online', offline: 'Offline',
+      offlineBanner: 'No internet. Saved entries stay on this phone and sync automatically when you are back online.',
+      navHome: 'Home', navWater: 'Water', navFeed: 'Feed', navStock: 'Stock', navMore: 'More',
+      pond3: 'Pond 3',
+      moreTitle: 'More', ready: 'Ready for offline use', close: 'Close',
+      grpProd: 'Production', grpAcc: 'Accounts', grpApp: 'App',
+      mBatch: 'Batches', mHatch: 'Hatching', mLarvae: 'Larvae', mTanks: 'Tanks',
+      mSales: 'Sales', mExpense: 'Expenses', mBuyers: 'Buyers', mReports: 'Reports',
+      setDesktop: 'Desktop view', setUsers: 'Users', setLogout: 'Log out',
+      sumTitle: 'Current batch', sample: '(sample data)', mAge: 'Age', mAlive: 'Alive', mFed: 'Fed today', mCount: 'Count',
+      uDays: 'days', uTimes: 'times',
+      secId: 'Identity', secWater: 'Water quality', secFeed: 'Feed', secMore: 'More details',
+      fBatchNo: 'Batch no.', fSpecies: 'Species', speciesShrimp: 'Shrimp', fStart: 'Start date',
+      fFeedType: 'Feed type', feed1: 'Feed 1', feed2: 'Feed 2', feed3: 'Feed 3', fAmount: 'Amount', fTimes: 'Times per day', fLastFed: 'Last fed',
+      fAmmonia: 'Ammonia', fNitrite: 'Nitrite', fAlk: 'Alkalinity', fNote: 'Note', optional: '(optional)',
+      savedDemo: 'This is a sample screen, nothing was saved.',
+      required: 'Enter a value',
+      range: function (a, b) { return 'Enter a value between ' + a + ' and ' + b; },
+      savedOnline: 'Saved. Syncing now.', savedOffline: 'Saved on this phone. It will sync when you are online.',
+      pending: 'Pending', syncing: 'Syncing', synced: 'Synced', failed: 'Failed',
+      failNote: 'Server rejected it: O₂ outside 0–20 mg/L.', fix: 'Fix and resend',
+      mTemp: 'Temp', mSal: 'Salinity', mO2: 'O₂', today: 'Today', yesterday: 'Yesterday',
+      months: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+      langBtn: 'বাংলা'
+    }
+  };
+  var RANGES = { ph: [0, 14], t: [0, 50], sal: [0, 60], o2: [0, 20] };  /* always in base units: °C, ppt, mg/L */
+  function idf(v) { return v; }
+  var UN = {
+    t:   { '°C': { from: idf, to: idf, ph: '29.5' }, '°F': { from: function (c) { return c * 9 / 5 + 32; }, to: function (f) { return (f - 32) * 5 / 9; }, ph: '85.1' } },
+    sal: { 'ppt': { from: idf, to: idf, ph: '22' }, 'ppm': { from: function (v) { return v * 1000; }, to: function (v) { return v / 1000; }, ph: '22000' } },
+    o2:  { 'mg/L': { from: idf, to: idf, ph: '5.4' }, 'ppm': { from: idf, to: idf, ph: '5.4' } }
+  };
+  var cur = { t: '°C', sal: 'ppt', o2: 'mg/L' };  /* display and input units; stored values are always base units */
+  function rnd(v) { return Math.round(v * 100) / 100; }
+  function toBase(k, v) { return UN[k] ? UN[k][cur[k]].to(v) : v; }
+  function shown(k, baseVal) { return UN[k] ? rnd(UN[k][cur[k]].from(baseVal)) : baseVal; }
+  var ICON = {
+    clock: '<svg class="i s" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    check: '<svg class="i s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>',
+    x: '<svg class="i s" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>',
+    sync: '<svg class="i s" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 0 0-14-5M4 12a8 8 0 0 0 14 5M6 3v4h4M18 21v-4h-4"/></svg>',
+    alert: '<svg class="i s" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg>'
+  };
+  var STATUS_ICON = { pending: 'clock', syncing: 'sync', synced: 'check', failed: 'x' };
+
+  var lang = 'bn', online = true, nextId = 10, statusTimer = null, screen = 'water', waterTab = 'new';
+  var app = document.getElementById('app');
+
+  function at(daysAgo, h, m) { var d = new Date(); d.setDate(d.getDate() - daysAgo); d.setHours(h, m, 0, 0); return d; }
+  var readings = [
+    { id: 1, at: at(0, 6, 30), tank: 'A1', ph: 8.1, t: 29.5, sal: 22, o2: 5.4, status: 'synced' },
+    { id: 2, at: at(0, 5, 45), tank: 'A2', ph: 7.9, t: 28.8, sal: 21, o2: 5.1, status: 'pending' },
+    { id: 3, at: at(1, 17, 10), tank: 'B1', ph: 8.3, t: 30.1, sal: 24, o2: 24, status: 'failed' },
+    { id: 4, at: at(1, 6, 15), tank: 'A1', ph: 8.0, t: 29.2, sal: 22, o2: 5.6, status: 'synced' }
+  ];
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function localInput(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+  function fmtWhen(d) {
+    var L = D[lang], now = new Date(), t = pad(d.getHours()) + ':' + pad(d.getMinutes());
+    var diff = Math.round((new Date(now.getFullYear(), now.getMonth(), now.getDate()) - new Date(d.getFullYear(), d.getMonth(), d.getDate())) / 86400000);
+    if (diff === 0) return L.today + ' ' + t;
+    if (diff === 1) return L.yesterday + ' ' + t;
+    return d.getDate() + ' ' + L.months[d.getMonth()] + ' ' + t;
+  }
+  function tankName(code) { return code === 'P3' ? D[lang].pond3 : 'Tank ' + code; }
+
+  function applyLang() {
+    var L = D[lang];
+    app.dataset.lang = lang;
+    document.documentElement.lang = lang;
+    app.querySelectorAll('[data-i]').forEach(function (el) { el.textContent = L[el.getAttribute('data-i')]; });
+    app.querySelectorAll('[data-i-opt]').forEach(function (el) { el.textContent = L.pond3; });
+    app.querySelectorAll('[data-i-label]').forEach(function (el) { el.setAttribute('aria-label', L[el.getAttribute('data-i-label')]); });
+    document.getElementById('langBtn').textContent = L.langBtn;
+    document.getElementById('netLabel').textContent = online ? L.online : L.offline;
+    document.getElementById('pageTitle').textContent = screen === 'batch' ? L.titleBatch : L.title;
+    document.getElementById('saveBtn').textContent = screen === 'batch' ? L.saveBatch : L.save;
+    renderCards();
+    renderNotifs();
+    ['ph', 't', 'sal', 'o2'].forEach(function (k) { var i = field(k); if (i.closest('.control').dataset.invalid === 'true') validate(k); });
+  }
+
+  /* notifications (sample data) */
+  var notifs = [
+    { id: 1, kind: 'warn', n: 1, ago: ['min', 12], unread: true },
+    { id: 2, kind: 'bad', n: 2, ago: ['min', 95], unread: true },
+    { id: 3, kind: 'review', n: 3, ago: ['hr', 5], unread: true },
+    { id: 4, kind: 'ok', n: 4, ago: ['day', 1], unread: false }
+  ];
+  var NICON = {
+    warn: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 16H3zM12 10v4M12 17.5v.01"/></svg>',
+    bad: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>',
+    review: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6v3H9zM7 5.5H5v15h14v-15h-2M9 14l2 2 4-4"/></svg>',
+    ok: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>'
+  };
+  function renderNotifs() {
+    var L = D[lang], html = '', unread = 0;
+    notifs.forEach(function (x) {
+      if (x.unread) unread++;
+      var t = x.ago[0] === 'min' ? L.agoMin(x.ago[1]) : x.ago[0] === 'hr' ? L.agoHr(x.ago[1]) : L.yesterday;
+      html += '<li><button class="notif" type="button" data-n="' + x.id + '" data-unread="' + x.unread + '">' +
+        '<span class="n-ico ' + x.kind + '">' + NICON[x.kind] + '</span>' +
+        '<span><p class="n-title">' + L['n' + x.n + 't'] + '</p><p class="n-body">' + L['n' + x.n + 'b'] + '</p></span>' +
+        '<span class="n-side"><span class="n-time">' + t + '</span><span class="n-dot"' + (x.unread ? '' : ' hidden') + '></span></span></button></li>';
+    });
+    document.getElementById('notifList').innerHTML = html;
+    var c = document.getElementById('bellCount');
+    c.textContent = unread; c.hidden = unread === 0;
+    document.getElementById('bellBtn').setAttribute('aria-label', L.bellLabel(unread));
+    document.getElementById('markAll').hidden = unread === 0;
+  }
+  document.getElementById('notifList').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-n]'); if (!b) return;
+    var id = Number(b.getAttribute('data-n'));
+    notifs.forEach(function (x) { if (x.id === id) x.unread = false; });
+    renderNotifs();
+  });
+  document.getElementById('markAll').addEventListener('click', function () {
+    notifs.forEach(function (x) { x.unread = false; });
+    renderNotifs();
+    document.getElementById('closeNotif').focus();
+  });
+
+  function badge(status) {
+    return '<span class="badge ' + status + '">' + ICON[STATUS_ICON[status]] + D[lang][status] + '</span>';
+  }
+  function renderCards() {
+    var L = D[lang], html = '';
+    readings.slice().sort(function (a, b) { return b.at - a.at; }).forEach(function (r) {
+      html += '<li class="card"><div class="card-top"><span class="when">' + fmtWhen(r.at) + ' <span class="tank">· ' + tankName(r.tank) + '</span></span>' + badge(r.status) + '</div>' +
+        '<dl class="metrics"><div><dt>pH</dt><dd>' + r.ph + '</dd></div>' +
+        '<div><dt>' + L.mTemp + '</dt><dd>' + shown('t', r.t) + ' <small>' + cur.t + '</small></dd></div>' +
+        '<div><dt>' + L.mSal + '</dt><dd>' + shown('sal', r.sal) + ' <small>' + cur.sal + '</small></dd></div>' +
+        '<div><dt>' + L.mO2 + '</dt><dd>' + shown('o2', r.o2) + ' <small>' + cur.o2 + '</small></dd></div></dl>' +
+        (r.status === 'failed' ? '<div class="card-foot"><p class="card-note">' + L.failNote + '</p><button class="btn-sm" type="button" data-fix="' + r.id + '">' + L.fix + '</button></div>' : '') + '</li>';
+    });
+    document.getElementById('cards').innerHTML = html;
+    var pend = readings.filter(function (r) { return r.status !== 'synced' && r.status !== 'failed'; }).length;
+    var pc = document.getElementById('pendCount');
+    pc.textContent = pend; pc.hidden = pend === 0;
+  }
+  document.getElementById('cards').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-fix]'); if (!b) return;
+    var id = Number(b.getAttribute('data-fix'));
+    readings.forEach(function (r) { if (r.id === id) { r.o2 = 5.5; r.status = 'pending'; } });
+    renderCards(); flush();
+  });
+
+  function field(k) { return document.getElementById('f-' + k); }
+  function validate(k) {
+    var input = field(k), ctl = input.closest('.control'), err = document.getElementById('e-' + k), L = D[lang];
+    var raw = input.value.trim().replace(',', '.'), msg = '';
+    if (raw === '') msg = L.required;
+    else {
+      var n = Number(raw), b = toBase(k, n);
+      if (!isFinite(n) || b < RANGES[k][0] - 1e-9 || b > RANGES[k][1] + 1e-9) msg = L.range(shown(k, RANGES[k][0]), shown(k, RANGES[k][1]));
+    }
+    ctl.dataset.invalid = msg ? 'true' : 'false';
+    input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    err.dataset.show = msg ? 'true' : 'false';
+    err.innerHTML = msg ? ICON.alert + '<span>' + msg + '</span>' : '';
+    return !msg;
+  }
+  ['ph', 't', 'sal', 'o2'].forEach(function (k) {
+    var i = field(k);
+    i.addEventListener('blur', function () { if (i.value !== '' || i.closest('.control').dataset.invalid === 'true') validate(k); });
+    i.addEventListener('input', function () { if (i.closest('.control').dataset.invalid === 'true') validate(k); });
+  });
+
+  /* unit picker: converts what is already typed, swaps the example value, re-checks the range */
+  ['t', 'sal', 'o2'].forEach(function (k) {
+    var sel = document.getElementById('u-' + k);
+    sel.addEventListener('change', function () {
+      var inp = field(k), raw = inp.value.trim().replace(',', '.'), oldU = cur[k], newU = sel.value;
+      if (raw !== '' && isFinite(Number(raw))) inp.value = String(rnd(UN[k][newU].from(UN[k][oldU].to(Number(raw)))));
+      cur[k] = newU;
+      inp.placeholder = UN[k][newU].ph;
+      renderCards();
+      if (inp.closest('.control').dataset.invalid === 'true') validate(k);
+    });
+  });
+
+  function say(msg) {
+    var el = document.getElementById('statusLine'); el.textContent = msg;
+    clearTimeout(statusTimer); statusTimer = setTimeout(function () { el.textContent = ''; }, 5000);
+  }
+  function flush() {
+    if (!online) return;
+    readings.filter(function (r) { return r.status === 'pending'; }).forEach(function (r, idx) {
+      setTimeout(function () { if (online && r.status === 'pending') { r.status = 'syncing'; renderCards(); } }, 500 + idx * 900);
+      setTimeout(function () { if (r.status === 'syncing') { r.status = 'synced'; renderCards(); } }, 1500 + idx * 900);
+    });
+  }
+
+  document.getElementById('form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var ok = true;
+    ['ph', 't', 'sal', 'o2'].forEach(function (k) { if (!validate(k)) ok = false; });
+    if (!ok) { var bad = app.querySelector('.control[data-invalid="true"] input'); if (bad) bad.focus(); return; }
+    var num = function (k) { return rnd(toBase(k, Number(field(k).value.trim().replace(',', '.')))); };
+    var when = new Date(field('at').value); if (isNaN(when)) when = new Date();
+    readings.push({ id: nextId++, at: when, tank: document.getElementById('f-tank').value, ph: num('ph'), t: num('t'), sal: num('sal'), o2: num('o2'), status: 'pending' });
+    ['ph', 't', 'sal', 'o2'].forEach(function (k) { field(k).value = ''; field(k).closest('.control').dataset.invalid = 'false'; });
+    field('at').value = localInput(new Date());
+    renderCards();
+    say(online ? D[lang].savedOnline : D[lang].savedOffline);
+    flush();
+  });
+  document.getElementById('batchForm').addEventListener('submit', function (e) { e.preventDefault(); say(D[lang].savedDemo); });
+
+  /* cancel: discard what was typed on the current screen and clear errors */
+  document.getElementById('cancelBtn').addEventListener('click', function () {
+    if (screen === 'batch') {
+      document.getElementById('batchForm').reset();
+    } else {
+      document.getElementById('form').reset();
+      ['ph', 't', 'sal', 'o2'].forEach(function (k) {
+        var c = field(k).closest('.control'); c.dataset.invalid = 'false'; field(k).setAttribute('aria-invalid', 'false');
+        var er = document.getElementById('e-' + k); er.dataset.show = 'false'; er.innerHTML = '';
+      });
+      field('at').value = localInput(new Date());
+      ['t', 'sal', 'o2'].forEach(function (k) { document.getElementById('u-' + k).value = cur[k]; });
+    }
+    say(D[lang].cancelled);
+  });
+
+  /* screens: water (two sub-tabs) and batch (heavy form) */
+  function showWaterTab(which) {
+    waterTab = which;
+    var isNew = which === 'new';
+    document.getElementById('tabNew').setAttribute('aria-selected', isNew);
+    document.getElementById('tabHist').setAttribute('aria-selected', !isNew);
+    document.getElementById('paneNew').hidden = !isNew || screen !== 'water';
+    document.getElementById('paneHist').hidden = isNew || screen !== 'water';
+    document.getElementById('saveBar').hidden = !isNew && screen === 'water';
+  }
+  function setScreen(s) {
+    screen = s;
+    var batch = s === 'batch';
+    document.getElementById('subtabs').hidden = batch;
+    document.getElementById('paneBatch').hidden = !batch;
+    document.getElementById('saveBtn').setAttribute('form', batch ? 'batchForm' : 'form');
+    var water = document.getElementById('navWater');
+    if (batch) water.removeAttribute('aria-current'); else water.setAttribute('aria-current', 'page');
+    document.getElementById('moreBtn').dataset.on = batch ? 'true' : 'false';
+    if (batch) { document.getElementById('paneNew').hidden = true; document.getElementById('paneHist').hidden = true; document.getElementById('saveBar').hidden = false; }
+    else showWaterTab(waterTab);
+    document.getElementById('statusLine').textContent = '';
+    applyLang();
+  }
+  document.getElementById('tabNew').addEventListener('click', function () { showWaterTab('new'); });
+  document.getElementById('tabHist').addEventListener('click', function () { showWaterTab('hist'); });
+  document.getElementById('navWater').addEventListener('click', function () { if (sheetOpen()) closeSheet(false); if (screen !== 'water') setScreen('water'); });
+
+  /* collapsible sections */
+  app.querySelectorAll('.sec-head').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var open = b.getAttribute('aria-expanded') === 'true';
+      b.setAttribute('aria-expanded', open ? 'false' : 'true');
+      document.getElementById(b.getAttribute('aria-controls')).hidden = open;
+    });
+  });
+
+  document.getElementById('netBtn').addEventListener('click', function () {
+    online = !online;
+    this.setAttribute('aria-pressed', online ? 'false' : 'true');
+    document.getElementById('offBanner').hidden = online;
+    document.getElementById('netLabel').textContent = online ? D[lang].online : D[lang].offline;
+    flush();
+  });
+  document.getElementById('langBtn').addEventListener('click', function () { lang = lang === 'bn' ? 'en' : 'bn'; applyLang(); });
+
+  /* more sheet: dialog semantics, focus moves in on open, Tab stays inside, Esc/scrim/close return focus to the More button */
+  var sheets = [];
+  function makeSheet(cfg) {
+    var wrap = document.getElementById(cfg.wrap), el = document.getElementById(cfg.sheet), trigger = document.getElementById(cfg.trigger), closeBtn = document.getElementById(cfg.close), timer = null;
+    var s = {
+      el: el,
+      isOpen: function () { return !wrap.hidden && wrap.classList.contains('open'); },
+      open: function () {
+        sheets.forEach(function (o) { if (o !== s && o.isOpen()) o.close(false); });
+        clearTimeout(timer);
+        wrap.hidden = false;
+        trigger.setAttribute('aria-expanded', 'true');
+        requestAnimationFrame(function () { requestAnimationFrame(function () { wrap.classList.add('open'); }); });
+        closeBtn.focus();
+      },
+      close: function (restoreFocus) {
+        wrap.classList.remove('open');
+        trigger.setAttribute('aria-expanded', 'false');
+        timer = setTimeout(function () { wrap.hidden = true; }, 230);
+        if (restoreFocus !== false) trigger.focus();
+      }
+    };
+    trigger.addEventListener('click', function () { if (s.isOpen()) s.close(); else s.open(); });
+    closeBtn.addEventListener('click', function () { s.close(); });
+    wrap.querySelector('.scrim').addEventListener('click', function () { s.close(); });
+    sheets.push(s);
+    return s;
+  }
+  var moreSheet = makeSheet({ wrap: 'sheetWrap', sheet: 'moreSheet', trigger: 'moreBtn', close: 'closeSheet' });
+  var notifSheet = makeSheet({ wrap: 'notifWrap', sheet: 'notifSheet', trigger: 'bellBtn', close: 'closeNotif' });
+  function sheetOpen() { return sheets.some(function (s) { return s.isOpen(); }); }
+  function closeSheet(restoreFocus) { sheets.forEach(function (s) { if (s.isOpen()) s.close(restoreFocus); }); }
+
+  moreSheet.el.querySelectorAll('.tile, .row').forEach(function (b) { b.addEventListener('click', function () { moreSheet.close(b.id !== 'tileBatch'); }); });
+  document.getElementById('tileBatch').addEventListener('click', function () { setScreen('batch'); });
+  app.addEventListener('keydown', function (e) {
+    var open = sheets.filter(function (s) { return s.isOpen(); })[0];
+    if (!open) return;
+    if (e.key === 'Escape') { e.preventDefault(); open.close(); return; }
+    if (e.key !== 'Tab') return;
+    var f = open.el.querySelectorAll('button:not([disabled]):not([hidden])');
+    if (!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    else if (!open.el.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+  });
+  ['tabNew', 'tabHist'].forEach(function (id) { document.getElementById(id).addEventListener('click', function () { if (sheetOpen()) closeSheet(false); }); });
+
+  field('at').value = localInput(new Date());
+  applyLang();
+})();
+</script>
