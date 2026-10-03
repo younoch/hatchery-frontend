@@ -34,4 +34,5 @@
 - 2026-10-03: Zod version must be compatible with @vee-validate/zod (peer zod ^3.24.0); latest Zod is 4.x. Resolve at Step 1.
 
 ## Parking lot
--
+- Move components.json and src/lib/utils.ts to shared/ in Step 5
+- Switch to single "typescript-eslint" package
