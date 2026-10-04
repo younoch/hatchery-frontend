@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import TokenDemo from './TokenDemo.vue'
 </script>
 
 <template>
-  <HelloWorld />
+  <TokenDemo />
 </template>

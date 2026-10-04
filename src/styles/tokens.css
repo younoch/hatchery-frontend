@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+:root {
+  /* Runtime CSS variables (override in media queries) */
+  --fs-body: 0.875rem; /* 14px - fine pointer base */
+  --fs-body-sm: 0.8125rem; /* 13px */
+  --fs-label: 0.8125rem; /* 13px */
+  --fs-cap: 0.75rem; /* 12px */
+  --fs-h2: 1rem; /* 16px */
+  --fs-h1: 1.25rem; /* 20px */
+  --lh-body: 1.45;
+  --control-h: 2.25rem; /* 36px - fine pointer */
+  --small-h: 2rem; /* 32px */
+}
+
+/* Coarse pointer (touch) overrides - exactly like prototype lines 45-54 */
+@media (pointer: coarse) {
+  :root {
+    --fs-body: 0.9375rem; /* 15px */
+    --fs-body-sm: 0.875rem; /* 14px */
+    --fs-label: 0.875rem; /* 14px */
+    --fs-cap: 0.75rem; /* 12px */
+    --fs-h2: 1.125rem; /* 18px */
+    --fs-h1: 1.25rem; /* 20px */
+    --lh-body: 1.45;
+    --control-h: 2.75rem; /* 44px */
+  }
+}
+
+/* Bangla language overrides - only line-height change */
+html[lang='bn'] {
+  --lh-body: 1.6; /* Taller for Bangla matra */
+}
+
+@theme {
+  --*: initial;
+
+  /* Font family */
+  --font-sans: 'Inter', 'Noto Sans Bengali', system-ui, -apple-system, sans-serif;
+
+  /* Breakpoint for mobile/desktop split (48rem = 768px) */
+  --breakpoint-desktop: 48rem;
+
+  /* Custom spacing scale (five steps only, in rem) */
+  --spacing-1: 0.25rem; /* 4px */
+  --spacing-2: 0.5rem; /* 8px */
+  --spacing-3: 0.75rem; /* 12px */
+  --spacing-4: 1rem; /* 16px */
+  --spacing-6: 1.5rem; /* 24px */
+
+  /* Custom radius scale (in rem) */
+  --radius-control: 0.625rem; /* 10px */
+  --radius-card: 0.75rem; /* 12px */
+  --radius-sheet: 1.25rem; /* 20px */
+
+  /* shadcn semantic colors mapped to our tokens only */
+  --color-background: #F3F6F7;
+  --color-foreground: #171717;
+  --color-card: #FFFFFF;
+  --color-card-foreground: #171717;
+  --color-popover: #FFFFFF;
+  --color-popover-foreground: #171717;
+  --color-primary: #0E7490;
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: #EAF0F2;
+  --color-secondary-foreground: #171717;
+  --color-muted: #EAF0F2; /* light surface */
+  --color-muted-foreground: #525252;
+  --color-accent: #076C87; /* darkened for AA contrast */
+  --color-accent-foreground: #FFFFFF;
+  --color-destructive: #DC2626;
+  --color-destructive-foreground: #FFFFFF;
+  --color-border: #D9E1E4;
+  --color-input: #D9E1E4;
+  --color-ring: #0891B2;
+
+  /* Custom color palette - light mode only for MVP (no duplicates with shadcn semantic) */
+  --color-primary-50: #ECFEFF;
+  --color-primary-500: #0891B2;
+  --color-primary-600: #0E7490;
+  --color-primary-900: #164E63;
+
+  --color-success: #16A34A;
+  --color-success-soft: #E3F5E9;
+
+  --color-warning: #D97706;
+  --color-warning-soft: #FDF0DC;
+
+  --color-danger: #DC2626;
+  --color-danger-soft: #FCE8E8;
+
+  --color-neutral-50: #FAFAFA;
+  --color-neutral-200: #E5E5E5;
+  --color-neutral-900: #171717;
+
+  --color-surface-2: #EAF0F2;
+  --color-line: #D9E1E4;
+  --color-focus: #0891B2;
+
+  /* Reading-range colors (from prototype lines 19, 21, 23) */
+  --color-read-ok: #15803D;
+  --color-read-warn: #B45309;
+  --color-read-bad: #C81E1E;
+
+  /* Sync-status colors (own tokens, values equal to prototype's ok/warn/bad from lines 267-269) */
+  --color-sync-pending: #B45309; /* warn */
+  --color-sync-syncing: #B45309; /* warn */
+  --color-sync-failed: #C81E1E; /* bad */
+  --color-sync-synced: #15803D; /* ok */
+}
+
+@theme inline {
+  /* Expose runtime variables to Tailwind */
+  --text-body: var(--fs-body);
+  --text-body-sm: var(--fs-body-sm);
+  --text-label: var(--fs-label);
+  --text-caption: var(--fs-cap);
+  --text-h2: var(--fs-h2);
+  --text-h1: var(--fs-h1);
+  --leading-body: var(--lh-body);
+  --height-control: var(--control-h);
+  --height-small: var(--small-h);
+}
+
+:root {
+  /* Map theme tokens to CSS variables for easy reference */
+  --s-1: var(--spacing-1);
+  --s-2: var(--spacing-2);
+  --s-3: var(--spacing-3);
+  --s-4: var(--spacing-4);
+  --s-6: var(--spacing-6);
+
+  --r-ctl: var(--radius-control);
+  --r-card: var(--radius-card);
+  --r-sheet: var(--radius-sheet);
+
+  --bg: var(--color-background);
+  --surface: var(--color-card);
+  --surface-2: var(--color-surface-2);
+  --fg: var(--color-foreground);
+  --line: var(--color-border);
+  --focus: var(--color-ring);
+}
+

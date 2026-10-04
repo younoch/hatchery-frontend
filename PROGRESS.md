@@ -4,8 +4,8 @@
 |---|---|---|---|
 | 0 | Orientation | done | 2026-10-03 |
 | 1 | Project setup | done | 2026-10-03 |
-| 2 | Tailwind and shadcn-vue init | in review | - |
-| 3 | Design tokens (Layer 1) | not started | - |
+| 2 | Tailwind and shadcn-vue init | done | 2026-10-03 |
+| 3 | Design tokens (Layer 1) | in review | - |
 | 4 | i18n | not started | - |
 | 5 | Folder structure and routing | not started | - |
 | 6 | Button | not started | - |

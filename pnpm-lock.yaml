@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@fontsource/inter':
+        specifier: 5.1.0
+        version: 5.1.0
+      '@fontsource/noto-sans-bengali':
+        specifier: 5.1.0
+        version: 5.1.0
       '@lucide/vue':
         specifier: ^1.50.0
         version: 1.50.0(vue@3.5.43(typescript@6.0.3))
@@ -150,6 +156,12 @@ packages:
 
   '@floating-ui/vue@1.1.11':
     resolution: {integrity: sha512-HzHKCNVxnGS35r9fCHBc3+uCnjw9IWIlCPL683cGgM9Kgj2BiAl8x1mS7vtvP6F9S/e/q4O6MApwSHj8hNLGfw==}
+
+  '@fontsource/inter@5.1.0':
+    resolution: {integrity: sha512-zKZR3kf1G0noIes1frLfOHP5EXVVm0M7sV/l9f/AaYf+M/DId35FO4LkigWjqWYjTJZGgplhdv4cB+ssvCqr5A==}
+
+  '@fontsource/noto-sans-bengali@5.1.0':
+    resolution: {integrity: sha512-qwf6jCgOTqrT//YcuhDqbHTlmACj/sSd8a/j1wdM3/SnNYRQRU/eG/ILuZXDKqAiI89UV/RHi3mRvI0SK24Miw==}
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -1424,6 +1436,10 @@ snapshots:
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
+
+  '@fontsource/inter@5.1.0': {}
+
+  '@fontsource/noto-sans-bengali@5.1.0': {}
 
   '@humanfs/core@0.19.2':
     dependencies:

@@ -21,7 +21,7 @@ You are building the frontend of a hatchery management app, one small step at a 
 - Fields: at most two columns on a phone. Long inputs span the full width. Rarely used fields live in a collapsible "more details" section.
 - Unit picker on temperature (°C/°F), salinity (ppt/ppm), oxygen (mg/L/ppm). Typed values convert when the unit changes. Stored data is always °C, ppt, mg/L.
 - Notification bell with an unread count in the app bar on every screen; the list opens in the same bottom-sheet pattern as the More sheet.
-- Bangla text gets about +1px per type level and a taller line-height (1.6).
+- Bangla and English use the SAME font sizes (owner decision, changed after the prototype; the prototype's Bangla +1px override is outdated). Only line-height differs: Bangla 1.6.
 - Sync-status badges use color, icon and text together.
 - The validation ranges shown in the prototype are samples. Do not hardcode them as real limits; confirm with the owner.
 - **Proposed, confirm with the owner at Step 3:** reading-range colors (ok/warn/bad) are separate tokens from the sync-status colors; MVP is light mode only.
