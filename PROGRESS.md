@@ -5,7 +5,7 @@
 | 0 | Orientation | done | 2026-10-03 |
 | 1 | Project setup | done | 2026-10-03 |
 | 2 | Tailwind and shadcn-vue init | done | 2026-10-03 |
-| 3 | Design tokens (Layer 1) | in review | - |
+| 3 | Design tokens (Layer 1) | done | 2026-10-04 |
 | 4 | i18n | not started | - |
 | 5 | Folder structure and routing | not started | - |
 | 6 | Button | not started | - |
@@ -36,3 +36,5 @@
 ## Parking lot
 - Move components.json and src/lib/utils.ts to shared/ in Step 5
 - Switch to single "typescript-eslint" package
+- Clean up woff files in dist (keep only woff2)
+- Removed legacy alias vars --bg/--fg/--line/--focus from :root (now use shadcn semantic names directly)

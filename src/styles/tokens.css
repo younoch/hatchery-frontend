@@ -133,12 +133,5 @@ html[lang='bn'] {
   --r-ctl: var(--radius-control);
   --r-card: var(--radius-card);
   --r-sheet: var(--radius-sheet);
-
-  --bg: var(--color-background);
-  --surface: var(--color-card);
-  --surface-2: var(--color-surface-2);
-  --fg: var(--color-foreground);
-  --line: var(--color-border);
-  --focus: var(--color-ring);
 }
 
