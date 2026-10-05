@@ -46,6 +46,7 @@ For every step in section 7:
 2. **Do only that step.** Smallest working increment. Do not start work that belongs to a later step. No refactors outside the step; note them in the "Parking lot" of `PROGRESS.md` instead.
 3. **Verify:** run `pnpm lint`, `pnpm typecheck` and `pnpm build`, plus tests if the project has them. Report the real results, including failures.
 4. **Checkpoint:** stop and post the report in section 4. Then **wait**. Do not continue on your own.
+5. **Shared components:** if the step creates or changes a shared component, update COMPONENTS.md in the same step.
 5. **Owner review.**
    - If the owner gives suggestions: implement **only those**, verify again, post a short checkpoint update, and wait again. Repeat until there are none.
    - If the owner says there is nothing to change ("ok", "next", "no suggestions" or similar): mark the step done in `PROGRESS.md` and start the next step.
@@ -60,6 +61,7 @@ Step N: <name>: ready for review
 - How to check it by hand: <exact commands or clicks>
 - Verification: lint / typecheck / build / tests: <real results>
 - Compared with the prototype: <what matches, what differs and why>   (UI steps only)
+- Reused / extracted: <shared components reused, new ones created, any UI duplicated and why>
 - Choices I made: <anything not dictated by the plan>
 - Problems or doubts: <or "none">
 - Proposed commit: <type(scope): message>
@@ -80,6 +82,7 @@ Step N: <name>: ready for review
 - Numbers and units display in English numerals and English unit symbols, even in Bangla text.
 - Readings are stored and shown in °C, ppt, mg/L only. Do not build unit conversion.
 - Android phones are the only mobile target. Light mode only for the MVP.
+- Reuse rule: before building any UI, check COMPONENTS.md and shared/components/. If the same pattern (same markup and behavior, differing only in text, data or variant) is needed a second time, do not copy it: extract it into shared/components/ (shadcn primitives stay in shared/components/ui/). Text, data and variants come in through props, slots and cva variants, never hardcoded inside. The first use may stay inline, except for these patterns which are shared from the start: Metric (label, value, unit), StatusBadge, Card, SummaryCard.
 
 **Offline:** follow section 6 of the plan exactly (client UUID, `recordedAt` vs `syncedAt`, never delete data for being old, logout never touches IndexedDB, Dexie versioning from version 1).
 
