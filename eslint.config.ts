@@ -4,6 +4,7 @@ import typescriptParser from '@typescript-eslint/parser'
 import vueParser from 'vue-eslint-parser'
 import prettier from 'eslint-plugin-prettier/recommended'
 import configPrettier from 'eslint-config-prettier'
+import * as vueI18nPlugin from '@intlify/eslint-plugin-vue-i18n'
 
 export default [
   {
@@ -19,16 +20,31 @@ export default [
     plugins: {
       '@typescript-eslint': typescriptEslint,
       vue: pluginVue,
+      '@intlify/vue-i18n': vueI18nPlugin,
     },
     rules: {
       'vue/multi-word-component-names': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@intlify/vue-i18n/no-raw-text': [
+        'error',
+        {
+          ignorePattern: '^(?:°C|ppt|mg/L|pH|-?[0-9]+(?:\\.[0-9]+)?)$',
+          ignoreNodes: ['v-icon', 'Transition', 'Teleport', 'Suspense'],
+        },
+      ],
+      '@intlify/vue-i18n/no-missing-keys': 'error',
+    },
+    settings: {
+      'vue-i18n': {
+        localeDir: './src/shared/locales/*.json',
+        messageSyntaxVersion: '9',
+      },
     },
   },
   prettier,
   configPrettier,
   {
-    ignores: ['dist/**', 'node_modules/**'],
+    ignores: ['dist/**', 'node_modules/**', 'src/components/HelloWorld.vue'],
   },
 ]

@@ -6,10 +6,10 @@
 | 1 | Project setup | done | 2026-10-03 |
 | 2 | Tailwind and shadcn-vue init | done | 2026-10-03 |
 | 3 | Design tokens (Layer 1) | done | 2026-10-04 |
-| 4 | i18n | not started | - |
+| 4 | i18n | done | 2026-10-06 |
 | 5 | Folder structure and routing | not started | - |
 | 6 | Button | not started | - |
-| 7 | Field, Input and unit picker | not started | - |
+| 7 | Field and Input | not started | - |
 | 8 | Sheet and Tabs | not started | - |
 | 9 | Layout components | not started | - |
 | 10 | Styleguide page | not started | - |
@@ -17,7 +17,7 @@
 | 12 | Desktop shell | not started | - |
 | 13 | Swipe navigation | not started | - |
 | 14 | PWA basics | not started | - |
-| 15 | Schema and units | not started | - |
+| 15 | Schema | not started | - |
 | 16 | Dexie storage layer | not started | - |
 | 17 | Entry screen | not started | - |
 | 18 | History and sync badge | not started | - |
@@ -32,9 +32,16 @@
 
 ## Decisions log
 - 2026-10-03: Zod version must be compatible with @vee-validate/zod (peer zod ^3.24.0); latest Zod is 4.x. Resolve at Step 1.
-
+- 2026-10-03: Zod pinned to 3.25.76 for @vee-validate/zod compatibility (resolved in Step 1).
+- 2026-10-04: Bangla and English use the same font sizes; only Bangla line-height differs (1.6).
+- 2026-10-04: Removed legacy alias vars --bg/--fg/--line/--focus; code uses shadcn semantic names directly.
+- 2026-10-05: One fixed unit per parameter (°C, ppt, mg/L), no unit picker, no conversion. Field names carry the unit (temperatureC, salinityPpt, oxygenMgL).
+- 2026-10-05: i18n setup with vue-i18n (legacy: false, default locale: bn, fallback: bn). Language toggle persisted in localStorage, lang attribute kept in sync.
+- 2026-10-06: esbuild build script allowed in pnpm-workspace.yaml because vite 8.3.2 resolves tsx/esbuild; revisit when upgrading vite.
 ## Parking lot
 - Move components.json and src/lib/utils.ts to shared/ in Step 5
 - Switch to single "typescript-eslint" package
 - Clean up woff files in dist (keep only woff2)
-- Removed legacy alias vars --bg/--fg/--line/--focus from :root (now use shadcn semantic names directly)
+- Delete HelloWorld.vue and remove its i18n lint ignore
+- Check vue-i18n CSP behavior in the browser console by serving dist with script-src 'self' and no unsafe-eval; pending until the first screen calls t() (Step 5 or Step 10)
+- useLanguage() creates a watch on every call; keep language switching in one place in Step 5
