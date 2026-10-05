@@ -2,5 +2,11 @@
   "common": {
     "save": "Save",
     "cancel": "Cancel"
+  },
+  "device": {
+    "mobilePlaceholder": "Mobile view",
+    "desktopPlaceholder": "Desktop view",
+    "switchToMobile": "Switch to mobile view",
+    "switchToDesktop": "Switch to desktop view"
   }
 }

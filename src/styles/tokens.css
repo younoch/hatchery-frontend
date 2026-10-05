@@ -110,6 +110,12 @@ html[lang='bn'] {
 }
 
 @theme inline {
+  --spacing-s-1: var(--s-1);
+  --spacing-s-2: var(--s-2);
+  --spacing-s-3: var(--s-3);
+  --spacing-s-4: var(--s-4);
+  --spacing-s-6: var(--s-6);
+
   /* Expose runtime variables to Tailwind */
   --text-body: var(--fs-body);
   --text-body-sm: var(--fs-body-sm);
@@ -134,4 +140,3 @@ html[lang='bn'] {
   --r-card: var(--radius-card);
   --r-sheet: var(--radius-sheet);
 }
-

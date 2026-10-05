@@ -7,7 +7,7 @@
 | 2 | Tailwind and shadcn-vue init | done | 2026-10-03 |
 | 3 | Design tokens (Layer 1) | done | 2026-10-04 |
 | 4 | i18n | done | 2026-10-06 |
-| 5 | Folder structure and routing | not started | - |
+| 5 | Folder structure and routing | in review | - |
 | 6 | Button | not started | - |
 | 7 | Field and Input | not started | - |
 | 8 | Sheet and Tabs | not started | - |
@@ -38,10 +38,8 @@
 - 2026-10-05: One fixed unit per parameter (°C, ppt, mg/L), no unit picker, no conversion. Field names carry the unit (temperatureC, salinityPpt, oxygenMgL).
 - 2026-10-05: i18n setup with vue-i18n (legacy: false, default locale: bn, fallback: bn). Language toggle persisted in localStorage, lang attribute kept in sync.
 - 2026-10-06: esbuild build script allowed in pnpm-workspace.yaml because vite 8.3.2 resolves tsx/esbuild; revisit when upgrading vite.
+- 2026-10-06: Device auto-detection uses the existing 48rem breakpoint; only narrow Android viewports default to mobile.
 ## Parking lot
-- Move components.json and src/lib/utils.ts to shared/ in Step 5
 - Switch to single "typescript-eslint" package
 - Clean up woff files in dist (keep only woff2)
-- Delete HelloWorld.vue and remove its i18n lint ignore
-- Check vue-i18n CSP behavior in the browser console by serving dist with script-src 'self' and no unsafe-eval; pending until the first screen calls t() (Step 5 or Step 10)
-- useLanguage() creates a watch on every call; keep language switching in one place in Step 5
+- Check vue-i18n CSP behavior in the browser console by serving dist with script-src 'self' and no unsafe-eval; now unblocked because the Step 5 placeholder calls t()

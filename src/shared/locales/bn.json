@@ -2,5 +2,11 @@
   "common": {
     "save": "সেভ করুন",
     "cancel": "বাতিল"
+  },
+  "device": {
+    "mobilePlaceholder": "মোবাইল ভিউ",
+    "desktopPlaceholder": "ডেস্কটপ ভিউ",
+    "switchToMobile": "মোবাইল ভিউতে যান",
+    "switchToDesktop": "ডেস্কটপ ভিউতে যান"
   }
 }

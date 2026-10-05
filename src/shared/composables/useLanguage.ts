@@ -1,13 +1,15 @@
-import { watch } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const STORAGE_KEY = 'hatchery-lang'
 
 export function useLanguage() {
   const { locale } = useI18n()
+  const currentLocale = computed(() => locale.value)
 
   const setLanguage = (lang: 'bn' | 'en') => {
     locale.value = lang
+    document.documentElement.lang = lang
     try {
       localStorage.setItem(STORAGE_KEY, lang)
     } catch {
@@ -19,12 +21,8 @@ export function useLanguage() {
     setLanguage(locale.value === 'bn' ? 'en' : 'bn')
   }
 
-  watch(locale, newLang => {
-    document.documentElement.lang = newLang
-  })
-
   return {
-    locale,
+    locale: currentLocale,
     setLanguage,
     toggleLanguage,
   }

@@ -45,6 +45,6 @@ export default [
   prettier,
   configPrettier,
   {
-    ignores: ['dist/**', 'node_modules/**', 'src/components/HelloWorld.vue'],
+    ignores: ['dist/**', 'node_modules/**'],
   },
 ]
