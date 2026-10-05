@@ -197,22 +197,32 @@
   }
   .control select { appearance: none; }
   .control .unit { padding-right: var(--s-3); color: var(--muted); font-size: var(--fs-label); flex-shrink: 0; }
-  /* unit picker: a native select shaped like the unit label, full field height so it is easy to tap */
-  .unit-wrap { position: relative; display: flex; align-items: center; height: 100%; flex-shrink: 0; color: var(--muted); }
-  .unit-wrap::after {
-    content: ''; position: absolute; right: var(--s-3); top: 50%; width: 5px; height: 5px; margin-top: -4px;
-    border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); pointer-events: none;
-  }
-  .control .unit-select {
-    flex: none; width: auto; min-width: 3.25rem; padding: 0 1.5rem 0 var(--s-2);
-    color: inherit; font-size: var(--fs-label); text-align-last: right; cursor: pointer;
-    border-left: 1px solid var(--line); border-radius: 0 var(--r-ctl) var(--r-ctl) 0; background: var(--surface-2);
-  }
-  .control .unit-select:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
   .control[data-invalid="true"] { border-color: var(--bad); }
   .control[data-invalid="true"]:focus-within { outline-color: var(--bad); }
   input[type="datetime-local"], input[type="date"], input[type="time"] { color-scheme: inherit; font-variant-numeric: tabular-nums; }
   .num { font-variant-numeric: tabular-nums; }
+  /* stepper field: - value + , with a chip that shows the last value of this tank */
+  .field-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s-2); min-height: 1.75rem; }
+  .field-head > label { font-size: var(--fs-label); font-weight: 500; }
+  /* hint chip: 28px to look at; touch area grows upward and sideways, the stepper below sits on top of it */
+  .same-chip { min-height: 1.75rem; padding: 0 var(--s-2); max-width: 70%; color: var(--accent-text); }
+  .chip-text { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .same-chip::after { inset: -13px -4px -5px; }  /* measured from the padding box (1px border): 12px above + 4px below + 28px = 44px */
+  .same-chip[disabled] { color: var(--muted); border-style: dashed; }
+  .same-chip[data-hidden="true"] { display: none; }
+  .stepper { position: relative; gap: 0; overflow: hidden; }
+  .stepper input { text-align: center; }
+  .stepper .unit { padding: 0 var(--s-2) 0 0; }
+  .step-btn {
+    flex: none; width: var(--control-h); height: 100%; border: 0; background: var(--surface-2); color: var(--fg);
+    display: inline-flex; align-items: center; justify-content: center; touch-action: manipulation;
+  }
+  .step-btn:first-child { border-right: 1px solid var(--line); }
+  .step-btn:last-child { border-left: 1px solid var(--line); }
+  .step-btn:active { background: var(--line); }
+  .step-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+  .control input[data-prefill="true"] { color: var(--muted); font-style: italic; }
+  .note-line { margin: var(--s-2) 0 0; color: var(--muted); font-size: var(--fs-cap); overflow-wrap: anywhere; }
   .err { display: none; margin: 0; gap: var(--s-1); align-items: flex-start; color: var(--bad); font-size: var(--fs-cap); line-height: 1.4; }
   .err[data-show="true"] { display: flex; }
   .err svg { margin-top: 1px; flex-shrink: 0; }
@@ -417,25 +427,29 @@
               </select>
             </div>
           </div>
-          <div class="field">
-            <label for="f-ph">pH</label>
-            <div class="control"><input id="f-ph" class="num" inputmode="decimal" autocomplete="off" placeholder="8.1" aria-describedby="e-ph"></div>
+          <div class="field field--wide" data-k="ph">
+            <div class="field-head"><label for="f-ph">pH</label><button type="button" class="chip-btn same-chip" id="same-ph" data-hidden="true"><span class="chip-text"></span></button></div>
+            <div class="control stepper"><button type="button" class="step-btn" data-step="-1" data-k="ph" data-i-label="dec" aria-label="Decrease"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button><input id="f-ph" class="num" inputmode="decimal" autocomplete="off" placeholder="8.1" aria-describedby="e-ph"><button type="button" class="step-btn" data-step="1" data-k="ph" data-i-label="inc" aria-label="Increase"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg></button></div>
             <p class="err" id="e-ph"></p>
           </div>
-          <div class="field">
-            <label for="f-t" data-i="temp">তাপমাত্রা</label>
-            <div class="control"><input id="f-t" class="num" inputmode="decimal" autocomplete="off" placeholder="29.5" aria-describedby="e-t"><span class="unit-wrap"><select class="unit-select" id="u-t" data-i-label="uT" aria-label="তাপমাত্রার একক"><option>°C</option><option>°F</option></select></span></div>
+          <div class="field field--wide" data-k="t">
+            <div class="field-head"><label for="f-t" data-i="temp">তাপমাত্রা</label><button type="button" class="chip-btn same-chip" id="same-t" data-hidden="true"><span class="chip-text"></span></button></div>
+            <div class="control stepper"><button type="button" class="step-btn" data-step="-1" data-k="t" data-i-label="dec" aria-label="Decrease"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button><input id="f-t" class="num" inputmode="decimal" autocomplete="off" placeholder="29.5" aria-describedby="e-t"><span class="unit">°C</span><button type="button" class="step-btn" data-step="1" data-k="t" data-i-label="inc" aria-label="Increase"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg></button></div>
             <p class="err" id="e-t"></p>
           </div>
-          <div class="field">
-            <label for="f-sal" data-i="salinity">লবণাক্ততা</label>
-            <div class="control"><input id="f-sal" class="num" inputmode="decimal" autocomplete="off" placeholder="22" aria-describedby="e-sal"><span class="unit-wrap"><select class="unit-select" id="u-sal" data-i-label="uS" aria-label="লবণাক্ততার একক"><option>ppt</option><option>ppm</option></select></span></div>
+          <div class="field field--wide" data-k="sal">
+            <div class="field-head"><label for="f-sal" data-i="salinity">লবণাক্ততা</label><button type="button" class="chip-btn same-chip" id="same-sal" data-hidden="true"><span class="chip-text"></span></button></div>
+            <div class="control stepper"><button type="button" class="step-btn" data-step="-1" data-k="sal" data-i-label="dec" aria-label="Decrease"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button><input id="f-sal" class="num" inputmode="decimal" autocomplete="off" placeholder="22" aria-describedby="e-sal"><span class="unit">ppt</span><button type="button" class="step-btn" data-step="1" data-k="sal" data-i-label="inc" aria-label="Increase"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg></button></div>
             <p class="err" id="e-sal"></p>
           </div>
-          <div class="field">
-            <label for="f-o2" data-i="oxygen">অক্সিজেন (O₂)</label>
-            <div class="control"><input id="f-o2" class="num" inputmode="decimal" autocomplete="off" placeholder="5.4" aria-describedby="e-o2"><span class="unit-wrap"><select class="unit-select" id="u-o2" data-i-label="uO" aria-label="অক্সিজেনের একক"><option>mg/L</option><option>ppm</option></select></span></div>
+          <div class="field field--wide" data-k="o2">
+            <div class="field-head"><label for="f-o2" data-i="oxygen">অক্সিজেন (O₂)</label><button type="button" class="chip-btn same-chip" id="same-o2" data-hidden="true"><span class="chip-text"></span></button></div>
+            <div class="control stepper"><button type="button" class="step-btn" data-step="-1" data-k="o2" data-i-label="dec" aria-label="Decrease"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button><input id="f-o2" class="num" inputmode="decimal" autocomplete="off" placeholder="5.4" aria-describedby="e-o2"><span class="unit">mg/L</span><button type="button" class="step-btn" data-step="1" data-k="o2" data-i-label="inc" aria-label="Increase"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg></button></div>
             <p class="err" id="e-o2"></p>
+          </div>
+          <div class="field field--wide">
+            <h3 class="sec-title"><button class="sec-head" type="button" aria-expanded="false" aria-controls="f-more"><span data-i="secMore">আরও তথ্য</span><svg class="i chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></h3>
+            <div class="field" id="f-more" hidden><label for="f-note"><span data-i="fNote">মন্তব্য</span> <span class="sample" data-i="optional">(ঐচ্ছিক)</span></label><div class="control"><input id="f-note" maxlength="200" autocomplete="off"></div></div>
           </div>
         </div>
       </form>
@@ -630,7 +644,9 @@
       <li>Section-এর মাঝে 24px, section-এর ভেতরে field-এর মাঝে 12px। এই দুটি মান পুরো app-এ একই।</li>
       <li>Spacing লেখে layout component (<code>.stack</code>, <code>.section</code>, <code>.field-grid</code>), page নয়। Page শুধু এগুলো সাজায়।</li>
       <li>কম ব্যবহৃত field "আরও তথ্য" section-এ ভাঁজ করা থাকে। বেশি field হলে ছোট না করে section বাড়ে।</li>
-      <li>Unit বদল: field-এর ডানের ছোট ঘরে চাপলে তালিকা খোলে (তাপমাত্রা °C/°F, লবণাক্ততা ppt/ppm, O₂ mg/L/ppm)। লেখা মান নিজে রূপান্তর হয়, সীমা ও নমুনা মানও বদলায়। ডেটা সবসময় °C, ppt, mg/L-এ জমা হয়, unit শুধু দেখা ও লেখার সুবিধা।</li>
+      <li>প্রতিটি মানের unit স্থির (তাপমাত্রা °C, লবণাক্ততা ppt, O₂ mg/L)। Unit বদলের picker নেই, রূপান্তরও নেই। ডেটা ওই unit-এই জমা হয়।</li>
+      <li>মন্তব্য ঐচ্ছিক, "আরও তথ্য"-তে ভাঁজ করা থাকে (সর্বোচ্চ ২০০ অক্ষর)। বিশেষ কিছু (বৃষ্টি, রং বদল) লিখে রাখার জন্য। না লিখলেও সেভ হয়, history card-এ থাকলে ছোট করে দেখায়।</li>
+      <li>আগের মান: tank বাছলে ওই tank-এ নিজের শেষ মান ধূসর ইটালিক "অনিশ্চিত" অবস্থায় বসে। − / + চাপলে বা "আগের মতোই" চাপলে নিশ্চিত হয়। সব ক'টি নিশ্চিত না হলে সেভ হয় না। মান ২৪ ঘণ্টার বেশি পুরোনো হলে বসে না, শুধু চিপে দেখায়।</li>
       <li>বিজ্ঞপ্তি: ওপরের বারে ঘণ্টা আইকন, প্রতিটি screen-এ আছে। চাপলে "আরও"-এর মতোই নিচ থেকে sheet ওঠে। নতুন বিজ্ঞপ্তির সংখ্যা ঘণ্টায় দেখায়, চাপলে পড়া হয়ে যায়। এখানকার চারটি বিজ্ঞপ্তি নমুনা, কোন ঘটনায় আসল বিজ্ঞপ্তি যাবে তা পরে ঠিক হবে।</li>
       <li>ছোট chip আর বোতাম দেখতে 32px, কিন্তু অদৃশ্য padding-এ 44px স্পর্শ। পাশের gap কমপক্ষে 8px, তাই এলাকা মেলে না।</li>
     </ul>
@@ -666,7 +682,6 @@
       title: 'পানির মান', titleBatch: 'ব্যাচ', tabNew: 'নতুন এন্ট্রি', tabHist: 'ইতিহাস', recordedAt: 'পরীক্ষার সময়', tank: 'ট্যাঙ্ক / পুকুর',
       temp: 'তাপমাত্রা', salinity: 'লবণাক্ততা', oxygen: 'অক্সিজেন (O₂)', save: 'সেভ করুন', saveBatch: 'ব্যাচ সেভ করুন',
       cancel: 'বাতিল', cancelled: 'বাতিল করা হয়েছে, লেখা মুছে গেছে।',
-      uT: 'তাপমাত্রার একক', uS: 'লবণাক্ততার একক', uO: 'অক্সিজেনের একক',
       notifTitle: 'বিজ্ঞপ্তি', notifSample: 'নমুনা বিজ্ঞপ্তি', markAll: 'সব পড়া হয়েছে',
       bellLabel: function (n) { return n ? 'বিজ্ঞপ্তি, ' + n + 'টি নতুন' : 'বিজ্ঞপ্তি, নতুন কিছু নেই'; },
       agoMin: function (n) { return n + ' মিনিট আগে'; }, agoHr: function (n) { return n + ' ঘণ্টা আগে'; },
@@ -691,6 +706,8 @@
       fAmmonia: 'অ্যামোনিয়া', fNitrite: 'নাইট্রাইট', fAlk: 'ক্ষারত্ব', fNote: 'মন্তব্য', optional: '(ঐচ্ছিক)',
       savedDemo: 'এটা নমুনা screen, কিছু সেভ হয়নি।',
       required: 'মান লিখুন',
+      confirmVal: 'নিশ্চিত করুন: − / + চাপুন বা "আগের মতোই" চাপুন', dec: 'কমান', inc: 'বাড়ান',
+      sameLast: function (v) { return 'আগের মতোই ' + v; }, lastOld: function (v, w) { return 'আগের মান ' + v + ' · ' + w; },
       range: function (a, b) { return a + ' থেকে ' + b + ' এর মধ্যে লিখুন'; },
       savedOnline: 'সেভ হয়েছে, সিঙ্ক হচ্ছে।', savedOffline: 'সেভ হয়েছে। ফোনে আছে, ইন্টারনেট এলে সিঙ্ক হবে।',
       pending: 'সিঙ্ক বাকি', syncing: 'সিঙ্ক হচ্ছে', synced: 'সিঙ্ক হয়েছে', failed: 'ব্যর্থ',
@@ -703,7 +720,6 @@
       title: 'Water Quality', titleBatch: 'Batch', tabNew: 'New entry', tabHist: 'History', recordedAt: 'Tested at', tank: 'Tank / pond',
       temp: 'Temperature', salinity: 'Salinity', oxygen: 'Oxygen (O₂)', save: 'Save', saveBatch: 'Save batch',
       cancel: 'Cancel', cancelled: 'Cancelled. What you typed was cleared.',
-      uT: 'Temperature unit', uS: 'Salinity unit', uO: 'Oxygen unit',
       notifTitle: 'Notifications', notifSample: 'Sample notifications', markAll: 'Mark all read',
       bellLabel: function (n) { return n ? 'Notifications, ' + n + ' new' : 'Notifications, none new'; },
       agoMin: function (n) { return n + ' min ago'; }, agoHr: function (n) { return n + ' h ago'; },
@@ -728,6 +744,8 @@
       fAmmonia: 'Ammonia', fNitrite: 'Nitrite', fAlk: 'Alkalinity', fNote: 'Note', optional: '(optional)',
       savedDemo: 'This is a sample screen, nothing was saved.',
       required: 'Enter a value',
+      confirmVal: 'Confirm: tap − / + or "Same as last"', dec: 'Decrease', inc: 'Increase',
+      sameLast: function (v) { return 'Same as last ' + v; }, lastOld: function (v, w) { return 'Last ' + v + ' · ' + w; },
       range: function (a, b) { return 'Enter a value between ' + a + ' and ' + b; },
       savedOnline: 'Saved. Syncing now.', savedOffline: 'Saved on this phone. It will sync when you are online.',
       pending: 'Pending', syncing: 'Syncing', synced: 'Synced', failed: 'Failed',
@@ -737,17 +755,9 @@
       langBtn: 'বাংলা'
     }
   };
-  var RANGES = { ph: [0, 14], t: [0, 50], sal: [0, 60], o2: [0, 20] };  /* always in base units: °C, ppt, mg/L */
-  function idf(v) { return v; }
-  var UN = {
-    t:   { '°C': { from: idf, to: idf, ph: '29.5' }, '°F': { from: function (c) { return c * 9 / 5 + 32; }, to: function (f) { return (f - 32) * 5 / 9; }, ph: '85.1' } },
-    sal: { 'ppt': { from: idf, to: idf, ph: '22' }, 'ppm': { from: function (v) { return v * 1000; }, to: function (v) { return v / 1000; }, ph: '22000' } },
-    o2:  { 'mg/L': { from: idf, to: idf, ph: '5.4' }, 'ppm': { from: idf, to: idf, ph: '5.4' } }
-  };
-  var cur = { t: '°C', sal: 'ppt', o2: 'mg/L' };  /* display and input units; stored values are always base units */
+  var RANGES = { ph: [0, 14], t: [0, 50], sal: [0, 60], o2: [0, 20] };  /* °C, ppt, mg/L */
+  var UNITS = { t: '°C', sal: 'ppt', o2: 'mg/L' };  /* fixed: stored and shown in these units, no conversion */
   function rnd(v) { return Math.round(v * 100) / 100; }
-  function toBase(k, v) { return UN[k] ? UN[k][cur[k]].to(v) : v; }
-  function shown(k, baseVal) { return UN[k] ? rnd(UN[k][cur[k]].from(baseVal)) : baseVal; }
   var ICON = {
     clock: '<svg class="i s" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
     check: '<svg class="i s" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>',
@@ -763,8 +773,8 @@
   function at(daysAgo, h, m) { var d = new Date(); d.setDate(d.getDate() - daysAgo); d.setHours(h, m, 0, 0); return d; }
   var readings = [
     { id: 1, at: at(0, 6, 30), tank: 'A1', ph: 8.1, t: 29.5, sal: 22, o2: 5.4, status: 'synced' },
-    { id: 2, at: at(0, 5, 45), tank: 'A2', ph: 7.9, t: 28.8, sal: 21, o2: 5.1, status: 'pending' },
-    { id: 3, at: at(1, 17, 10), tank: 'B1', ph: 8.3, t: 30.1, sal: 24, o2: 24, status: 'failed' },
+    { id: 2, at: at(0, 5, 45), tank: 'A2', ph: 7.9, t: 28.8, sal: 21, o2: 5.1, note: 'বৃষ্টির পর নেওয়া', status: 'pending' },
+    { id: 3, at: at(2, 17, 10), tank: 'B1', ph: 8.3, t: 30.1, sal: 24, o2: 24, status: 'failed' },
     { id: 4, at: at(1, 6, 15), tank: 'A1', ph: 8.0, t: 29.2, sal: 22, o2: 5.6, status: 'synced' }
   ];
 
@@ -792,6 +802,7 @@
     document.getElementById('saveBtn').textContent = screen === 'batch' ? L.saveBatch : L.save;
     renderCards();
     renderNotifs();
+    renderLastHints();
     ['ph', 't', 'sal', 'o2'].forEach(function (k) { var i = field(k); if (i.closest('.control').dataset.invalid === 'true') validate(k); });
   }
 
@@ -839,14 +850,16 @@
   function badge(status) {
     return '<span class="badge ' + status + '">' + ICON[STATUS_ICON[status]] + D[lang][status] + '</span>';
   }
+  function esc(t) { return String(t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function renderCards() {
     var L = D[lang], html = '';
     readings.slice().sort(function (a, b) { return b.at - a.at; }).forEach(function (r) {
       html += '<li class="card"><div class="card-top"><span class="when">' + fmtWhen(r.at) + ' <span class="tank">· ' + tankName(r.tank) + '</span></span>' + badge(r.status) + '</div>' +
         '<dl class="metrics"><div><dt>pH</dt><dd>' + r.ph + '</dd></div>' +
-        '<div><dt>' + L.mTemp + '</dt><dd>' + shown('t', r.t) + ' <small>' + cur.t + '</small></dd></div>' +
-        '<div><dt>' + L.mSal + '</dt><dd>' + shown('sal', r.sal) + ' <small>' + cur.sal + '</small></dd></div>' +
-        '<div><dt>' + L.mO2 + '</dt><dd>' + shown('o2', r.o2) + ' <small>' + cur.o2 + '</small></dd></div></dl>' +
+        '<div><dt>' + L.mTemp + '</dt><dd>' + r.t + ' <small>' + UNITS.t + '</small></dd></div>' +
+        '<div><dt>' + L.mSal + '</dt><dd>' + r.sal + ' <small>' + UNITS.sal + '</small></dd></div>' +
+        '<div><dt>' + L.mO2 + '</dt><dd>' + r.o2 + ' <small>' + UNITS.o2 + '</small></dd></div></dl>' +
+        (r.note ? '<p class="note-line">' + esc(r.note) + '</p>' : '') +
         (r.status === 'failed' ? '<div class="card-foot"><p class="card-note">' + L.failNote + '</p><button class="btn-sm" type="button" data-fix="' + r.id + '">' + L.fix + '</button></div>' : '') + '</li>';
     });
     document.getElementById('cards').innerHTML = html;
@@ -862,13 +875,73 @@
   });
 
   function field(k) { return document.getElementById('f-' + k); }
+  /* last value of the selected tank (own readings only): shown unconfirmed, must be confirmed before save */
+  var STEP = { ph: 0.1, t: 0.5, sal: 1, o2: 0.1 }, DEC = { ph: 1, t: 1, sal: 0, o2: 1 }, MAX_AGE_H = 24;
+  function lastFor(tank) {
+    var best = null;
+    readings.forEach(function (r) { if (r.tank === tank && (!best || r.at > best.at)) best = r; });
+    return best;
+  }
+  function isFresh(r) { return r && (Date.now() - r.at.getTime()) / 3600000 <= MAX_AGE_H; }
+  function renderLastHints() {
+    var L = D[lang], r = lastFor(document.getElementById('f-tank').value);
+    ['ph', 't', 'sal', 'o2'].forEach(function (k) {
+      var chip = document.getElementById('same-' + k);
+      if (!r) { chip.dataset.hidden = 'true'; return; }
+      chip.dataset.hidden = 'false';
+      if (isFresh(r)) { chip.disabled = false; chip.firstChild.textContent = L.sameLast(r[k]); }
+      else { chip.disabled = true; chip.firstChild.textContent = L.lastOld(r[k], fmtWhen(r.at)); }
+    });
+  }
+  function clearField(k) {
+    var i = field(k); i.value = ''; delete i.dataset.prefill;
+    var c = i.closest('.control'); c.dataset.invalid = 'false'; i.setAttribute('aria-invalid', 'false');
+    var er = document.getElementById('e-' + k); er.dataset.show = 'false'; er.innerHTML = '';
+  }
+  function applyLast() {
+    var r = lastFor(document.getElementById('f-tank').value);
+    ['ph', 't', 'sal', 'o2'].forEach(function (k) {
+      clearField(k);
+      if (isFresh(r)) { field(k).value = String(r[k]); field(k).dataset.prefill = 'true'; }
+    });
+    renderLastHints();
+  }
+  function confirmField(k) { delete field(k).dataset.prefill; }
+  function stepField(k, dir) {
+    var i = field(k), raw = i.value.trim().replace(',', '.'), base = raw === '' ? NaN : Number(raw);
+    if (!isFinite(base)) { var r = lastFor(document.getElementById('f-tank').value); base = r ? r[k] : (RANGES[k][0] + RANGES[k][1]) / 2; }
+    var v = Math.min(RANGES[k][1], Math.max(RANGES[k][0], base + dir * STEP[k]));
+    i.value = v.toFixed(DEC[k]); confirmField(k);
+    if (i.closest('.control').dataset.invalid === 'true') validate(k);
+  }
+  app.querySelectorAll('.step-btn').forEach(function (b) {
+    var k = b.dataset.k, dir = Number(b.dataset.step), t1, t2;
+    function stop() { clearTimeout(t1); clearInterval(t2); }
+    b.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      stepField(k, dir);
+      t1 = setTimeout(function () { t2 = setInterval(function () { stepField(k, dir); }, 120); }, 450);
+    });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (n) { b.addEventListener(n, stop); });
+    b.addEventListener('click', function (e) { if (e.detail === 0) stepField(k, dir); });  /* keyboard Enter/Space */
+    b.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  });
+  ['ph', 't', 'sal', 'o2'].forEach(function (k) {
+    document.getElementById('same-' + k).addEventListener('click', function () {
+      confirmField(k); if (field(k).closest('.control').dataset.invalid === 'true') validate(k);
+    });
+    field(k).addEventListener('input', function () { confirmField(k); });
+  });
+  document.getElementById('f-tank').addEventListener('change', applyLast);
+
   function validate(k) {
     var input = field(k), ctl = input.closest('.control'), err = document.getElementById('e-' + k), L = D[lang];
     var raw = input.value.trim().replace(',', '.'), msg = '';
     if (raw === '') msg = L.required;
+    else if (input.dataset.prefill === 'true') msg = L.confirmVal;
     else {
-      var n = Number(raw), b = toBase(k, n);
-      if (!isFinite(n) || b < RANGES[k][0] - 1e-9 || b > RANGES[k][1] + 1e-9) msg = L.range(shown(k, RANGES[k][0]), shown(k, RANGES[k][1]));
+      var n = Number(raw);
+      if (!isFinite(n) || n < RANGES[k][0] - 1e-9 || n > RANGES[k][1] + 1e-9) msg = L.range(RANGES[k][0], RANGES[k][1]);
     }
     ctl.dataset.invalid = msg ? 'true' : 'false';
     input.setAttribute('aria-invalid', msg ? 'true' : 'false');
@@ -880,19 +953,6 @@
     var i = field(k);
     i.addEventListener('blur', function () { if (i.value !== '' || i.closest('.control').dataset.invalid === 'true') validate(k); });
     i.addEventListener('input', function () { if (i.closest('.control').dataset.invalid === 'true') validate(k); });
-  });
-
-  /* unit picker: converts what is already typed, swaps the example value, re-checks the range */
-  ['t', 'sal', 'o2'].forEach(function (k) {
-    var sel = document.getElementById('u-' + k);
-    sel.addEventListener('change', function () {
-      var inp = field(k), raw = inp.value.trim().replace(',', '.'), oldU = cur[k], newU = sel.value;
-      if (raw !== '' && isFinite(Number(raw))) inp.value = String(rnd(UN[k][newU].from(UN[k][oldU].to(Number(raw)))));
-      cur[k] = newU;
-      inp.placeholder = UN[k][newU].ph;
-      renderCards();
-      if (inp.closest('.control').dataset.invalid === 'true') validate(k);
-    });
   });
 
   function say(msg) {
@@ -912,11 +972,12 @@
     var ok = true;
     ['ph', 't', 'sal', 'o2'].forEach(function (k) { if (!validate(k)) ok = false; });
     if (!ok) { var bad = app.querySelector('.control[data-invalid="true"] input'); if (bad) bad.focus(); return; }
-    var num = function (k) { return rnd(toBase(k, Number(field(k).value.trim().replace(',', '.')))); };
+    var num = function (k) { return rnd(Number(field(k).value.trim().replace(',', '.'))); };
     var when = new Date(field('at').value); if (isNaN(when)) when = new Date();
-    readings.push({ id: nextId++, at: when, tank: document.getElementById('f-tank').value, ph: num('ph'), t: num('t'), sal: num('sal'), o2: num('o2'), status: 'pending' });
-    ['ph', 't', 'sal', 'o2'].forEach(function (k) { field(k).value = ''; field(k).closest('.control').dataset.invalid = 'false'; });
+    readings.push({ id: nextId++, at: when, tank: document.getElementById('f-tank').value, ph: num('ph'), t: num('t'), sal: num('sal'), o2: num('o2'), note: document.getElementById('f-note').value.trim(), status: 'pending' });
     field('at').value = localInput(new Date());
+    document.getElementById('f-note').value = '';
+    applyLast();
     renderCards();
     say(online ? D[lang].savedOnline : D[lang].savedOffline);
     flush();
@@ -929,12 +990,8 @@
       document.getElementById('batchForm').reset();
     } else {
       document.getElementById('form').reset();
-      ['ph', 't', 'sal', 'o2'].forEach(function (k) {
-        var c = field(k).closest('.control'); c.dataset.invalid = 'false'; field(k).setAttribute('aria-invalid', 'false');
-        var er = document.getElementById('e-' + k); er.dataset.show = 'false'; er.innerHTML = '';
-      });
+      applyLast();
       field('at').value = localInput(new Date());
-      ['t', 'sal', 'o2'].forEach(function (k) { document.getElementById('u-' + k).value = cur[k]; });
     }
     say(D[lang].cancelled);
   });
@@ -1035,6 +1092,7 @@
   ['tabNew', 'tabHist'].forEach(function (id) { document.getElementById(id).addEventListener('click', function () { if (sheetOpen()) closeSheet(false); }); });
 
   field('at').value = localInput(new Date());
+  applyLast();
   applyLang();
 })();
 </script>

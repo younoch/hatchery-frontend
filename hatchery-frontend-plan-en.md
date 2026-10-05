@@ -469,6 +469,9 @@ export const db = new HatcheryDB()
 - First-time setup: requires internet once; "offline ready" gate before offline entry (section 6)
 - Single active session per account: takeover policy, not block (section 6)
 - Device type is a feature-design lens only; access control is RBAC only (sections 1 and 3)
+- Last value on the entry screen: for the selected tank, the current user's own latest reading (local data only, no backend endpoint) pre-fills pH, temperature, salinity and oxygen as an **unconfirmed** value. Each field must be confirmed (tap −/+, type, or tap "same as last") before Save is allowed, so a value can never be saved without an explicit action. A last value older than 24 hours is not pre-filled (shown as a hint only); no previous reading means empty fields. Dexie `readings` needs the index `[createdById+tankId+recordedAt]` at version 1. Step sizes (pH 0.1, temperature 0.5, salinity 1, oxygen 0.1) and the 24-hour limit are samples to confirm with the owner. Known limit: a second device of the same user starts with no history
+- Note on a water reading: one optional free-text `note` (max 200 characters), inside the collapsed "more details" section; never required, never blocks Save; shown as a small line on the history card. Always rendered as text (no HTML)
+- Units: one fixed unit per parameter (°C, ppt, mg/L), shown as a static label; no unit picker and no unit conversion in the MVP. Reason: one location and one industry use one unit, and conversion adds complexity and wrong-unit risk. Field names carry the unit (`temperatureC`, `salinityPpt`, `oxygenMgL`) so a second unit can be added later without a data migration
 
 ### Deferred / backend follow-ups
 - Ownership-scoped edit permission (own vs any record) and record creator/owner handling — backend not ready

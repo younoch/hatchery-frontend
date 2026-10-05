@@ -19,7 +19,9 @@ You are building the frontend of a hatchery management app, one small step at a 
 - Controls: field, primary button and cancel button are 44px on touch (36px with a mouse). Sub-tabs, chips and small inline buttons look 32px but keep a 44px touch area through invisible padding.
 - Primary button uses `primary-600`, not `primary-500` (white text contrast). Cancel button is a red outline button, same size as Save.
 - Fields: at most two columns on a phone. Long inputs span the full width. Rarely used fields live in a collapsible "more details" section.
-- Unit picker on temperature (°C/°F), salinity (ppt/ppm), oxygen (mg/L/ppm). Typed values convert when the unit changes. Stored data is always °C, ppt, mg/L.
+- One fixed unit per parameter: temperature °C, salinity ppt, oxygen mg/L, shown as a static label. No unit picker and no unit conversion in the MVP (owner decision; the prototype's picker was removed). Field names carry the unit (`temperatureC`, `salinityPpt`, `oxygenMgL`).
+- Last value and steppers (see the plan, section 10): the four water fields are single-column stepper fields (−, value, +, 44px buttons, long-press repeat; typing still works). The current user's own latest reading for the selected tank pre-fills them as an **unconfirmed** value (muted italic) with a "same as last" chip; each field must be confirmed before Save works. Older than 24 hours: hint only, no pre-fill. Step sizes and the 24 h limit are samples; confirm with the owner.
+- Optional `note` on a water reading: max 200 characters, in the collapsed "more details" section, never required, shown as a small line on the history card, always rendered as text.
 - Notification bell with an unread count in the app bar on every screen; the list opens in the same bottom-sheet pattern as the More sheet.
 - Bangla and English use the SAME font sizes (owner decision, changed after the prototype; the prototype's Bangla +1px override is outdated). Only line-height differs: Bangla 1.6.
 - Sync-status badges use color, icon and text together.
@@ -76,7 +78,7 @@ Step N: <name>: ready for review
 - `mobile/` and `desktop/` contain no API calls and no business logic. All of that lives in `shared/`.
 - Access token only in memory. Never write any token to localStorage.
 - Numbers and units display in English numerals and English unit symbols, even in Bangla text.
-- Stored readings use base units (°C, ppt, mg/L). Display and input units are a preference.
+- Readings are stored and shown in °C, ppt, mg/L only. Do not build unit conversion.
 - Android phones are the only mobile target. Light mode only for the MVP.
 
 **Offline:** follow section 6 of the plan exactly (client UUID, `recordedAt` vs `syncedAt`, never delete data for being old, logout never touches IndexedDB, Dexie versioning from version 1).
@@ -104,7 +106,7 @@ Each step ends at a checkpoint (section 3). Steps are deliberately small. If one
 
 **Phase B: Components**
 - **Step 6: Button.** Variants: primary, red-outline cancel, small (32px look, 44px touch area). Built with `cva`.
-- **Step 7: Field, Input and unit picker.** Form field wrapper (label, control, error), numeric input with unit slot, native-select unit picker, Select.
+- **Step 7: Field and Input.** Form field wrapper (label, control, error), numeric input with a static unit label, numeric stepper input (−/+, long-press repeat, 44px buttons), Select.
 - **Step 8: Sheet and Tabs.** Bottom Sheet with focus trap, Esc, scrim, and focus returning to the trigger; sub-tabs with the small-control touch area.
 - **Step 9: Layout components.** `PageHeader`, `FormSection` (collapsible), `FieldGrid`, `StickyActionBar`, `CardList`. They own all spacing. Add a lint or review rule that view files do not use margin or padding utilities.
 - **Step 10: Styleguide page.** `/dev/styleguide` showing every component in Bangla and English. Include one heavy screen (about 14 fields in sections) as a stress test.
@@ -116,9 +118,9 @@ Each step ends at a checkpoint (section 3). Steps are deliberately small. If one
 - **Step 14: PWA basics.** `vite-plugin-pwa`, manifest, offline fallback page, `mkcert` HTTPS, install prompt, "offline ready" state.
 
 **Phase D: Water quality (mobile first)**
-- **Step 15: Schema and units.** Shared Zod schema for a reading, unit conversion helpers (base units), i18n error keys. If you want a test runner for the conversion logic, ask the owner first.
-- **Step 16: Dexie storage layer.** `readings` table at version 1, CRUD (edit and delete only while pending), `navigator.storage.persist()`, retention cleanup. Use a stub user id until Step 20.
-- **Step 17: Entry screen.** Build the prototype's entry screen with VeeValidate + Zod: units, save to Dexie as `pending`, cancel, status line.
+- **Step 15: Schema.** Shared Zod schema for a reading (fields named `temperatureC`, `salinityPpt`, `oxygenMgL`, plus optional `note` up to 200 characters; validation ranges still to be confirmed with the owner), i18n error keys. No unit conversion. If you want a test runner for the schema, ask the owner first.
+- **Step 16: Dexie storage layer.** `readings` table at version 1 with the index `[createdById+tankId+recordedAt]` and a helper for "latest reading of this user for this tank", CRUD (edit and delete only while pending), `navigator.storage.persist()`, retention cleanup. Use a stub user id until Step 20.
+- **Step 17: Entry screen.** Build the prototype's entry screen with VeeValidate + Zod: static unit labels, last-value pre-fill with the unconfirmed/confirmed rule, save to Dexie as `pending`, cancel, status line.
 - **Step 18: History and sync badge.** Card list, status badge (pending, syncing, failed, synced), fix-and-resend on a failed record.
 - **Step 19: Error handling.** Global Vue error handler, `unhandledrejection`, `ErrorBoundary` at app and view level with context-aware messages.
 
