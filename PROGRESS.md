@@ -7,8 +7,8 @@
 | 2 | Tailwind and shadcn-vue init | done | 2026-10-03 |
 | 3 | Design tokens (Layer 1) | done | 2026-10-04 |
 | 4 | i18n | done | 2026-10-06 |
-| 5 | Folder structure and routing | in review | - |
-| 6 | Button | not started | - |
+| 5 | Folder structure and routing | done | 2026-10-06 |
+| 6 | Button | done | 2026-10-06 |
 | 7 | Field and Input | not started | - |
 | 8 | Sheet and Tabs | not started | - |
 | 9 | Layout components | not started | - |
@@ -43,3 +43,4 @@
 - Switch to single "typescript-eslint" package
 - Clean up woff files in dist (keep only woff2)
 - Check vue-i18n CSP behavior in the browser console by serving dist with script-src 'self' and no unsafe-eval; now unblocked because the Step 5 placeholder calls t()
+- class-variance-authority is in devDependencies but used at runtime; ask owner before moving to dependencies
