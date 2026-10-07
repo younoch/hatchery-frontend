@@ -1,7 +1,9 @@
 {
   "common": {
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "decreaseValue": "Decrease value",
+    "increaseValue": "Increase value"
   },
   "device": {
     "mobilePlaceholder": "Mobile view",

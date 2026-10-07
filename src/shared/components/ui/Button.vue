@@ -55,7 +55,7 @@ const classes = computed(() =>
 
 <style scoped>
 button:focus-visible {
-  outline: 2px solid var(--color-ring);
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }
 

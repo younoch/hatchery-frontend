@@ -9,7 +9,7 @@
 | 4 | i18n | done | 2026-10-06 |
 | 5 | Folder structure and routing | done | 2026-10-06 |
 | 6 | Button | done | 2026-10-06 |
-| 7 | Field and Input | not started | - |
+| 7 | Field and Input | in review | 2026-10-06 |
 | 8 | Sheet and Tabs | not started | - |
 | 9 | Layout components | not started | - |
 | 10 | Styleguide page | not started | - |
@@ -32,6 +32,7 @@
 
 ## Decisions log
 - 2026-10-03: Zod version must be compatible with @vee-validate/zod (peer zod ^3.24.0); latest Zod is 4.x. Resolve at Step 1.
+- 2026-10-06: Shared form primitives are built as reusable UI pieces in `src/shared/components/ui/` with generic label/hint/error slots and no screen-level hardcoded content.
 - 2026-10-03: Zod pinned to 3.25.76 for @vee-validate/zod compatibility (resolved in Step 1).
 - 2026-10-04: Bangla and English use the same font sizes; only Bangla line-height differs (1.6).
 - 2026-10-04: Removed legacy alias vars --bg/--fg/--line/--focus; code uses shadcn semantic names directly.
