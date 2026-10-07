@@ -2,6 +2,7 @@
   "common": {
     "save": "Save",
     "cancel": "Cancel",
+    "close": "Close",
     "decreaseValue": "Decrease value",
     "increaseValue": "Increase value"
   },

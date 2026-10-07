@@ -9,8 +9,8 @@
 | 4 | i18n | done | 2026-10-06 |
 | 5 | Folder structure and routing | done | 2026-10-06 |
 | 6 | Button | done | 2026-10-06 |
-| 7 | Field and Input | in review | 2026-10-06 |
-| 8 | Sheet and Tabs | not started | - |
+| 7 | Field and Input | done | 2026-10-07 |
+| 8 | Sheet and Tabs | in review | - |
 | 9 | Layout components | not started | - |
 | 10 | Styleguide page | not started | - |
 | 11 | Mobile shell | not started | - |

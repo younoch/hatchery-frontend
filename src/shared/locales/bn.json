@@ -2,6 +2,7 @@
   "common": {
     "save": "সেভ করুন",
     "cancel": "বাতিল",
+    "close": "বন্ধ করুন",
     "decreaseValue": "মান কমান",
     "increaseValue": "মান বাড়ান"
   },
