@@ -1,3 +1,4 @@
+import noViewSpacingUtils from './eslint-rules/no-view-spacing-utils.ts'
 import pluginVue from 'eslint-plugin-vue'
 import typescriptEslint from '@typescript-eslint/eslint-plugin'
 import typescriptParser from '@typescript-eslint/parser'
@@ -40,6 +41,19 @@ export default [
         localeDir: './src/shared/locales/*.json',
         messageSyntaxVersion: '9',
       },
+    },
+  },
+  {
+    files: ['src/**/views/**/*.vue', 'src/**/views/*.vue'],
+    plugins: {
+      'hatchery-layout': {
+        rules: {
+          'no-view-spacing-utils': noViewSpacingUtils,
+        },
+      },
+    },
+    rules: {
+      'hatchery-layout/no-view-spacing-utils': 'error',
     },
   },
   prettier,
