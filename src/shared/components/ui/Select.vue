@@ -37,6 +37,9 @@ const props = withDefaults(
 
 const generatedId = useId()
 const fieldId = computed(() => props.id ?? generatedId)
+const selectedLabel = computed(
+  () => props.options.find(option => option.value === model.value)?.label ?? props.placeholder ?? ''
+)
 
 const triggerClasses = computed(() =>
   cn(
@@ -61,7 +64,7 @@ const itemClasses =
       :aria-invalid="invalid || undefined"
       :aria-describedby="errorId"
     >
-      <SelectValue :placeholder="placeholder" />
+      <SelectValue :placeholder="placeholder">{{ selectedLabel }}</SelectValue>
       <svg
         viewBox="0 0 24 24"
         class="h-4 w-4 shrink-0 text-muted-foreground"
