@@ -3,9 +3,13 @@ import { resolve } from 'path'
 
 const bnPath = resolve(import.meta.dirname, '../src/shared/locales/bn.json')
 const enPath = resolve(import.meta.dirname, '../src/shared/locales/en.json')
+const styleguideBnPath = resolve(import.meta.dirname, '../src/mobile/views/styleguide.bn.json')
+const styleguideEnPath = resolve(import.meta.dirname, '../src/mobile/views/styleguide.en.json')
 
 const bn = JSON.parse(readFileSync(bnPath, 'utf-8'))
 const en = JSON.parse(readFileSync(enPath, 'utf-8'))
+const styleguideBn = JSON.parse(readFileSync(styleguideBnPath, 'utf-8'))
+const styleguideEn = JSON.parse(readFileSync(styleguideEnPath, 'utf-8'))
 
 function getAllKeys(obj: Record<string, unknown>, prefix = ''): Set<string> {
   const keys = new Set<string>()
@@ -21,22 +25,39 @@ function getAllKeys(obj: Record<string, unknown>, prefix = ''): Set<string> {
   return keys
 }
 
-const bnKeys = getAllKeys(bn)
-const enKeys = getAllKeys(en)
+function compareKeys(
+  first: Record<string, unknown>,
+  second: Record<string, unknown>,
+  firstName: string,
+  secondName: string
+): boolean {
+  const firstKeys = getAllKeys(first)
+  const secondKeys = getAllKeys(second)
+  const missingInSecond = [...firstKeys].filter(key => !secondKeys.has(key))
+  const missingInFirst = [...secondKeys].filter(key => !firstKeys.has(key))
 
-const missingInEn = [...bnKeys].filter(k => !enKeys.has(k))
-const missingInBn = [...enKeys].filter(k => !bnKeys.has(k))
+  if (missingInSecond.length > 0 || missingInFirst.length > 0) {
+    if (missingInSecond.length > 0) {
+      console.error(`Missing keys in ${secondName}:`)
+      missingInSecond.forEach(key => console.error(`  - ${key}`))
+    }
+    if (missingInFirst.length > 0) {
+      console.error(`Missing keys in ${firstName}:`)
+      missingInFirst.forEach(key => console.error(`  - ${key}`))
+    }
+    return false
+  }
 
-if (missingInEn.length > 0 || missingInBn.length > 0) {
-  if (missingInEn.length > 0) {
-    console.error('Missing keys in en.json:')
-    missingInEn.forEach(k => console.error(`  - ${k}`))
-  }
-  if (missingInBn.length > 0) {
-    console.error('Missing keys in bn.json:')
-    missingInBn.forEach(k => console.error(`  - ${k}`))
-  }
-  process.exit(1)
+  console.log(`i18n keys match between ${firstName} and ${secondName}`)
+  return true
 }
 
-console.log('i18n keys match between bn.json and en.json')
+const sharedLocalesMatch = compareKeys(bn, en, 'bn.json', 'en.json')
+const styleguideLocalesMatch = compareKeys(
+  styleguideBn,
+  styleguideEn,
+  'styleguide.bn.json',
+  'styleguide.en.json'
+)
+
+if (!sharedLocalesMatch || !styleguideLocalesMatch) process.exitCode = 1
