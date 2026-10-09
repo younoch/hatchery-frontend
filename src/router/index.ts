@@ -5,7 +5,13 @@ import DevicePlaceholderView from '@/shared/components/DevicePlaceholderView.vue
 import { getInitialDeviceClass } from '@/shared/composables/useDeviceClass'
 
 const devRoutes = import.meta.env.DEV
-  ? [{ path: '/dev/styleguide', component: () => import('@/mobile/views/StyleguideView.vue') }]
+  ? [
+      { path: '/dev/styleguide', component: () => import('@/mobile/views/StyleguideView.vue') },
+      {
+        path: '/dev/styleguide/heavy',
+        component: () => import('@/mobile/views/StyleguideHeavyView.vue'),
+      },
+    ]
   : []
 
 export const router = createRouter({
