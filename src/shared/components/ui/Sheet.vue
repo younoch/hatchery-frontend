@@ -58,6 +58,7 @@ const sheetStyle = computed(() => ({
 
       <DialogContent
         :style="sheetStyle"
+        @keydown.esc.prevent="open = false"
         :class="
           cn(
             'fixed inset-x-0 bottom-[var(--sheet-offset-bottom)] z-50 mx-auto h-[68%] w-full max-w-[420px] rounded-t-sheet border border-border bg-card px-s-4 pb-s-4 pt-s-3',

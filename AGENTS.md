@@ -112,7 +112,8 @@ Each step ends at a checkpoint (section 3). Steps are deliberately small. If one
 - **Step 7: Field and Input.** Form field wrapper (label, control, error), numeric input with a static unit label, numeric stepper input (−/+, long-press repeat, 44px buttons), Select.
 - **Step 8: Sheet and Tabs.** Bottom Sheet with focus trap, Esc, scrim, and focus returning to the trigger; sub-tabs with the small-control touch area.
 - **Step 9: Layout components.** `PageHeader`, `FormSection` (collapsible), `FieldGrid`, `StickyActionBar`, `CardList`. They own all spacing. Add a lint or review rule that view files do not use margin or padding utilities.
-- **Step 10: Styleguide page.** `/dev/styleguide` showing every component in Bangla and English. Include one heavy screen (about 14 fields in sections) as a stress test.
+- **Step 10a: Styleguide, components only.** `/dev/styleguide` (dev builds only, `import.meta.env.DEV`; must not ship in the production bundle or precache). Show every existing shared component with its variants and states, in Bangla and English, using the single existing language switch. The page is a view file, so the no-view-spacing-utils rule applies: spacing only through layout components. Extend `scripts/check-layout-classes.mjs` to scan all `.css` files in `dist/assets` and also `src/**/views/**/*.vue`.
+- **Step 10b: Styleguide, heavy screen.** One stress-test screen (about 14 fields in sections) added to the styleguide, 360px in bn and en.
 
 **Phase C: Shells**
 - **Step 11: Mobile shell.** App bar (bell with unread count, online chip, language), `BottomTabBar`, `MoreSheet`, notifications sheet (sample data), with the ARIA and focus rules from the plan.

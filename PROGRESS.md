@@ -11,8 +11,9 @@
 | 6 | Button | done | 2026-10-06 |
 | 7 | Field and Input | done | 2026-10-07 |
 | 8 | Sheet and Tabs | done | 2026-10-09 |
-| 9 | Layout components | in review | - |
-| 10 | Styleguide page | not started | - |
+| 9 | Layout components | done | 2026-10-09 |
+| 10a | Styleguide: components | in review | - |
+| 10b | Styleguide: heavy screen | not started | - |
 | 11 | Mobile shell | not started | - |
 | 12 | Desktop shell | not started | - |
 | 13 | Swipe navigation | not started | - |
@@ -40,6 +41,7 @@
 - 2026-10-05: i18n setup with vue-i18n (legacy: false, default locale: bn, fallback: bn). Language toggle persisted in localStorage, lang attribute kept in sync.
 - 2026-10-06: esbuild build script allowed in pnpm-workspace.yaml because vite 8.3.2 resolves tsx/esbuild; revisit when upgrading vite.
 - 2026-10-06: Device auto-detection uses the existing 48rem breakpoint; only narrow Android viewports default to mobile.
+- 2026-10-09: The dev-only `/dev/styleguide` route is excluded from the prefixed mobile/desktop redirect, and the layout class audit now checks both built CSS assets and view files.
 ## Parking lot
 - Switch to single "typescript-eslint" package
 - Clean up woff files in dist (keep only woff2)
