@@ -37,6 +37,8 @@ html[lang='bn'] {
 
   /* Font family */
   --font-sans: 'Inter', 'Noto Sans Bengali', system-ui, -apple-system, sans-serif;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
 
   /* Breakpoint for mobile/desktop split (48rem = 768px) */
   --breakpoint-desktop: 48rem;
