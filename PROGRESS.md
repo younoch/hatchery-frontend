@@ -12,7 +12,7 @@
 | 7 | Field and Input | done | 2026-10-07 |
 | 8 | Sheet and Tabs | done | 2026-10-09 |
 | 9 | Layout components | done | 2026-10-09 |
-| 10a | Styleguide: components | in review | - |
+| 10a | Styleguide: components | done | 2026-10-09
 | 10b | Styleguide: heavy screen | not started | - |
 | 11 | Mobile shell | not started | - |
 | 12 | Desktop shell | not started | - |
