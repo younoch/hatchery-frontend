@@ -10,8 +10,8 @@
 | 5 | Folder structure and routing | done | 2026-10-06 |
 | 6 | Button | done | 2026-10-06 |
 | 7 | Field and Input | done | 2026-10-07 |
-| 8 | Sheet and Tabs | in review | - |
-| 9 | Layout components | not started | - |
+| 8 | Sheet and Tabs | done | 2026-10-09 |
+| 9 | Layout components | in review | - |
 | 10 | Styleguide page | not started | - |
 | 11 | Mobile shell | not started | - |
 | 12 | Desktop shell | not started | - |
@@ -45,3 +45,4 @@
 - Clean up woff files in dist (keep only woff2)
 - Check vue-i18n CSP behavior in the browser console by serving dist with script-src 'self' and no unsafe-eval; now unblocked because the Step 5 placeholder calls t()
 - class-variance-authority is in devDependencies but used at runtime; ask owner before moving to dependencies
+- Decide whether to add a shadow token for StickyActionBar's rgba(0,0,0,0.12); no shadow token was added in Step 9
