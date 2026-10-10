@@ -4,12 +4,28 @@
     "cancel": "বাতিল",
     "close": "বন্ধ করুন",
     "decreaseValue": "মান কমান",
-    "increaseValue": "মান বাড়ান"
+    "increaseValue": "মান বাড়ান",
+    "toggleLanguage": "ভাষা পরিবর্তন করুন"
   },
   "device": {
     "mobilePlaceholder": "মোবাইল ভিউ",
     "desktopPlaceholder": "ডেস্কটপ ভিউ",
     "switchToMobile": "মোবাইল ভিউতে যান",
     "switchToDesktop": "ডেস্কটপ ভিউতে যান"
+  },
+  "network": {
+    "online": "অনলাইন",
+    "offline": "অফলাইন",
+    "offlineBanner": "ইন্টারনেট নেই। সেভ করা এন্ট্রি ফোনে থাকবে, ইন্টারনেট এলে নিজে নিজে সিঙ্ক হবে।"
+  },
+  "nav": {
+    "waterQuality": "পানির মান"
+  },
+  "notifications": {
+    "labelNew": "বিজ্ঞপ্তি, {count}টি নতুন",
+    "labelNone": "বিজ্ঞপ্তি, নতুন কিছু নেই"
+  },
+  "language": {
+    "toggleLabel": "EN"
   }
 }

@@ -4,12 +4,28 @@
     "cancel": "Cancel",
     "close": "Close",
     "decreaseValue": "Decrease value",
-    "increaseValue": "Increase value"
+    "increaseValue": "Increase value",
+    "toggleLanguage": "Switch language"
   },
   "device": {
     "mobilePlaceholder": "Mobile view",
     "desktopPlaceholder": "Desktop view",
     "switchToMobile": "Switch to mobile view",
     "switchToDesktop": "Switch to desktop view"
+  },
+  "network": {
+    "online": "Online",
+    "offline": "Offline",
+    "offlineBanner": "No internet. Saved entries stay on this phone and sync automatically when you are back online."
+  },
+  "nav": {
+    "waterQuality": "Water Quality"
+  },
+  "notifications": {
+    "labelNew": "Notifications, {count} new",
+    "labelNone": "Notifications, none new"
+  },
+  "language": {
+    "toggleLabel": "বাংলা"
   }
 }
