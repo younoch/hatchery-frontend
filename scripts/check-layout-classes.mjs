@@ -3,9 +3,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const sharedComponentsDir = join(root, 'src/shared/components')
-const layoutDir = join(root, 'src/shared/components/layout')
-const viewDir = join(root, 'src')
+const srcDir = join(root, 'src')
 const assetsDir = join(root, 'dist/assets')
 
 async function collectVueFiles(directory) {
@@ -56,18 +54,8 @@ function hasSelector(css, token) {
   }
   return false
 }
-
 async function collectRelevantVueFiles() {
-  const [componentEntries, layoutFiles, viewFiles] = await Promise.all([
-    readdir(sharedComponentsDir, { withFileTypes: true }),
-    collectVueFiles(layoutDir),
-    collectVueFiles(viewDir).then(files => files.filter(file => /\/views\//.test(file))),
-  ])
-  const componentFiles = componentEntries
-    .filter(entry => entry.isFile() && entry.name.endsWith('.vue'))
-    .map(entry => join(sharedComponentsDir, entry.name))
-
-  return [...new Set([...componentFiles, ...layoutFiles, ...viewFiles])]
+  return collectVueFiles(srcDir)
 }
 
 const files = await collectRelevantVueFiles()
