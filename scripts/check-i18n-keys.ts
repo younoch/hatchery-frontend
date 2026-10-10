@@ -60,4 +60,10 @@ const styleguideLocalesMatch = compareKeys(
   'styleguide.en.json'
 )
 
-if (!sharedLocalesMatch || !styleguideLocalesMatch) process.exitCode = 1
+const heavyBnPath = resolve(import.meta.dirname, '../src/mobile/views/heavy.bn.json')
+const heavyEnPath = resolve(import.meta.dirname, '../src/mobile/views/heavy.en.json')
+const heavyBn = JSON.parse(readFileSync(heavyBnPath, 'utf-8'))
+const heavyEn = JSON.parse(readFileSync(heavyEnPath, 'utf-8'))
+const heavyLocalesMatch = compareKeys(heavyBn, heavyEn, 'heavy.bn.json', 'heavy.en.json')
+
+if (!sharedLocalesMatch || !styleguideLocalesMatch || !heavyLocalesMatch) process.exitCode = 1
