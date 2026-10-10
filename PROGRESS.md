@@ -15,7 +15,7 @@
 | 10a | Styleguide: components | done | 2026-10-09
 | 10b | Styleguide: heavy screen | done | 2026-10-10
 | 11a | Mobile shell, app bar | done | 2026-10-10
-| 11b | Mobile shell, tab bar | not started | |
+| 11b | Mobile shell, tab bar | done | 2026-10-10
 | 11c | Mobile shell, notifications | not started | |
 | 12 | Desktop shell | not started | - |
 | 13 | Swipe navigation | not started | - |

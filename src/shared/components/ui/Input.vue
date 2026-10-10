@@ -32,14 +32,14 @@ const fieldId = computed(() => props.id ?? generatedId)
 
 const inputClasses = computed(() =>
   cn(
-    'h-control w-full min-w-0 bg-transparent px-s-3 text-body text-foreground placeholder:text-muted-foreground',
+    'h-control w-full min-w-[0] bg-transparent px-s-3 text-body text-foreground placeholder:text-muted-foreground',
     props.inputClass
   )
 )
 
 const wrapperClasses = computed(() =>
   cn(
-    'flex h-control min-w-0 items-center overflow-hidden rounded-control border bg-card transition-colors',
+    'flex h-control min-w-[0] items-center overflow-hidden rounded-control border bg-card transition-colors',
     props.invalid ? 'border-danger' : 'border-border',
     'field-control',
     props.class
@@ -49,16 +49,8 @@ const wrapperClasses = computed(() =>
 
 <template>
   <div :class="wrapperClasses">
-    <input
-      v-bind="$attrs"
-      :id="fieldId"
-      v-model="model"
-      :type="type"
-      :inputmode="inputmode"
-      :aria-invalid="invalid || undefined"
-      :aria-describedby="invalid ? errorId : undefined"
-      :class="inputClasses"
-    />
+    <input v-bind="$attrs" :id="fieldId" v-model="model" :type="type" :inputmode="inputmode"
+      :aria-invalid="invalid || undefined" :aria-describedby="invalid ? errorId : undefined" :class="inputClasses" />
     <span v-if="unit" class="mr-s-3 shrink-0 text-label font-medium text-muted-foreground">
       {{ unit }}
     </span>

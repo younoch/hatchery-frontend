@@ -35,7 +35,7 @@ const hasError = computed(() => Boolean(errorText.value))
 </script>
 
 <template>
-  <div :class="cn('flex min-w-0 flex-col gap-s-1', props.class)">
+  <div :class="cn('flex min-w-[0px] flex-col gap-s-1', props.class)">
     <div v-if="label || hint" class="flex items-center justify-between gap-s-2">
       <label
         v-if="label"
@@ -48,7 +48,7 @@ const hasError = computed(() => Boolean(errorText.value))
       <span v-if="hint" class="text-caption text-muted-foreground">{{ hint }}</span>
     </div>
 
-    <div :class="cn('min-w-0', props.contentClass)">
+    <div :class="cn('min-w-[0px]', props.contentClass)">
       <slot :id="id" :error-id="errorId" :has-error="hasError" />
     </div>
 
@@ -60,7 +60,7 @@ const hasError = computed(() => Boolean(errorText.value))
     >
       <svg
         viewBox="0 0 24 24"
-        class="mt-0.5 h-3.5 w-3.5 shrink-0"
+        class="mt-[0.125rem] h-[0.875rem] w-[0.875rem] shrink-0"
         fill="none"
         stroke="currentColor"
         stroke-width="2"
@@ -77,7 +77,7 @@ const hasError = computed(() => Boolean(errorText.value))
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .required-indicator::before {
   content: '*';
   color: var(--color-danger);
