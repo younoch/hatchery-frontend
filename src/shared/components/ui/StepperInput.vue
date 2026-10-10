@@ -141,37 +141,88 @@ onBeforeUnmount(stopRepeat)
 </script>
 
 <template>
-  <Field :label="label" :id="id" :hint="hint" :error-key="errorKey" :error-params="errorParams" :required="required"
-    :class="props.class">
+  <Field
+    :label="label"
+    :id="id"
+    :hint="hint"
+    :error-key="errorKey"
+    :error-params="errorParams"
+    :required="required"
+    :class="props.class"
+  >
     <template #default="{ id: fieldId, errorId, hasError }">
       <div :class="wrapperClasses">
-        <button type="button" :class="[stepClasses, 'border-r border-border']" :disabled="disabled"
-          :aria-label="t('common.decreaseValue')" @pointerdown="beginRepeat(-1)" @pointerup="stopRepeat"
-          @pointerleave="stopRepeat" @pointercancel="stopRepeat" @click="handleKeyboardClick(-1, $event)"
-          @contextmenu.prevent>
-          <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" aria-hidden="true">
+        <button
+          type="button"
+          :class="[stepClasses, 'border-r border-border']"
+          :disabled="disabled"
+          :aria-label="t('common.decreaseValue')"
+          @pointerdown="beginRepeat(-1)"
+          @pointerup="stopRepeat"
+          @pointerleave="stopRepeat"
+          @pointercancel="stopRepeat"
+          @click="handleKeyboardClick(-1, $event)"
+          @contextmenu.prevent
+        >
+          <svg
+            viewBox="0 0 24 24"
+            class="h-4 w-4"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
             <path d="M5 12h14" />
           </svg>
         </button>
 
-        <input :id="fieldId" v-model="inputValue" type="text" inputmode="decimal" :min="min" :max="max" :step="step"
-          :disabled="disabled" role="spinbutton" :aria-valuemin="Number.isFinite(min) ? min : undefined"
-          :aria-valuemax="Number.isFinite(max) ? max : undefined" :aria-valuenow="
+        <input
+          :id="fieldId"
+          v-model="inputValue"
+          type="text"
+          inputmode="decimal"
+          :min="min"
+          :max="max"
+          :step="step"
+          :disabled="disabled"
+          role="spinbutton"
+          :aria-valuemin="Number.isFinite(min) ? min : undefined"
+          :aria-valuemax="Number.isFinite(max) ? max : undefined"
+          :aria-valuenow="
             inputValue !== '' && Number.isFinite(Number(inputValue))
               ? Number(inputValue)
               : undefined
-          " :aria-invalid="hasError ? 'true' : undefined" :aria-describedby="hasError ? errorId : undefined"
-          :class="inputClasses" @input="emit('confirmed')" />
+          "
+          :aria-invalid="hasError ? 'true' : undefined"
+          :aria-describedby="hasError ? errorId : undefined"
+          :class="inputClasses"
+          @input="emit('confirmed')"
+        />
 
         <span v-if="unit" class="mr-s-2 shrink-0 text-label text-muted-foreground">{{ unit }}</span>
 
-        <button type="button" :class="[stepClasses, 'border-l border-border']" :disabled="disabled"
-          :aria-label="t('common.increaseValue')" @pointerdown="beginRepeat(1)" @pointerup="stopRepeat"
-          @pointerleave="stopRepeat" @pointercancel="stopRepeat" @click="handleKeyboardClick(1, $event)"
-          @contextmenu.prevent>
-          <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" aria-hidden="true">
+        <button
+          type="button"
+          :class="[stepClasses, 'border-l border-border']"
+          :disabled="disabled"
+          :aria-label="t('common.increaseValue')"
+          @pointerdown="beginRepeat(1)"
+          @pointerup="stopRepeat"
+          @pointerleave="stopRepeat"
+          @pointercancel="stopRepeat"
+          @click="handleKeyboardClick(1, $event)"
+          @contextmenu.prevent
+        >
+          <svg
+            viewBox="0 0 24 24"
+            class="h-4 w-4"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
             <path d="M12 5v14M5 12h14" />
           </svg>
         </button>

@@ -56,12 +56,16 @@ const sheetStyle = computed(() => ({
     <DialogPortal>
       <DialogOverlay class="fixed bottom-[0] left-[0] right-[0] top-[0] z-40 bg-foreground/50" />
 
-      <DialogContent :style="sheetStyle" @keydown.esc.prevent="open = false" :class="
+      <DialogContent
+        :style="sheetStyle"
+        @keydown.esc.prevent="open = false"
+        :class="
           cn(
             'fixed left-[0] right-[0] bottom-[var(--sheet-offset-bottom)] z-50 mx-auto h-[68%] w-full max-w-[420px] rounded-t-sheet border border-border bg-card px-s-4 pb-s-4 pt-s-3',
             props.contentClass
           )
-        ">
+        "
+      >
         <div class="mx-auto flex w-full max-w-[420px] flex-col gap-s-3">
           <div class="mx-auto h-[0.375rem] w-[3rem] rounded-full bg-muted" aria-hidden="true" />
 
@@ -77,11 +81,21 @@ const sheetStyle = computed(() => ({
             <div v-else class="flex-1" />
 
             <DialogClose as-child>
-              <button type="button"
+              <button
+                type="button"
                 class="flex h-control w-[var(--control-h)] shrink-0 items-center justify-center rounded-control text-muted-foreground transition-colors hover:bg-muted active:bg-border focus-visible:outline-none"
-                :aria-label="t('common.close')">
-                <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                :aria-label="t('common.close')"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
                   <path d="M6 6l12 12M18 6L6 18" />
                 </svg>
               </button>

@@ -49,8 +49,16 @@ const wrapperClasses = computed(() =>
 
 <template>
   <div :class="wrapperClasses">
-    <input v-bind="$attrs" :id="fieldId" v-model="model" :type="type" :inputmode="inputmode"
-      :aria-invalid="invalid || undefined" :aria-describedby="invalid ? errorId : undefined" :class="inputClasses" />
+    <input
+      v-bind="$attrs"
+      :id="fieldId"
+      v-model="model"
+      :type="type"
+      :inputmode="inputmode"
+      :aria-invalid="invalid || undefined"
+      :aria-describedby="invalid ? errorId : undefined"
+      :class="inputClasses"
+    />
     <span v-if="unit" class="mr-s-3 shrink-0 text-label font-medium text-muted-foreground">
       {{ unit }}
     </span>
