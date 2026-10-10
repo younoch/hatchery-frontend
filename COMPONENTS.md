@@ -20,3 +20,5 @@
 | PageBody | src/shared/components/layout/PageBody.vue | Page content wrapper owning `min-w-[0] px-s-4 pt-s-3 pb-s-4` without scrolling or height behavior. | default slot |
 | MobileAppBar | src/mobile/components/nav/MobileAppBar.vue | Mobile app bar on `PageHeader`: route title (from `meta.titleKey`), bell with unread badge (sample count, not wired yet), online/offline status chip, language toggle. | none (reads route meta, `useNotificationCount`, `useOnlineStatus`, `useLanguage`) |
 | MobileShell | src/mobile/layouts/MobileShell.vue | Mobile route layout: app bar, offline banner (`role="status"`), scrolling content area with `<router-view />`. Tab bar is added in Step 11b. | none |
+| BottomTabBar | src/mobile/components/nav/BottomTabBar.vue | Bottom nav built from `navItems` (one link per module, `aria-current` on the active one) plus a fixed "More" tab that opens MoreSheet. Columns follow item count. | none |
+| MoreSheet | src/mobile/components/nav/MoreSheet.vue | Bottom sheet opened by the trigger slot (the More tab); holds the desktop-view switch for now. Owns its open state. | bottomOffset; slot `trigger` |

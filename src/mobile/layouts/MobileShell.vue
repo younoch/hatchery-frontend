@@ -2,6 +2,7 @@
 import { useI18n } from 'vue-i18n'
 
 import MobileAppBar from '@/mobile/components/nav/MobileAppBar.vue'
+import BottomTabBar from '@/mobile/components/nav/BottomTabBar.vue'
 import { useOnlineStatus } from '@/shared/composables/useOnlineStatus'
 
 const { t } = useI18n()
@@ -35,5 +36,6 @@ const { isOnline } = useOnlineStatus()
     <main class="min-h-[0] flex-1 overflow-y-auto">
       <router-view />
     </main>
+    <BottomTabBar />
   </div>
 </template>

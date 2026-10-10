@@ -19,7 +19,9 @@
     "offlineBanner": "No internet. Saved entries stay on this phone and sync automatically when you are back online."
   },
   "nav": {
-    "waterQuality": "Water Quality"
+    "waterQuality": "Water Quality",
+    "main": "Main navigation",
+    "more": "More"
   },
   "notifications": {
     "labelNew": "Notifications, {count} new",
