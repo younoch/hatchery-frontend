@@ -29,5 +29,16 @@
   },
   "language": {
     "toggleLabel": "EN"
+  },
+  "validation": {
+    "required": "মান লিখুন",
+    "number": "সংখ্যা লিখুন",
+    "ph": { "outOfRange": "{min} থেকে {max} এর মধ্যে লিখুন" },
+    "temperatureC": { "outOfRange": "{min} থেকে {max} এর মধ্যে লিখুন" },
+    "salinityPpt": { "outOfRange": "{min} থেকে {max} এর মধ্যে লিখুন" },
+    "oxygenMgL": { "outOfRange": "{min} থেকে {max} এর মধ্যে লিখুন" },
+    "tank": { "required": "ট্যাঙ্ক বাছুন" },
+    "recordedAt": { "invalid": "সঠিক সময় দিন" },
+    "note": { "tooLong": "সর্বোচ্চ {max} অক্ষর" }
   }
 }

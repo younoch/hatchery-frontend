@@ -16,9 +16,9 @@
 | 10b | Styleguide: heavy screen | done | 2026-10-10
 | 11a | Mobile shell, app bar | done | 2026-10-10
 | 11b | Mobile shell, tab bar | done | 2026-10-10
-| 11c | Mobile shell, notifications | not started | |
-| 12 | Desktop shell | not started | - |
-| 13 | Swipe navigation | not started | - |
+| 11c | Mobile shell, notifications | deferred|-|
+| 12 | Desktop shell | deferred | - |
+| 13 | Swipe navigation | deferred | - |
 | 14 | PWA basics | not started | - |
 | 15 | Schema | not started | - |
 | 16 | Dexie storage layer | not started | - |
@@ -44,6 +44,7 @@
 - 2026-10-06: esbuild build script allowed in pnpm-workspace.yaml because vite 8.3.2 resolves tsx/esbuild; revisit when upgrading vite.
 - 2026-10-06: Device auto-detection uses the existing 48rem breakpoint; only narrow Android viewports default to mobile.
 - 2026-10-09: The dev-only `/dev/styleguide` route is excluded from the prefixed mobile/desktop redirect, and the layout class audit now checks both built CSS assets and view files.
+- - 2026-10-10: vertical slice; order 15, 16, 17, 18, then 14 (PWA); 11c/12/13 deferred until client feedback.
 ## Parking lot
 - Switch to single "typescript-eslint" package
 - Clean up woff files in dist (keep only woff2)
