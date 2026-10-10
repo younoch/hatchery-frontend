@@ -13,8 +13,10 @@
 | 8 | Sheet and Tabs | done | 2026-10-09 |
 | 9 | Layout components | done | 2026-10-09 |
 | 10a | Styleguide: components | done | 2026-10-09
-| 10b | Styleguide: heavy screen | not started | - |
-| 11 | Mobile shell | not started | - |
+| 10b | Styleguide: heavy screen | done | 2026-10-10
+| 11a | Mobile shell, app bar | done | 2026-10-10
+| 11b | Mobile shell, tab bar | not started | |
+| 11c | Mobile shell, notifications | not started | |
 | 12 | Desktop shell | not started | - |
 | 13 | Swipe navigation | not started | - |
 | 14 | PWA basics | not started | - |

@@ -18,3 +18,5 @@
 | CardList | src/shared/components/layout/CardList.vue | Semantic list container owning card gap (`gap-s-2`) and optional empty state. | as, empty, emptyKey, class; slots `empty`, default |
 | SectionStack | src/shared/components/layout/SectionStack.vue | Grid container owning the 24px gap between page sections (`gap-s-6`). | default slot |
 | PageBody | src/shared/components/layout/PageBody.vue | Page content wrapper owning `min-w-[0] px-s-4 pt-s-3 pb-s-4` without scrolling or height behavior. | default slot |
+| MobileAppBar | src/mobile/components/nav/MobileAppBar.vue | Mobile app bar on `PageHeader`: route title (from `meta.titleKey`), bell with unread badge (sample count, not wired yet), online/offline status chip, language toggle. | none (reads route meta, `useNotificationCount`, `useOnlineStatus`, `useLanguage`) |
+| MobileShell | src/mobile/layouts/MobileShell.vue | Mobile route layout: app bar, offline banner (`role="status"`), scrolling content area with `<router-view />`. Tab bar is added in Step 11b. | none |

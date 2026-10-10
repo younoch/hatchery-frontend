@@ -116,7 +116,9 @@ Each step ends at a checkpoint (section 3). Steps are deliberately small. If one
 - **Step 10b: Styleguide, heavy screen.** One stress-test screen (about 14 fields in sections) added to the styleguide, 360px in bn and en.
 
 **Phase C: Shells**
-- **Step 11: Mobile shell.** App bar (bell with unread count, online chip, language), `BottomTabBar`, `MoreSheet`, notifications sheet (sample data), with the ARIA and focus rules from the plan.
+- **Step 11a: Mobile shell, app bar.** `MobileShell` structure (app bar, scrolling content area, offline banner) and the app bar
+- **Step 11b: Mobile shell, tab bar.** `BottomTabBar` (5 items, `aria-current`, 56px items) and `MoreSheet` (opens above the tab bar, groups from the prototype), built on the existing `Sheet`.
+- **Step 11c: Mobile shell, notifications.** Notifications sheet (sample data, bell opens it, mark-all-read), and fix the `Sheet` height so it is relative to the app container, not the viewport. Scrim becomes `bg-foreground/50`.
 - **Step 12: Desktop shell.** `Sidebar` and `TopNavbar`, minimal.
 - **Step 13: Swipe navigation.** VueUse `useSwipe`, 20-30px edge offset, disabled over drag inputs.
 - **Step 14: PWA basics.** `vite-plugin-pwa`, manifest, offline fallback page, `mkcert` HTTPS, install prompt, "offline ready" state.
