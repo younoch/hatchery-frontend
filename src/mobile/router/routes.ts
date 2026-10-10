@@ -6,7 +6,13 @@ export const mobileRoutes: RouteRecordRaw[] = [
   {
     path: '/m',
     component: MobileShell,
+    redirect: '/m/water',
     children: [
+      {
+        path: 'water',
+        component: PlaceholderView,
+        meta: { titleKey: 'nav.waterQuality' },
+      },
       {
         path: ':pathMatch(.*)*',
         component: PlaceholderView,
