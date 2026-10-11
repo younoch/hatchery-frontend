@@ -47,3 +47,17 @@ export const waterReadingSchema = z.object({
 })
 
 export type WaterReadingInput = z.infer<typeof waterReadingSchema>
+
+// Form fields hand over strings (typing) or numbers (stepper); empty means missing.
+function toNumber(value: unknown): unknown {
+  if (typeof value !== 'string') return value
+  const trimmed = value.trim()
+  return trimmed === '' ? undefined : Number(trimmed.replace(',', '.'))
+}
+
+export const waterReadingFormSchema = waterReadingSchema.extend({
+  ph: z.preprocess(toNumber, waterReadingSchema.shape.ph),
+  temperatureC: z.preprocess(toNumber, waterReadingSchema.shape.temperatureC),
+  salinityPpt: z.preprocess(toNumber, waterReadingSchema.shape.salinityPpt),
+  oxygenMgL: z.preprocess(toNumber, waterReadingSchema.shape.oxygenMgL),
+})

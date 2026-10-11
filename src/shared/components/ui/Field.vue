@@ -77,7 +77,7 @@ const hasError = computed(() => Boolean(errorText.value))
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .required-indicator::before {
   content: '*';
   color: var(--color-danger);

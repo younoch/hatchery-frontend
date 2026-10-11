@@ -40,5 +40,18 @@
     "tank": { "required": "Choose a tank" },
     "recordedAt": { "invalid": "Enter a valid time" },
     "note": { "tooLong": "At most {max} characters" }
+  },
+  "water": {
+    "recordedAt": "Tested at",
+    "tank": "Tank / pond",
+    "ph": "pH",
+    "temperature": "Temperature",
+    "salinity": "Salinity",
+    "oxygen": "Oxygen (O₂)",
+    "moreDetails": "More details",
+    "note": "Note",
+    "optional": "(optional)",
+    "saved": "Saved on this phone. It will sync when you are online.",
+    "cancelled": "Cancelled. What you typed was cleared."
   }
 }

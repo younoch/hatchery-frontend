@@ -33,12 +33,39 @@
   "validation": {
     "required": "মান লিখুন",
     "number": "সংখ্যা লিখুন",
-    "ph": { "outOfRange": "{min} থেকে {max} এর মধ্যে লিখুন" },
-    "temperatureC": { "outOfRange": "{min} থেকে {max} এর মধ্যে লিখুন" },
-    "salinityPpt": { "outOfRange": "{min} থেকে {max} এর মধ্যে লিখুন" },
-    "oxygenMgL": { "outOfRange": "{min} থেকে {max} এর মধ্যে লিখুন" },
-    "tank": { "required": "ট্যাঙ্ক বাছুন" },
-    "recordedAt": { "invalid": "সঠিক সময় দিন" },
-    "note": { "tooLong": "সর্বোচ্চ {max} অক্ষর" }
+    "ph": {
+      "outOfRange": "{min} থেকে {max} এর মধ্যে লিখুন"
+    },
+    "temperatureC": {
+      "outOfRange": "{min} থেকে {max} এর মধ্যে লিখুন"
+    },
+    "salinityPpt": {
+      "outOfRange": "{min} থেকে {max} এর মধ্যে লিখুন"
+    },
+    "oxygenMgL": {
+      "outOfRange": "{min} থেকে {max} এর মধ্যে লিখুন"
+    },
+    "tank": {
+      "required": "ট্যাঙ্ক বাছুন"
+    },
+    "recordedAt": {
+      "invalid": "সঠিক সময় দিন"
+    },
+    "note": {
+      "tooLong": "সর্বোচ্চ {max} অক্ষর"
+    }
+  },
+  "water": {
+    "recordedAt": "পরীক্ষার সময়",
+    "tank": "ট্যাঙ্ক / পুকুর",
+    "ph": "pH",
+    "temperature": "তাপমাত্রা",
+    "salinity": "লবণাক্ততা",
+    "oxygen": "অক্সিজেন (O₂)",
+    "moreDetails": "আরও তথ্য",
+    "note": "মন্তব্য",
+    "optional": "(ঐচ্ছিক)",
+    "saved": "সেভ হয়েছে। ফোনে আছে, ইন্টারনেট এলে সিঙ্ক হবে।",
+    "cancelled": "বাতিল করা হয়েছে, লেখা মুছে গেছে।"
   }
 }
