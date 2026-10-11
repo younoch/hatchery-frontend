@@ -24,7 +24,9 @@
 | 16 | Dexie storage layer | done | 2026-10-11 |
 | 17a | Entry screen, form and save | done | 2026-10-11 |
 | 17b | Entry screen, last value | done | 2026-10-12 |
-| 18 | History and sync badge | not started | - |
+| 18a | History: sub-tabs and card list | not started | - |
+| 18b | History: StatusBadge and pending count | not started | - |
+| 18c | History: fix-and-resend (local only) | not started | - |
 | 19 | Error handling | not started | - |
 | 20 | Auth | not started | - |
 | 21 | Sync engine | not started | - |
@@ -50,6 +52,8 @@
 - 2026-10-11: Step 17 split into 17a (form, validation, save) and 17b (last-value prefill and confirm rule); step sizes and 24h limit are samples until the owner confirms.
 - 2026-10-12: Step 17b step sizes (pH 0.1, temperature 0.5, salinity 1, oxygen 0.1) and the 24h prefill limit are still samples; owner has not confirmed them.
 - 2026-10-12: Formatting is no longer an ESLint error (`prettier/prettier` rule off); Prettier is run by hand on specific files.
+- 2026-10-12: Step 18 split into 18a (sub-tabs and card list from real Dexie data), 18b (shared StatusBadge, pending count) and 18c (fix-and-resend, local update only). The real send happens in Step 21 (sync engine).
+- 2026-10-12: Until Step 21, real records are only `pending`. The styleguide shows all four badge states as samples so the visuals can be checked.
 ## Parking lot
 - Switch to single "typescript-eslint" package
 - Clean up woff files in dist (keep only woff2)
