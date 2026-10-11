@@ -21,7 +21,7 @@
 | 13 | Swipe navigation | deferred | - |
 | 14 | PWA basics | not started | - |
 | 15 | Schema | done | 2026-10-10 |
-| 16 | Dexie storage layer | not started | - |
+| 16 | Dexie storage layer | done | 2026-10-11 |
 | 17 | Entry screen | not started | - |
 | 18 | History and sync badge | not started | - |
 | 19 | Error handling | not started | - |
