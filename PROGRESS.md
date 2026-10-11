@@ -22,8 +22,8 @@
 | 14 | PWA basics | not started | - |
 | 15 | Schema | done | 2026-10-10 |
 | 16 | Dexie storage layer | done | 2026-10-11 |
-| 17a | Entry screen, form and save | done | 2026-10-11
-| 17b | Entry screen, last value | not started | |
+| 17a | Entry screen, form and save | done | 2026-10-11 |
+| 17b | Entry screen, last value | done | 2026-10-12 |
 | 18 | History and sync badge | not started | - |
 | 19 | Error handling | not started | - |
 | 20 | Auth | not started | - |
@@ -48,6 +48,8 @@
 - 2026-10-10: vertical slice; order 15, 16, 17, 18, then 14 (PWA); 11c/12/13 deferred until client feedback.
 - 2026-10-11: tank list is a fixed config (src/shared/config/tanks.ts) for the prototype; backend-driven tanks and organization module come after client feedback.
 - 2026-10-11: Step 17 split into 17a (form, validation, save) and 17b (last-value prefill and confirm rule); step sizes and 24h limit are samples until the owner confirms.
+- 2026-10-12: Step 17b step sizes (pH 0.1, temperature 0.5, salinity 1, oxygen 0.1) and the 24h prefill limit are still samples; owner has not confirmed them.
+- 2026-10-12: Formatting is no longer an ESLint error (`prettier/prettier` rule off); Prettier is run by hand on specific files.
 ## Parking lot
 - Switch to single "typescript-eslint" package
 - Clean up woff files in dist (keep only woff2)
@@ -56,3 +58,5 @@
 - Decide whether to add a shadow token for StickyActionBar's rgba(0,0,0,0.12); no shadow token was added in Step 9
 - 2026-10-10: vertical slice, only water quality; tab bar from navItems config, More sheet holds desktop switch only; more modules on client feedback.
 - Audit still reports min-w-0, h-3.5, w-3.5, mt-0.5 (location unknown, not in ui/*.vue top level) and required-indicator (Field's own <style> class, audit should ignore it)
+- Move the "same as last" chip into the label row of StepperInput (needs a look at Field.vue); it currently sits in its own row above the control.
+- `chip-row` in StepperInput uses scoped CSS; move it to a token or layout component later.
