@@ -477,6 +477,7 @@ export const db = new HatcheryDB()
 - Ownership-scoped edit permission (own vs any record) and record creator/owner handling — backend not ready
 - Alerts/notifications for late-synced or dangerous readings — to be decided later
 - Optional PIN on the offline local session — post-MVP
+- Tank list: fixed config for the prototype; organization-scoped, backend-driven tanks (and an organization module) after client feedback. Adding `tanks` to Dexie then needs `version(2)`; existing readings stay untouched.
 
 ## Appendix A: Backend change instruction (for the NestJS backend LLM/session)
 

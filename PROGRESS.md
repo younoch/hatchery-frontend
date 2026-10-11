@@ -20,7 +20,7 @@
 | 12 | Desktop shell | deferred | - |
 | 13 | Swipe navigation | deferred | - |
 | 14 | PWA basics | not started | - |
-| 15 | Schema | not started | - |
+| 15 | Schema | done | 2026-10-10 |
 | 16 | Dexie storage layer | not started | - |
 | 17 | Entry screen | not started | - |
 | 18 | History and sync badge | not started | - |
@@ -44,7 +44,8 @@
 - 2026-10-06: esbuild build script allowed in pnpm-workspace.yaml because vite 8.3.2 resolves tsx/esbuild; revisit when upgrading vite.
 - 2026-10-06: Device auto-detection uses the existing 48rem breakpoint; only narrow Android viewports default to mobile.
 - 2026-10-09: The dev-only `/dev/styleguide` route is excluded from the prefixed mobile/desktop redirect, and the layout class audit now checks both built CSS assets and view files.
-- - 2026-10-10: vertical slice; order 15, 16, 17, 18, then 14 (PWA); 11c/12/13 deferred until client feedback.
+- 2026-10-10: vertical slice; order 15, 16, 17, 18, then 14 (PWA); 11c/12/13 deferred until client feedback.
+- 2026-10-11: tank list is a fixed config (src/shared/config/tanks.ts) for the prototype; backend-driven tanks and organization module come after client feedback.
 ## Parking lot
 - Switch to single "typescript-eslint" package
 - Clean up woff files in dist (keep only woff2)
