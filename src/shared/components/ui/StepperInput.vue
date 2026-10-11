@@ -60,7 +60,7 @@ const formatDisplay = (value: string | number | null | undefined) => {
 }
 
 const inputValue = computed({
-  get: () => formatDisplay(model.value),
+  get: () => (typeof model.value === 'string' ? model.value : formatDisplay(model.value)),
   set: value => {
     model.value = value.replace(',', '.')
   },
@@ -151,6 +151,9 @@ onBeforeUnmount(stopRepeat)
     :class="props.class"
   >
     <template #default="{ id: fieldId, errorId, hasError }">
+      <div v-if="$slots.chip" class="chip-row">
+        <slot name="chip" />
+      </div>
       <div :class="wrapperClasses">
         <button
           type="button"
@@ -199,7 +202,6 @@ onBeforeUnmount(stopRepeat)
           :class="inputClasses"
           @input="emit('confirmed')"
         />
-
         <span v-if="unit" class="mr-s-2 shrink-0 text-label text-muted-foreground">{{ unit }}</span>
 
         <button
@@ -236,5 +238,11 @@ onBeforeUnmount(stopRepeat)
   border-color: var(--color-focus);
   outline: 2px solid var(--color-focus);
   outline-offset: 0;
+}
+
+.chip-row {
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: var(--spacing-s-1);
 }
 </style>

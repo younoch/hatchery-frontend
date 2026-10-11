@@ -33,13 +33,27 @@
   "validation": {
     "required": "Enter a value",
     "number": "Enter a number",
-    "ph": { "outOfRange": "Enter a value between {min} and {max}" },
-    "temperatureC": { "outOfRange": "Enter a value between {min} and {max}" },
-    "salinityPpt": { "outOfRange": "Enter a value between {min} and {max}" },
-    "oxygenMgL": { "outOfRange": "Enter a value between {min} and {max}" },
-    "tank": { "required": "Choose a tank" },
-    "recordedAt": { "invalid": "Enter a valid time" },
-    "note": { "tooLong": "At most {max} characters" }
+    "ph": {
+      "outOfRange": "Enter a value between {min} and {max}"
+    },
+    "temperatureC": {
+      "outOfRange": "Enter a value between {min} and {max}"
+    },
+    "salinityPpt": {
+      "outOfRange": "Enter a value between {min} and {max}"
+    },
+    "oxygenMgL": {
+      "outOfRange": "Enter a value between {min} and {max}"
+    },
+    "tank": {
+      "required": "Choose a tank"
+    },
+    "recordedAt": {
+      "invalid": "Enter a valid time"
+    },
+    "note": {
+      "tooLong": "At most {max} characters"
+    }
   },
   "water": {
     "recordedAt": "Tested at",
@@ -52,6 +66,9 @@
     "note": "Note",
     "optional": "(optional)",
     "saved": "Saved on this phone. It will sync when you are online.",
-    "cancelled": "Cancelled. What you typed was cleared."
+    "cancelled": "Cancelled. What you typed was cleared.",
+    "sameAsLast": "Same as last {value}",
+    "lastOld": "Last {value} · {when}",
+    "confirmRequired": "Confirm: tap − / + or \"Same as last\""
   }
 }
