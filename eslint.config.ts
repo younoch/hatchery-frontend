@@ -59,6 +59,11 @@ export default [
   prettier,
   configPrettier,
   {
+    rules: {
+      'prettier/prettier': 'off',
+    },
+  },
+  {
     ignores: ['dist/**', 'node_modules/**'],
   },
 ]
