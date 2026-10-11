@@ -2,7 +2,8 @@ import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
 import { i18n } from './shared/i18n'
-import { getInitialLanguage } from './shared/composables/useLanguage'
+import { getInitialLanguage } from '@/shared/composables/useLanguage'
+import { cleanupSyncedReadings, requestPersistentStorage } from '@/shared/storage/readings'
 import { router } from './router'
 
 const initialLang = getInitialLanguage()
@@ -14,3 +15,5 @@ app.use(router)
 i18n.global.locale.value = initialLang
 
 app.mount('#app')
+void requestPersistentStorage()
+void cleanupSyncedReadings()
