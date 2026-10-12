@@ -25,7 +25,7 @@
 | 17a | Entry screen, form and save | done | 2026-10-11 |
 | 17b | Entry screen, last value | done | 2026-10-12 |
 | 18a | History: sub-tabs and card list | done | 2026-10-12 |
-| 18b | History: StatusBadge and pending count | not started | - |
+| 18b | History: StatusBadge and pending count | done | 2026-10-12 |
 | 18c | History: fix-and-resend (local only) | not started | - |
 | 19 | Error handling | not started | - |
 | 20 | Auth | not started | - |
