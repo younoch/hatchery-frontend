@@ -188,7 +188,7 @@ onBeforeUnmount(() => window.clearTimeout(statusTimer))
 </script>
 
 <template>
-  <form class="flex min-h-full flex-col justify-between" novalidate @submit.prevent="onFormSubmit">
+  <form class="flex flex-1 flex-col justify-between" novalidate @submit.prevent="onFormSubmit">
     <PageBody>
       <FieldGrid :cols="1">
         <Field :label="t('water.recordedAt')" :error-key="errors.recordedAt"

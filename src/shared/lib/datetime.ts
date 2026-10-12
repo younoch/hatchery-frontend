@@ -10,3 +10,14 @@ export function toLocalInputValue(date: Date = new Date()): string {
 export function localInputToIso(value: string): string {
   return new Date(value).toISOString()
 }
+
+// Short date and time for cards. The "latn" numbering keeps English digits in Bangla text.
+export function formatReadingTime(iso: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale === 'bn' ? 'bn-BD-u-nu-latn' : 'en-GB', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(new Date(iso))
+}
