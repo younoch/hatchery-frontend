@@ -27,6 +27,12 @@
     "labelNew": "বিজ্ঞপ্তি, {count}টি নতুন",
     "labelNone": "বিজ্ঞপ্তি, নতুন কিছু নেই"
   },
+  "sync": {
+    "pending": "সিঙ্ক বাকি",
+    "syncing": "সিঙ্ক হচ্ছে",
+    "failed": "ব্যর্থ",
+    "synced": "সিঙ্ক হয়েছে"
+  },
   "language": {
     "toggleLabel": "EN"
   },
@@ -72,6 +78,7 @@
     "confirmRequired": "নিশ্চিত করুন: − / + চাপুন বা \"আগের মতোই\" চাপুন",
     "tabNew": "নতুন এন্ট্রি",
     "tabHistory": "ইতিহাস",
+    "tabHistoryCount": "ইতিহাস ({count})",
     "historyEmpty": "এখনো কোনো এন্ট্রি নেই।"
   }
 }

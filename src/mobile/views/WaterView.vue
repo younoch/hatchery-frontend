@@ -1,19 +1,41 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { liveQuery } from 'dexie'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import WaterEntryView from '@/mobile/views/WaterEntryView.vue'
 import WaterHistoryView from '@/mobile/views/WaterHistoryView.vue'
 import PageBody from '@/shared/components/layout/PageBody.vue'
 import Tabs from '@/shared/components/ui/Tabs.vue'
+import { countUnsyncedReadings } from '@/shared/storage/readings'
 
 const { t } = useI18n()
 
 const tab = ref('new')
+const unsyncedCount = ref(0)
 const items = computed(() => [
   { label: t('water.tabNew'), value: 'new' },
-  { label: t('water.tabHistory'), value: 'history' },
+  {
+    label:
+      unsyncedCount.value > 0
+        ? t('water.tabHistoryCount', { count: unsyncedCount.value })
+        : t('water.tabHistory'),
+    value: 'history',
+  },
 ])
+
+let unsubscribe: (() => void) | undefined
+
+onMounted(() => {
+  const subscription = liveQuery(() => countUnsyncedReadings()).subscribe({
+    next: count => {
+      unsyncedCount.value = count
+    },
+  })
+  unsubscribe = () => subscription.unsubscribe()
+})
+
+onBeforeUnmount(() => unsubscribe?.())
 </script>
 
 <template>

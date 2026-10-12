@@ -7,6 +7,7 @@ import enStyleguide from './styleguide.en.json'
 
 import Card from '@/shared/components/Card.vue'
 import Metric from '@/shared/components/Metric.vue'
+import StatusBadge from '@/shared/components/StatusBadge.vue'
 import Button from '@/shared/components/ui/Button.vue'
 import Field from '@/shared/components/ui/Field.vue'
 import Input from '@/shared/components/ui/Input.vue'
@@ -57,7 +58,7 @@ const exampleMetrics = computed(() => [
   { label: currentStyleguide.value.statusOxygen, value: 6.8, unit: 'mg/L' },
   { label: currentStyleguide.value.statusSalinity, value: 30, unit: 'ppt' },
 ])
-
+const syncStatuses = ['pending', 'syncing', 'failed', 'synced'] as const
 const languageLabel = computed(() =>
   t(locale.value === 'bn' ? 'styleguide.switchToEnglish' : 'styleguide.switchToBangla')
 )
@@ -73,7 +74,13 @@ const languageLabel = computed(() =>
           </Button>
         </template>
       </PageHeader>
-
+      <FormSection :title="currentStyleguide.statusBadges" :default-open="true">
+        <FieldGrid :cols="2">
+          <div v-for="status in syncStatuses" :key="status">
+            <StatusBadge :status="status" />
+          </div>
+        </FieldGrid>
+      </FormSection>
       <FormSection :title="currentStyleguide.buttons" :default-open="true">
         <FieldGrid :cols="2">
           <Button type="button">{{ currentStyleguide.primary }}</Button>

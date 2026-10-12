@@ -27,6 +27,12 @@
     "labelNew": "Notifications, {count} new",
     "labelNone": "Notifications, none new"
   },
+  "sync": {
+    "pending": "Pending",
+    "syncing": "Syncing",
+    "failed": "Failed",
+    "synced": "Synced"
+  },
   "language": {
     "toggleLabel": "বাংলা"
   },
@@ -72,6 +78,7 @@
     "confirmRequired": "Confirm: tap − / + or \"Same as last\"",
     "tabNew": "New entry",
     "tabHistory": "History",
-   "historyEmpty": "No entries yet."
+    "tabHistoryCount": "History ({count})",
+    "historyEmpty": "No entries yet."
   }
 }

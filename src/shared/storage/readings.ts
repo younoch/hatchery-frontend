@@ -100,3 +100,13 @@ export async function requestPersistentStorage(): Promise<boolean> {
     return false
   }
 }
+
+// Readings still waiting to reach the server (pending or syncing). failed is not counted.
+export async function countUnsyncedReadings(userId: string = STUB_USER_ID): Promise<number> {
+  return db.readings
+    .where('createdById')
+    .equals(userId)
+    .and(reading => reading.status === 'pending' || reading.status === 'syncing')
+    .count()
+}
+

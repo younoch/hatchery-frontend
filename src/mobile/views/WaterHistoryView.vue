@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 
 import Card from '@/shared/components/Card.vue'
 import Metric from '@/shared/components/Metric.vue'
+import StatusBadge from '@/shared/components/StatusBadge.vue'
 import CardList from '@/shared/components/layout/CardList.vue'
 import FieldGrid from '@/shared/components/layout/FieldGrid.vue'
 import PageBody from '@/shared/components/layout/PageBody.vue'
@@ -46,9 +47,12 @@ onBeforeUnmount(() => unsubscribe?.())
       <li v-for="reading in readings" :key="reading.id">
         <Card>
           <FieldGrid :cols="1">
-            <div class="text-label font-medium text-foreground">
-              {{ formatReadingTime(reading.recordedAt, locale) }}
-              <span class="text-muted-foreground">{{ tankName(reading.tankId) }}</span>
+            <div class="flex items-center justify-between gap-s-2">
+              <div class="min-w-[0] text-label font-medium text-foreground">
+                {{ formatReadingTime(reading.recordedAt, locale) }}
+                <span class="text-muted-foreground">{{ tankName(reading.tankId) }}</span>
+              </div>
+              <StatusBadge :status="reading.status" />
             </div>
             <FieldGrid :cols="2">
               <Metric
