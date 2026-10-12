@@ -24,7 +24,7 @@
 | 16 | Dexie storage layer | done | 2026-10-11 |
 | 17a | Entry screen, form and save | done | 2026-10-11 |
 | 17b | Entry screen, last value | done | 2026-10-12 |
-| 18a | History: sub-tabs and card list | not started | - |
+| 18a | History: sub-tabs and card list | done | 2026-10-12 |
 | 18b | History: StatusBadge and pending count | not started | - |
 | 18c | History: fix-and-resend (local only) | not started | - |
 | 19 | Error handling | not started | - |
@@ -64,3 +64,5 @@
 - Audit still reports min-w-0, h-3.5, w-3.5, mt-0.5 (location unknown, not in ui/*.vue top level) and required-indicator (Field's own <style> class, audit should ignore it)
 - Move the "same as last" chip into the label row of StepperInput (needs a look at Field.vue); it currently sits in its own row above the control.
 - `chip-row` in StepperInput uses scoped CSS; move it to a token or layout component later.
+- Dedupe `formatWhen` (WaterEntryView) and `formatReadingTime` (datetime.ts), and the water fields list that exists in both views.
+- Dexie `liveQuery` in WaterHistoryView has no error callback; handle in Step 19.
