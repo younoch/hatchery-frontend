@@ -121,7 +121,10 @@ Each step ends at a checkpoint (section 3). Steps are deliberately small. If one
 - **Step 11c: Mobile shell, notifications.** Notifications sheet (sample data, bell opens it, mark-all-read), and fix the `Sheet` height so it is relative to the app container, not the viewport. Scrim becomes `bg-foreground/50`.
 - **Step 12: Desktop shell.** `Sidebar` and `TopNavbar`, minimal.
 - **Step 13: Swipe navigation.** VueUse `useSwipe`, 20-30px edge offset, disabled over drag inputs.
-- **Step 14: PWA basics.** `vite-plugin-pwa`, manifest, offline fallback page, `mkcert` HTTPS, install prompt, "offline ready" state.
+- **Step 14-pre: Lazy route imports.** Convert route components to dynamic `import()` so the main chunk shrinks. No other change.
+- **Step 14a: PWA, plugin and manifest.** `vite-plugin-pwa` (ask before installing), manifest, icons, precache, offline fallback page. The dev styleguide must not ship in the precache.
+- **Step 14b: PWA, HTTPS and install.** `mkcert` HTTPS for local testing, `beforeinstallprompt` install prompt, "offline ready" state.
+- **Step 14c: PWA, real Android test.** The owner runs a checklist on a real phone (airplane mode, install, save a reading offline).
 
 **Phase D: Water quality (mobile first)**
 - **Step 15: Schema.** Shared Zod schema for a reading (fields named `temperatureC`, `salinityPpt`, `oxygenMgL`, plus optional `note` up to 200 characters; validation ranges still to be confirmed with the owner), i18n error keys. No unit conversion. If you want a test runner for the schema, ask the owner first.

@@ -19,7 +19,10 @@
 | 11c | Mobile shell, notifications | deferred|-|
 | 12 | Desktop shell | deferred | - |
 | 13 | Swipe navigation | deferred | - |
-| 14 | PWA basics | not started | - |
+| 14-pre | Lazy route imports | not started | - |
+| 14a | PWA: plugin, manifest, icons, offline fallback | not started | - |
+| 14b | PWA: HTTPS, install prompt, offline-ready state | not started | - |
+| 14c | PWA: real Android test | not started | - |
 | 15 | Schema | done | 2026-10-10 |
 | 16 | Dexie storage layer | done | 2026-10-11 |
 | 17a | Entry screen, form and save | done | 2026-10-11 |
@@ -55,6 +58,8 @@
 - 2026-10-12: Step 18 split into 18a (sub-tabs and card list from real Dexie data), 18b (shared StatusBadge, pending count) and 18c (fix-and-resend, local update only). The real send happens in Step 21 (sync engine).
 - 2026-10-12: Until Step 21, real records are only `pending`. The styleguide shows all four badge states as samples so the visuals can be checked.
 - 2026-10-12: Step 18c "Fix and resend" only sets a failed record back to pending (local). Editing the rejected values and the real send belong to Step 21.
+- 2026-10-12: Step 18c "Fix and resend" only sets a failed record back to pending (local). Editing the rejected values and the real send belong to Step 21.
+- 2026-10-13: Step 14 split into 14-pre (lazy route imports, main chunk is 533 kB), 14a, 14b and 14c (real Android test, done by the owner with a checklist). `vite-plugin-pwa` is in the fixed stack but is installed only after the owner agrees.
 
 ## Parking lot
 - Switch to single "typescript-eslint" package
@@ -68,3 +73,7 @@
 - `chip-row` in StepperInput uses scoped CSS; move it to a token or layout component later.
 - Dedupe `formatWhen` (WaterEntryView) and `formatReadingTime` (datetime.ts), and the water fields list that exists in both views.
 - Dexie `liveQuery` in WaterHistoryView has no error callback; handle in Step 19.
+- Dedupe `formatWhen` (WaterEntryView) and `formatReadingTime` (datetime.ts), and the water fields list that exists in both views.
+- Dexie `liveQuery` in WaterHistoryView and WaterView has no error callback; handle in Step 19.
+- Move the "same as last" chip into the label row of StepperInput (needs Field.vue); `chip-row` uses scoped CSS for now.
+- Architecture/dependency diagram after Step 20.
