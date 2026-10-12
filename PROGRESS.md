@@ -26,7 +26,7 @@
 | 17b | Entry screen, last value | done | 2026-10-12 |
 | 18a | History: sub-tabs and card list | done | 2026-10-12 |
 | 18b | History: StatusBadge and pending count | done | 2026-10-12 |
-| 18c | History: fix-and-resend (local only) | not started | - |
+| 18c | History: fix-and-resend (local only) | done | 2026-10-12 |
 | 19 | Error handling | not started | - |
 | 20 | Auth | not started | - |
 | 21 | Sync engine | not started | - |
@@ -54,6 +54,8 @@
 - 2026-10-12: Formatting is no longer an ESLint error (`prettier/prettier` rule off); Prettier is run by hand on specific files.
 - 2026-10-12: Step 18 split into 18a (sub-tabs and card list from real Dexie data), 18b (shared StatusBadge, pending count) and 18c (fix-and-resend, local update only). The real send happens in Step 21 (sync engine).
 - 2026-10-12: Until Step 21, real records are only `pending`. The styleguide shows all four badge states as samples so the visuals can be checked.
+- 2026-10-12: Step 18c "Fix and resend" only sets a failed record back to pending (local). Editing the rejected values and the real send belong to Step 21.
+
 ## Parking lot
 - Switch to single "typescript-eslint" package
 - Clean up woff files in dist (keep only woff2)
