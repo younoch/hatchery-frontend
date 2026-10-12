@@ -6,13 +6,14 @@ import { useI18n } from 'vue-i18n'
 import Card from '@/shared/components/Card.vue'
 import Metric from '@/shared/components/Metric.vue'
 import StatusBadge from '@/shared/components/StatusBadge.vue'
+import Button from '@/shared/components/ui/Button.vue'
 import CardList from '@/shared/components/layout/CardList.vue'
 import FieldGrid from '@/shared/components/layout/FieldGrid.vue'
 import PageBody from '@/shared/components/layout/PageBody.vue'
 import { TANKS } from '@/shared/config/tanks'
 import { formatReadingTime } from '@/shared/lib/datetime'
 import type { Reading } from '@/shared/storage/db'
-import { listReadings } from '@/shared/storage/readings'
+import { listReadings, retryFailedReading } from '@/shared/storage/readings'
 
 const { t, locale } = useI18n()
 
@@ -69,6 +70,15 @@ onBeforeUnmount(() => unsubscribe?.())
             >
               {{ reading.note }}
             </p>
+            <Button
+              v-if="reading.status === 'failed'"
+              type="button"
+              variant="secondary"
+              size="sm"
+              @click="retryFailedReading(reading.id)"
+            >
+              {{ t('water.fixAndResend') }}
+            </Button>
           </FieldGrid>
         </Card>
       </li>

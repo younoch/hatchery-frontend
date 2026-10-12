@@ -110,3 +110,13 @@ export async function countUnsyncedReadings(userId: string = STUB_USER_ID): Prom
     .count()
 }
 
+// Local only until the sync engine (Step 21): puts a failed record back in the queue.
+export async function retryFailedReading(id: string): Promise<boolean> {
+  return db.transaction('rw', db.readings, async () => {
+    const current = await db.readings.get(id)
+    if (!current || current.status !== 'failed') return false
+    await db.readings.update(id, { status: 'pending' })
+    return true
+  })
+}
+

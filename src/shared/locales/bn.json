@@ -79,6 +79,7 @@
     "tabNew": "নতুন এন্ট্রি",
     "tabHistory": "ইতিহাস",
     "tabHistoryCount": "ইতিহাস ({count})",
-    "historyEmpty": "এখনো কোনো এন্ট্রি নেই।"
+    "historyEmpty": "এখনো কোনো এন্ট্রি নেই।",
+    "fixAndResend": "ঠিক করে পাঠান"
   }
 }

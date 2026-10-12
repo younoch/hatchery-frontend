@@ -79,6 +79,7 @@
     "tabNew": "New entry",
     "tabHistory": "History",
     "tabHistoryCount": "History ({count})",
-    "historyEmpty": "No entries yet."
+    "historyEmpty": "No entries yet.",
+    "fixAndResend": "Fix and resend"
   }
 }
