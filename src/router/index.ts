@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { desktopRoutes } from '@/desktop/router/routes'
 import { mobileRoutes } from '@/mobile/router/routes'
-import DevicePlaceholderView from '@/shared/components/DevicePlaceholderView.vue'
 import { getInitialDeviceClass } from '@/shared/composables/useDeviceClass'
 
 const devRoutes = import.meta.env.DEV
@@ -22,7 +21,7 @@ export const router = createRouter({
     ...devRoutes,
     {
       path: '/:pathMatch(.*)*',
-      component: DevicePlaceholderView,
+      component: () => import('@/shared/components/DevicePlaceholderView.vue'),
     },
   ],
 })

@@ -1,7 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
 import MobileShell from '@/mobile/layouts/MobileShell.vue'
-import PlaceholderView from '@/mobile/views/PlaceholderView.vue'
-import WaterView from '@/mobile/views/WaterView.vue'
 
 export const mobileRoutes: RouteRecordRaw[] = [
   {
@@ -11,12 +9,12 @@ export const mobileRoutes: RouteRecordRaw[] = [
     children: [
       {
         path: 'water',
-        component: WaterView,
+        component: () => import('@/mobile/views/WaterView.vue'),
         meta: { titleKey: 'nav.waterQuality' },
       },
       {
         path: ':pathMatch(.*)*',
-        component: PlaceholderView,
+        component: () => import('@/mobile/views/PlaceholderView.vue'),
         meta: { titleKey: 'nav.waterQuality' },
       },
     ],
