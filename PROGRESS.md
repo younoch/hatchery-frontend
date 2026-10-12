@@ -20,7 +20,7 @@
 | 12 | Desktop shell | deferred | - |
 | 13 | Swipe navigation | deferred | - |
 | 14-pre | Lazy route imports | done | 2026-10-13 |
-| 14a | PWA: plugin, manifest, icons, offline fallback | not started | - |
+| 14a | PWA: plugin, manifest, icons, offline fallback | done | 2026-10-13 |
 | 14b | PWA: HTTPS, install prompt, offline-ready state | not started | - |
 | 14c | PWA: real Android test | not started | - |
 | 15 | Schema | done | 2026-10-10 |
@@ -61,6 +61,9 @@
 - 2026-10-12: Step 18c "Fix and resend" only sets a failed record back to pending (local). Editing the rejected values and the real send belong to Step 21.
 - 2026-10-13: Step 14 split into 14-pre (lazy route imports, main chunk is 533 kB), 14a, 14b and 14c (real Android test, done by the owner with a checklist). `vite-plugin-pwa` is in the fixed stack but is installed only after the owner agrees.
 - 2026-10-13: Route views are lazy imported; main chunk dropped from 533 kB to 229 kB. MobileShell stays eager.
+- 2026-10-13: Step 14a uses the precached app shell (`navigateFallback`) as the offline fallback; no separate offline page. Precache only woff2 fonts. Icons are placeholders until a logo exists; theme color is the primary token.
+- 2026-10-13: Step 14a uses the precached app shell (`navigateFallback`) as the offline fallback; no separate offline page. Only woff2 fonts are precached. Icons are placeholders until a logo exists; theme color is the primary token. `vite-plugin-pwa` 2.0.0 was installed (works with Vite 8).
+- 2026-10-13: Readings stay `pending` after going online until the sync engine exists (Step 21). This is expected, not a bug.
 
 ## Parking lot
 - Switch to single "typescript-eslint" package
