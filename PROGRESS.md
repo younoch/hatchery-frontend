@@ -64,6 +64,8 @@
 - 2026-10-13: Step 14a uses the precached app shell (`navigateFallback`) as the offline fallback; no separate offline page. Precache only woff2 fonts. Icons are placeholders until a logo exists; theme color is the primary token.
 - 2026-10-13: Step 14a uses the precached app shell (`navigateFallback`) as the offline fallback; no separate offline page. Only woff2 fonts are precached. Icons are placeholders until a logo exists; theme color is the primary token. `vite-plugin-pwa` 2.0.0 was installed (works with Vite 8).
 - 2026-10-13: Readings stay `pending` after going online until the sync engine exists (Step 21). This is expected, not a bug.
+- 2026-10-13: Owner confirmed the step sizes (pH 0.1, temperature 0.5, salinity 1, oxygen 0.1).
+- 2026-10-13: Owner decision: the last value has no age limit. The latest reading of the tank is always pre-filled (still unconfirmed until the user acts) and every save replaces it. The 24 h rule and the "old value" hint are removed.
 
 ## Parking lot
 - Switch to single "typescript-eslint" package
