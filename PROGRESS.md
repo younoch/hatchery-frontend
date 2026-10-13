@@ -21,7 +21,7 @@
 | 13 | Swipe navigation | deferred | - |
 | 14-pre | Lazy route imports | done | 2026-10-13 |
 | 14a | PWA: plugin, manifest, icons, offline fallback | done | 2026-10-13 |
-| 14b | PWA: HTTPS, install prompt, offline-ready state | not started | - |
+| 14b | PWA: install prompt and offline-ready state | not started | - |  - |
 | 14c | PWA: real Android test | not started | - |
 | 15 | Schema | done | 2026-10-10 |
 | 16 | Dexie storage layer | done | 2026-10-11 |
@@ -66,6 +66,7 @@
 - 2026-10-13: Readings stay `pending` after going online until the sync engine exists (Step 21). This is expected, not a bug.
 - 2026-10-13: Owner confirmed the step sizes (pH 0.1, temperature 0.5, salinity 1, oxygen 0.1).
 - 2026-10-13: Owner decision: the last value has no age limit. The latest reading of the tank is always pre-filled (still unconfirmed until the user acts) and every save replaces it. The 24 h rule and the "old value" hint are removed.
+- 2026-10-13: Step 14b drops `mkcert` HTTPS for now. The real phone test (14c) uses `adb reverse`, because `localhost` is a secure context on the phone. Gating offline entry until "offline ready" moves to Step 20 (it needs login and the first data fetch).
 
 ## Parking lot
 - Switch to single "typescript-eslint" package
