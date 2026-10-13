@@ -74,7 +74,6 @@
     "saved": "Saved on this phone. It will sync when you are online.",
     "cancelled": "Cancelled. What you typed was cleared.",
     "sameAsLast": "Same as last {value}",
-    "lastOld": "Last {value} · {when}",
     "confirmRequired": "Confirm: tap − / + or \"Same as last\"",
     "tabNew": "New entry",
     "tabHistory": "History",

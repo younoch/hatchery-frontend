@@ -75,13 +75,6 @@ export async function getLatestReading(
   return rows[0]
 }
 
-// Sample limit; confirm with the owner (plan section 10).
-export const LAST_VALUE_MAX_AGE_HOURS = 24
-
-export function isLastValueFresh(reading: Reading, now: number = Date.now()): boolean {
-  return now - Date.parse(reading.recordedAt) <= LAST_VALUE_MAX_AGE_HOURS * 3_600_000
-}
-
 // Synced readings older than the retention window are removed. pending/failed are never touched.
 export async function cleanupSyncedReadings(): Promise<number> {
   const cutoff = new Date(Date.now() - SYNCED_RETENTION_DAYS * 86_400_000).toISOString()

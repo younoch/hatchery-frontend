@@ -21,9 +21,9 @@ import {
   waterReadingFormSchema,
 } from '@/shared/schemas/waterQuality.schema'
 import type { Reading } from '@/shared/storage/db'
-import { createReading, getLatestReading, isLastValueFresh } from '@/shared/storage/readings'
+import { createReading, getLatestReading } from '@/shared/storage/readings'
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 
 // Step sizes are samples until the owner confirms them.
 const FIELDS = [
@@ -79,7 +79,6 @@ type FieldName = (typeof FIELDS)[number]['name']
 const CONFIRM_KEY = 'water.confirmRequired'
 
 const lastReading = ref<Reading>()
-const lastFresh = ref(false)
 const unconfirmed = reactive<Record<FieldName, boolean>>({
   ph: false,
   temperatureC: false,
@@ -92,21 +91,9 @@ function setUnconfirmed(value: boolean) {
   for (const f of FIELDS) unconfirmed[f.name] = value
 }
 
-function formatWhen(iso: string) {
-  // latn numbering keeps English digits in Bangla text
-  return new Intl.DateTimeFormat(locale.value === 'bn' ? 'bn-BD-u-nu-latn' : 'en-GB', {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  }).format(new Date(iso))
-}
-
 async function applyLast() {
   const token = ++loadToken
   lastReading.value = undefined
-  lastFresh.value = false
   setUnconfirmed(false)
   for (const f of FIELDS) {
     setFieldValue(f.name, '', false)
@@ -118,8 +105,6 @@ async function applyLast() {
   if (token !== loadToken || !last) return // stale result or no previous reading
 
   lastReading.value = last
-  lastFresh.value = isLastValueFresh(last)
-  if (!lastFresh.value) return // older than the limit: hint only
 
   for (const f of FIELDS) setFieldValue(f.name, String(last[f.name]), false)
   setUnconfirmed(true)
@@ -191,44 +176,76 @@ onBeforeUnmount(() => window.clearTimeout(statusTimer))
   <form class="flex flex-1 flex-col justify-between" novalidate @submit.prevent="onFormSubmit">
     <PageBody>
       <FieldGrid :cols="1">
-        <Field :label="t('water.recordedAt')" :error-key="errors.recordedAt"
-          :error-params="errorParams(errors.recordedAt)" required>
+        <Field
+          :label="t('water.recordedAt')"
+          :error-key="errors.recordedAt"
+          :error-params="errorParams(errors.recordedAt)"
+          required
+        >
           <template #default="{ id, errorId, hasError }">
-            <Input :id="id" v-model="recordedAt" type="datetime-local" :invalid="hasError" :error-id="errorId" />
+            <Input
+              :id="id"
+              v-model="recordedAt"
+              type="datetime-local"
+              :invalid="hasError"
+              :error-id="errorId"
+            />
           </template>
         </Field>
 
-        <Field :label="t('water.tank')" :error-key="errors.tankId" :error-params="errorParams(errors.tankId)" required>
+        <Field
+          :label="t('water.tank')"
+          :error-key="errors.tankId"
+          :error-params="errorParams(errors.tankId)"
+          required
+        >
           <template #default="{ id, errorId, hasError }">
-            <Select :id="id" v-model="tankId" :options="tankOptions" :invalid="hasError" :error-id="errorId" />
+            <Select
+              :id="id"
+              v-model="tankId"
+              :options="tankOptions"
+              :invalid="hasError"
+              :error-id="errorId"
+            />
           </template>
         </Field>
 
-        <StepperInput v-for="field in FIELDS" :key="field.name" v-model="models[field.name].value"
-          :label="t(field.labelKey)" :unit="field.unit" :min="WATER_RANGES[field.name].min"
-          :max="WATER_RANGES[field.name].max" :step="field.step" :decimals="field.decimals"
-          :unconfirmed="unconfirmed[field.name]" :error-key="errors[field.name]"
-          :error-params="errorParams(errors[field.name])" required @confirmed="confirm(field.name)"
-          @focusout="onFocusOut(field.name)">
+        <StepperInput
+          v-for="field in FIELDS"
+          :key="field.name"
+          v-model="models[field.name].value"
+          :label="t(field.labelKey)"
+          :unit="field.unit"
+          :min="WATER_RANGES[field.name].min"
+          :max="WATER_RANGES[field.name].max"
+          :step="field.step"
+          :decimals="field.decimals"
+          :unconfirmed="unconfirmed[field.name]"
+          :error-key="errors[field.name]"
+          :error-params="errorParams(errors[field.name])"
+          required
+          @confirmed="confirm(field.name)"
+          @focusout="onFocusOut(field.name)"
+        >
           <template #chip>
-            <Button v-if="lastReading && lastFresh" type="button" variant="secondary" size="sm"
-              @click="fillFromLast(field.name)">
+            <Button
+              v-if="lastReading"
+              type="button"
+              variant="secondary"
+              size="sm"
+              @click="fillFromLast(field.name)"
+            >
               {{ t('water.sameAsLast', { value: lastReading[field.name] }) }}
             </Button>
-            <span v-else-if="lastReading" class="text-caption text-muted-foreground">
-              {{
-              t('water.lastOld', {
-              value: lastReading[field.name],
-              when: formatWhen(lastReading.recordedAt),
-              })
-              }}
-            </span>
           </template>
         </StepperInput>
 
         <FormSection :title="t('water.moreDetails')" collapsible :default-open="false">
-          <Field :label="`${t('water.note')} ${t('water.optional')}`" :error-key="errors.note"
-            :error-params="errorParams(errors.note)">
+          <Field
+            :label="`${t('water.note')} ${t('water.optional')}`"
+            :error-key="errors.note"
+            :error-params="errorParams(errors.note)"
+          >
             <template #default="{ id, errorId, hasError }">
               <Input :id="id" v-model="note" :invalid="hasError" :error-id="errorId" />
             </template>
