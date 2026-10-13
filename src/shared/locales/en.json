@@ -23,6 +23,10 @@
     "main": "Main navigation",
     "more": "More"
   },
+  "pwa": {
+    "offlineReady": "Ready for offline use",
+    "install": "Install app"
+  },
   "notifications": {
     "labelNew": "Notifications, {count} new",
     "labelNone": "Notifications, none new"

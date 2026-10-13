@@ -5,6 +5,7 @@ import { i18n } from './shared/i18n'
 import { getInitialLanguage } from '@/shared/composables/useLanguage'
 import { cleanupSyncedReadings, requestPersistentStorage } from '@/shared/storage/readings'
 import { router } from './router'
+import { initPwa } from '@/shared/composables/usePwa'
 
 const initialLang = getInitialLanguage()
 document.documentElement.lang = initialLang
@@ -17,3 +18,4 @@ i18n.global.locale.value = initialLang
 app.mount('#app')
 void requestPersistentStorage()
 void cleanupSyncedReadings()
+initPwa()

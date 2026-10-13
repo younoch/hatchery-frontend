@@ -23,6 +23,10 @@
     "main": "মূল নেভিগেশন",
     "more": "আরও"
   },
+    "pwa": {
+    "offlineReady": "অফলাইনের জন্য তৈরি",
+    "install": "অ্যাপ ইনস্টল করুন"
+  },
   "notifications": {
     "labelNew": "বিজ্ঞপ্তি, {count}টি নতুন",
     "labelNone": "বিজ্ঞপ্তি, নতুন কিছু নেই"
