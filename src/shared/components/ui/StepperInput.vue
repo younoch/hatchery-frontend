@@ -150,10 +150,10 @@ onBeforeUnmount(stopRepeat)
     :required="required"
     :class="props.class"
   >
+    <template v-if="$slots.chip" #chip>
+      <slot name="chip" />
+    </template>
     <template #default="{ id: fieldId, errorId, hasError }">
-      <div v-if="$slots.chip" class="chip-row">
-        <slot name="chip" />
-      </div>
       <div :class="wrapperClasses">
         <button
           type="button"
@@ -238,11 +238,5 @@ onBeforeUnmount(stopRepeat)
   border-color: var(--color-focus);
   outline: 2px solid var(--color-focus);
   outline-offset: 0;
-}
-
-.chip-row {
-  display: flex;
-  justify-content: flex-end;
-  padding-bottom: var(--spacing-s-1);
 }
 </style>

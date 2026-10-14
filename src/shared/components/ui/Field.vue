@@ -45,7 +45,8 @@ const hasError = computed(() => Boolean(errorText.value))
         {{ label }}
         <span v-if="required" aria-hidden="true" class="required-indicator ml-s-1"></span>
       </label>
-      <span v-if="hint" class="text-caption text-muted-foreground">{{ hint }}</span>
+      <slot v-if="$slots.chip" name="chip" />
+      <span v-else-if="hint" class="text-caption text-muted-foreground">{{ hint }}</span>
     </div>
 
     <div :class="cn('min-w-[0px]', props.contentClass)">
