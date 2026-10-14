@@ -84,6 +84,5 @@
 - Dexie `liveQuery` in WaterHistoryView has no error callback; handle in Step 19.
 - Dedupe `formatWhen` (WaterEntryView) and `formatReadingTime` (datetime.ts), and the water fields list that exists in both views.
 - Dexie `liveQuery` in WaterHistoryView and WaterView has no error callback; handle in Step 19.
-- Move the "same as last" chip into the label row of StepperInput (needs Field.vue); `chip-row` uses scoped CSS for now.
 - Architecture/dependency diagram after Step 20.
 - Handle dynamic import failure (chunk load error) in the router (Step 19).
