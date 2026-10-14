@@ -86,6 +86,12 @@ Step N: <name>: ready for review
 
 **Offline:** follow section 6 of the plan exactly (client UUID, `recordedAt` vs `syncedAt`, never delete data for being old, logout never touches IndexedDB, Dexie versioning from version 1).
 
+## 5b. Where to test
+
+- Run lint, typecheck, build and the quick manual checks on localhost.
+- Anything that cannot be tested properly on localhost must be tested on production: PWA install, service worker updates, offline behavior, "offline ready", fonts and icons on a real phone, and the real device and browser differences. Deploy to Vercel and test the real link on a real mobile and a real desktop.
+- Do not spend time on workarounds (such as `adb reverse` or local HTTPS) for things the production link can show directly.
+
 ## 6. Definition of done (every step)
 
 - `pnpm lint`, `pnpm typecheck`, `pnpm build` all pass.
@@ -124,7 +130,7 @@ Each step ends at a checkpoint (section 3). Steps are deliberately small. If one
 - **Step 14-pre: Lazy route imports.** Convert route components to dynamic `import()` so the main chunk shrinks. No other change.
 - **Step 14a: PWA, plugin and manifest.** `vite-plugin-pwa` (ask before installing), manifest, icons, precache, offline fallback page. The dev styleguide must not ship in the precache.
 - **Step 14b: PWA, install and offline-ready.** `beforeinstallprompt` install button and an "offline ready" indicator, both in the More sheet. No HTTPS setup.
-- **Step 14c: PWA, real Android test.** The owner runs a checklist on a real phone through `adb reverse` (airplane mode, install, save a reading offline).
+- **Step 14c: PWA, production test.** Deploy to Vercel (`vercel.json` rewrites for the SPA). The owner runs a checklist on the production link on a real Android phone and a desktop browser: first open online, "offline ready", install, airplane mode, save a reading offline, and an update after a second deploy..
 
 **Phase D: Water quality (mobile first)**
 - **Step 15: Schema.** Shared Zod schema for a reading (fields named `temperatureC`, `salinityPpt`, `oxygenMgL`, plus optional `note` up to 200 characters; validation ranges still to be confirmed with the owner), i18n error keys. No unit conversion. If you want a test runner for the schema, ask the owner first.

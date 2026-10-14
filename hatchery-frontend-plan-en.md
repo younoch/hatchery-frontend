@@ -275,11 +275,16 @@ Current status of the UI (Step 18): the history card shows the badge for each st
 - Until "offline ready", offline entry is gated with a clear message; once ready, `navigator.storage.persist()` is requested and "Add to Home Screen" is prompted
 - A phone that has never loaded the app online cannot show anything offline; this is handled operationally (first open happens with internet, e.g. during onboarding)
 
+### Testing the deployed app
+- Features that depend on the real environment (service worker, install, offline, real device behavior) are verified on the production URL, on a real Android phone and a desktop browser, not only on localhost.
+- The SPA needs a rewrite rule (`vercel.json`) so deep links such as `/m/water` open directly.
+
 ## 7. Delivery
 
 - **PWA, distributed via link** — no Play Store plan for now
 - If the system succeeds, Capacitor can wrap it into a native APK later (storage layer kept separate so code is reusable)
 - HTTPS + domain required (service worker requirement)
+
 
 ### Onboarding plan (demo phase)
 - The developer opens the app personally on the first hatchery manager's phone (online) and verifies the "offline ready" state — this doubles as a real pilot before other staff use it
