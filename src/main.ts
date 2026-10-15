@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import './style.css'
+import '@/shared/utils/env'
 import App from './App.vue'
 import { i18n } from './shared/i18n'
 import { getInitialLanguage } from '@/shared/composables/useLanguage'
