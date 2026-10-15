@@ -30,7 +30,7 @@
 | 18a | History: sub-tabs and card list | done | 2026-10-12 |
 | 18b | History: StatusBadge and pending count | done | 2026-10-12 |
 | 18c | History: fix-and-resend (local only) | done | 2026-10-12 |
-| 19 | Error handling | not started | - |
+| 19 | Error handling | not started | done | 2026-10-15 |
 | 20 | Auth | not started | - |
 | 21 | Sync engine | not started | - |
 | 22 | Notifications | not started | - |
@@ -81,7 +81,6 @@
 - Move the "same as last" chip into the label row of StepperInput (needs a look at Field.vue); it currently sits in its own row above the control.
 - `chip-row` in StepperInput uses scoped CSS; move it to a token or layout component later.
 - Dedupe `formatWhen` (WaterEntryView) and `formatReadingTime` (datetime.ts), and the water fields list that exists in both views.
-- Dexie `liveQuery` in WaterHistoryView has no error callback; handle in Step 19.
 - Dedupe `formatWhen` (WaterEntryView) and `formatReadingTime` (datetime.ts), and the water fields list that exists in both views.
 - Architecture/dependency diagram after Step 20.
 - Wrap each route view in ErrorBoundary so a view crash does not take down the tab bar (plan section 8a).
