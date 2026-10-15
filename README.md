@@ -64,3 +64,4 @@ Start every session by telling the assistant to read `AGENTS.md`, then `PROGRESS
 - One commit per step or sub-step.
 - No `v-html`, no hardcoded UI text (all text goes through i18n keys), no hardcoded colors or spacing (design tokens only).
 
+

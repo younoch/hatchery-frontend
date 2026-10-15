@@ -31,7 +31,10 @@
 | 18b | History: StatusBadge and pending count | done | 2026-10-12 |
 | 18c | History: fix-and-resend (local only) | done | 2026-10-12 |
 | 19 | Error handling | done | 2026-10-15 |
-| 20 | Auth | not started | - |
+| 20a | Auth: env, types, Zod schemas, AuthAdapter | not started | - |
+| 20b | Auth: API client and refresh (single in-flight, cross-tab lock) | not started | - |
+| 20c | Auth: store, route guard, login view | not started | - |
+| 20d | Auth: offline local session | not started | - |
 | 21 | Sync engine | not started | - |
 | 22 | Notifications | not started | - |
 | 23 | Dashboard | not started | - |
@@ -69,6 +72,8 @@
 - 2026-10-13: Step 14b drops `mkcert` HTTPS for now. The real phone test (14c) uses `adb reverse`, because `localhost` is a secure context on the phone. Gating offline entry until "offline ready" moves to Step 20 (it needs login and the first data fetch).
 - 2026-10-14: Owner decision: whatever cannot be tested properly on localhost is tested on production. The app is deployed to Vercel and checked with the real link on a real mobile and desktop. This replaces the `adb reverse` plan for Step 14c.
 - 2026-10-14: Owner confirmed the step sizes (pH 0.1, temperature 0.5, salinity 1, oxygen 0.1) and decided the last value has no age limit.
+- 2026-10-15: Still UNVERIFIED (reports conflict, no real HTTP output yet): real Set-Cookie flags and Max-Age unit; `/user/me` `role` when the user has none and for the super admin; list response shape; login throttle values; `TOKEN_EXPIRATION` default. Step 20a schemas treat `role` as nullable and mark these with `TODO(verify)`.
+- 2026-10-15: Offline token expiry policy: data entry keeps working offline (saves go to Dexie); a 401 during sync means "session ended, log in again" and pending readings stay untouched.
 
 ## Parking lot
 - Switch to single "typescript-eslint" package
@@ -84,3 +89,4 @@
 - Dedupe `formatWhen` (WaterEntryView) and `formatReadingTime` (datetime.ts), and the water fields list that exists in both views.
 - Architecture/dependency diagram after Step 20.
 - Wrap each route view in ErrorBoundary so a view crash does not take down the tab bar (plan section 8a).
+- Get real curl output from the backend (login with Set-Cookie, `/user/me` for a user with no role and for the super admin, `/user` pagination) and resolve the `TODO(verify)` marks. Ask the backend session to answer: throttle values, `TOKEN_EXPIRATION` default.
