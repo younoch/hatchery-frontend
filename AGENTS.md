@@ -140,7 +140,7 @@ Each step ends at a checkpoint (section 3). Steps are deliberately small. If one
 - **Step 18a: History, sub-tabs and card list.** "New entry" and "History" sub-tabs on `/m/water` (using `Tabs`), card list from local Dexie data (`listReadings`), no badge yet. The save bar shows only on the "New entry" tab.
 - **Step 18b: History, StatusBadge.** Shared `StatusBadge` (pending, syncing, failed, synced; color, icon and text together, with an `aria-label`), used on each card, plus the pending count on the History tab. Styleguide shows all four states.
 - **Step 18c: History, fix-and-resend.** On a failed record, "Fix and resend" edits the record and sets it back to `pending` (local only; the real send is Step 21).
-- **Step 19: Error handling.** Global Vue error handler, `unhandledrejection`, `ErrorBoundary` at app and view level with context-aware messages.
+- **Step 19: Error handling.** Global Vue error handler, `unhandledrejection`, `ErrorBoundary` at app level (`App.vue`), liveQuery error callbacks, and chunk-load failure handling in the router. Per-view wrapping is a parking lot item.
 
 **Phase E: Backend integration (ask the owner whether the backend tasks are ready; if not, build against a mock adapter and say so)**
 - **Step 20: Auth.** Login, refresh interceptor with a single in-flight refresh, in-memory access token, permission keys in Pinia, local offline session, session-revoked handling.

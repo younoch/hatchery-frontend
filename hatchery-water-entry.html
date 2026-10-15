@@ -1,3 +1,6 @@
++<!-- NOTE (2026-10-13): The 24h prefill limit (MAX_AGE_H) in this prototype is OUTDATED.
++     Owner decision: no age limit; the latest reading always prefills.
++     See AGENTS.md section 1 "Last value and steppers". -->
 <title>Hatchery Water Entry</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -208,7 +211,6 @@
   .same-chip { min-height: 1.75rem; padding: 0 var(--s-2); max-width: 70%; color: var(--accent-text); }
   .chip-text { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .same-chip::after { inset: -13px -4px -5px; }  /* measured from the padding box (1px border): 12px above + 4px below + 28px = 44px */
-  .same-chip[disabled] { color: var(--muted); border-style: dashed; }
   .same-chip[data-hidden="true"] { display: none; }
   .stepper { position: relative; gap: 0; overflow: hidden; }
   .stepper input { text-align: center; }
@@ -646,7 +648,7 @@
       <li>কম ব্যবহৃত field "আরও তথ্য" section-এ ভাঁজ করা থাকে। বেশি field হলে ছোট না করে section বাড়ে।</li>
       <li>প্রতিটি মানের unit স্থির (তাপমাত্রা °C, লবণাক্ততা ppt, O₂ mg/L)। Unit বদলের picker নেই, রূপান্তরও নেই। ডেটা ওই unit-এই জমা হয়।</li>
       <li>মন্তব্য ঐচ্ছিক, "আরও তথ্য"-তে ভাঁজ করা থাকে (সর্বোচ্চ ২০০ অক্ষর)। বিশেষ কিছু (বৃষ্টি, রং বদল) লিখে রাখার জন্য। না লিখলেও সেভ হয়, history card-এ থাকলে ছোট করে দেখায়।</li>
-      <li>আগের মান: tank বাছলে ওই tank-এ নিজের শেষ মান ধূসর ইটালিক "অনিশ্চিত" অবস্থায় বসে। − / + চাপলে বা "আগের মতোই" চাপলে নিশ্চিত হয়। সব ক'টি নিশ্চিত না হলে সেভ হয় না। মান ২৪ ঘণ্টার বেশি পুরোনো হলে বসে না, শুধু চিপে দেখায়।</li>
+      <>আগের মান: tank বাছলে ওই tank-এ নিজের শেষ মান ধূসর ইটালিক "অনিশ্চিত" অবস্থায় বসে। − / + চাপলে বা "আগের মতোই" চাপলে নিশ্চিত হয়। সব ক'টি নিশ্চিত না হলে সেভ হয় না। সব ক'টি নিশ্চিত না হলে সেভ হয় না। পুরোনো মানের কোনো বয়সসীমা নেই, ট্যাঙ্কের শেষ মান সবসময় বসে। প্রতিটি সেভ নতুন শেষ মান হয়ে যায়।</li>
       <li>বিজ্ঞপ্তি: ওপরের বারে ঘণ্টা আইকন, প্রতিটি screen-এ আছে। চাপলে "আরও"-এর মতোই নিচ থেকে sheet ওঠে। নতুন বিজ্ঞপ্তির সংখ্যা ঘণ্টায় দেখায়, চাপলে পড়া হয়ে যায়। এখানকার চারটি বিজ্ঞপ্তি নমুনা, কোন ঘটনায় আসল বিজ্ঞপ্তি যাবে তা পরে ঠিক হবে।</li>
       <li>ছোট chip আর বোতাম দেখতে 32px, কিন্তু অদৃশ্য padding-এ 44px স্পর্শ। পাশের gap কমপক্ষে 8px, তাই এলাকা মেলে না।</li>
     </ul>
@@ -707,7 +709,7 @@
       savedDemo: 'এটা নমুনা screen, কিছু সেভ হয়নি।',
       required: 'মান লিখুন',
       confirmVal: 'নিশ্চিত করুন: − / + চাপুন বা "আগের মতোই" চাপুন', dec: 'কমান', inc: 'বাড়ান',
-      sameLast: function (v) { return 'আগের মতোই ' + v; }, lastOld: function (v, w) { return 'আগের মান ' + v + ' · ' + w; },
+      sameLast: function (v) { return 'আগের মতোই ' + v; }
       range: function (a, b) { return a + ' থেকে ' + b + ' এর মধ্যে লিখুন'; },
       savedOnline: 'সেভ হয়েছে, সিঙ্ক হচ্ছে।', savedOffline: 'সেভ হয়েছে। ফোনে আছে, ইন্টারনেট এলে সিঙ্ক হবে।',
       pending: 'সিঙ্ক বাকি', syncing: 'সিঙ্ক হচ্ছে', synced: 'সিঙ্ক হয়েছে', failed: 'ব্যর্থ',
@@ -745,7 +747,7 @@
       savedDemo: 'This is a sample screen, nothing was saved.',
       required: 'Enter a value',
       confirmVal: 'Confirm: tap − / + or "Same as last"', dec: 'Decrease', inc: 'Increase',
-      sameLast: function (v) { return 'Same as last ' + v; }, lastOld: function (v, w) { return 'Last ' + v + ' · ' + w; },
+      sameLast: function (v) { return 'Same as last ' + v; },
       range: function (a, b) { return 'Enter a value between ' + a + ' and ' + b; },
       savedOnline: 'Saved. Syncing now.', savedOffline: 'Saved on this phone. It will sync when you are online.',
       pending: 'Pending', syncing: 'Syncing', synced: 'Synced', failed: 'Failed',
@@ -876,21 +878,20 @@
 
   function field(k) { return document.getElementById('f-' + k); }
   /* last value of the selected tank (own readings only): shown unconfirmed, must be confirmed before save */
-  var STEP = { ph: 0.1, t: 0.5, sal: 1, o2: 0.1 }, DEC = { ph: 1, t: 1, sal: 0, o2: 1 }, MAX_AGE_H = 24;
+  var STEP = { ph: 0.1, t: 0.5, sal: 1, o2: 0.1 }, DEC = { ph: 1, t: 1, sal: 0, o2: 1 };
   function lastFor(tank) {
     var best = null;
     readings.forEach(function (r) { if (r.tank === tank && (!best || r.at > best.at)) best = r; });
     return best;
   }
-  function isFresh(r) { return r && (Date.now() - r.at.getTime()) / 3600000 <= MAX_AGE_H; }
-  function renderLastHints() {
+  
     var L = D[lang], r = lastFor(document.getElementById('f-tank').value);
     ['ph', 't', 'sal', 'o2'].forEach(function (k) {
       var chip = document.getElementById('same-' + k);
       if (!r) { chip.dataset.hidden = 'true'; return; }
       chip.dataset.hidden = 'false';
-      if (isFresh(r)) { chip.disabled = false; chip.firstChild.textContent = L.sameLast(r[k]); }
-      else { chip.disabled = true; chip.firstChild.textContent = L.lastOld(r[k], fmtWhen(r.at)); }
+            chip.disabled = false;
+      chip.firstChild.textContent = L.sameLast(r[k]);
     });
   }
   function clearField(k) {
@@ -902,7 +903,7 @@
     var r = lastFor(document.getElementById('f-tank').value);
     ['ph', 't', 'sal', 'o2'].forEach(function (k) {
       clearField(k);
-      if (isFresh(r)) { field(k).value = String(r[k]); field(k).dataset.prefill = 'true'; }
+      if (r) { field(k).value = String(r[k]); field(k).dataset.prefill = 'true'; }
     });
     renderLastHints();
   }

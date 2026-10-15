@@ -30,7 +30,7 @@
 | 18a | History: sub-tabs and card list | done | 2026-10-12 |
 | 18b | History: StatusBadge and pending count | done | 2026-10-12 |
 | 18c | History: fix-and-resend (local only) | done | 2026-10-12 |
-| 19 | Error handling | not started | done | 2026-10-15 |
+| 19 | Error handling | done | 2026-10-15 |
 | 20 | Auth | not started | - |
 | 21 | Sync engine | not started | - |
 | 22 | Notifications | not started | - |
