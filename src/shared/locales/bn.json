@@ -23,9 +23,14 @@
     "main": "মূল নেভিগেশন",
     "more": "আরও"
   },
-    "pwa": {
+  "pwa": {
     "offlineReady": "অফলাইনের জন্য তৈরি",
     "install": "অ্যাপ ইনস্টল করুন"
+  },
+  "error": {
+    "somethingWentWrong": "কিছু একটা সমস্যা হয়েছে।",
+    "dataSafe": "তোমার সেভ করা তথ্য নিরাপদ আছে।",
+    "retry": "আবার চেষ্টা করুন"
   },
   "notifications": {
     "labelNew": "বিজ্ঞপ্তি, {count}টি নতুন",

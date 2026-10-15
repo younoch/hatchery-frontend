@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useErrorStore } from '@/shared/stores/errorStore'
 import { desktopRoutes } from '@/desktop/router/routes'
 import { mobileRoutes } from '@/mobile/router/routes'
 import { getInitialDeviceClass } from '@/shared/composables/useDeviceClass'
@@ -24,6 +25,19 @@ export const router = createRouter({
       component: () => import('@/shared/components/DevicePlaceholderView.vue'),
     },
   ],
+})
+
+router.onError(err => {
+  const { report } = useErrorStore()
+  // Chunk load failures (lazy import 404 after a new deploy)
+  const isChunkError =
+    err?.message?.includes('Failed to fetch dynamically imported module') ||
+    err?.message?.includes('Importing a module script failed')
+  report(err, isChunkError ? 'router:chunk-load' : 'router')
+  if (isChunkError) {
+    // Force a full reload so the browser fetches the new chunk.
+    window.location.reload()
+  }
 })
 
 router.beforeEach(to => {

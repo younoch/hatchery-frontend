@@ -8,9 +8,10 @@ import WaterHistoryView from '@/mobile/views/WaterHistoryView.vue'
 import PageBody from '@/shared/components/layout/PageBody.vue'
 import Tabs from '@/shared/components/ui/Tabs.vue'
 import { countUnsyncedReadings } from '@/shared/storage/readings'
+import { useErrorStore } from '@/shared/stores/errorStore'
 
 const { t } = useI18n()
-
+const { report } = useErrorStore()
 const tab = ref('new')
 const unsyncedCount = ref(0)
 const items = computed(() => [
@@ -30,6 +31,9 @@ onMounted(() => {
   const subscription = liveQuery(() => countUnsyncedReadings()).subscribe({
     next: count => {
       unsyncedCount.value = count
+    },
+    error: err => {
+      report(err, 'WaterView:liveQuery')
     },
   })
   unsubscribe = () => subscription.unsubscribe()

@@ -27,6 +27,11 @@
     "offlineReady": "Ready for offline use",
     "install": "Install app"
   },
+  "error": {
+    "somethingWentWrong": "Something went wrong.",
+    "dataSafe": "Your saved data is safe.",
+    "retry": "Try again"
+  },
   "notifications": {
     "labelNew": "Notifications, {count} new",
     "labelNone": "Notifications, none new"

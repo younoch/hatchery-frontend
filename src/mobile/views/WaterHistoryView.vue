@@ -14,8 +14,10 @@ import { TANKS } from '@/shared/config/tanks'
 import { formatReadingTime } from '@/shared/lib/datetime'
 import type { Reading } from '@/shared/storage/db'
 import { listReadings, retryFailedReading } from '@/shared/storage/readings'
+import { useErrorStore } from '@/shared/stores/errorStore'
 
 const { t, locale } = useI18n()
+const { report } = useErrorStore()
 
 const METRICS = [
   { name: 'ph', labelKey: 'water.ph', unit: undefined },
@@ -34,6 +36,9 @@ onMounted(() => {
   const subscription = liveQuery(() => listReadings()).subscribe({
     next: rows => {
       readings.value = rows
+    },
+    error: err => {
+      report(err, 'WaterHistoryView:liveQuery')
     },
   })
   unsubscribe = () => subscription.unsubscribe()
