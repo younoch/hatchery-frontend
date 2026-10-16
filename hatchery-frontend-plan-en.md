@@ -32,7 +32,7 @@
 | Chart | D3 (calculation only — scale/shape/array; Vue template renders the SVG) |
 | Offline storage | IndexedDB via Dexie.js, with schema version migrations from day one |
 | PWA | vite-plugin-pwa |
-| HTTP | fetch/axios wrapper + interceptor |
+| HTTP | native `fetch` wrapper (`request`, `authedRequest`) with a custom single-flight refresh; no axios |
 | Package manager | pnpm |
 
 No test runner is installed (owner decision). No new dependency is added without asking the owner.
@@ -174,13 +174,14 @@ src/
     layouts/DesktopShell.vue
     router/routes.ts
   shared/
-    api/
+    api/                    # request, authedRequest, sessionManager, httpAuthAdapter
     stores/
     storage/                # Dexie db + readings helpers (+ sync queue later)
     composables/
     schemas/                # Zod schemas
     config/                 # tanks.ts (fixed list for the prototype)
     lib/                    # datetime, utils
+    utils/                  # env.ts (startup env validation)
     components/             # StatusBadge, Card, Metric, ui/, layout/
     locales/
     types/
@@ -251,6 +252,7 @@ Current status of the UI (Step 18): the history card shows the badge for each st
 - The login screen warns when another device holds the session
 - A revoked offline device discovers it only when the network returns (refresh fails) → login screen; `pending`/`failed` readings stay in IndexedDB and sync after re-login (same `createdById`)
 - Sync-time message must explain: "your session moved to another device, your data is safe"
+- **Backend status (2026-10-15):** not implemented (no family or takeover, no `session_revoked` code). Until it lands, a revoked or expired refresh token is just `401 Invalid or expired refresh token`, and the frontend shows one generic "session ended, log in again" message
 
 ### Logout behavior
 - Field devices are personal phones, so logout only clears auth tokens — it never touches IndexedDB
@@ -296,8 +298,9 @@ Current status of the UI (Step 18): the history card shows the badge for each st
 
 ### Token storage
 - **Access token:** in-memory only (Pinia store), never persisted to localStorage/IndexedDB
-- **Refresh token:** moving from response-body delivery to an **httpOnly cookie**, set by the backend (separate backend task, see Appendix A)
-- Until the backend change lands, refresh token is read from the response body and must NOT be written to localStorage; use Pinia (in-memory) as an interim measure
+- **Refresh token:** delivered only as an **httpOnly cookie** named `refresh_token` (backend Task 1 is done; the body of login and refresh contains only `access_token`). The frontend never reads or stores it and sends `credentials: 'include'` on every API call
+- The cookie `Path` is `/auth/refresh`, so it is sent only to `/auth/refresh` and `/auth/refresh/logout`. Logout must call `POST /auth/refresh/logout`
+- Cross-site setup (Vercel and API on different registrable domains) needs `COOKIE_SAME_SITE=none`, `COOKIE_SECURE=true` and the Vercel origin in `CORS_ORIGINS`. A Vercel proxy under a prefix such as `/api` will NOT work while the cookie Path is fixed to `/auth/refresh`
 - Refresh token lifetime: 14 days, sliding — comfortably above the 5-day offline assumption
 - Rotation keeps a short grace window (~20s, config): a just-rotated token presented again once is accepted instead of treated as theft; reuse outside the window revokes the token family
 - No PIN on the offline local session in the MVP; can be added later without a schema change
@@ -339,13 +342,18 @@ Screen-reader usage is unlikely in this user base, but most of this is cheap whe
 ## 8b. API Conventions & Resilience
 
 ### Pagination/filter/sort convention
-- Standard `ListQuery` shape reused across every list-fetching composable: `{ page, limit, sortBy, order, filters }` (default `page: 1`, `limit: 20`, `order: 'desc'`)
-- Matches the backend's existing `PaginationQueryDto`/`PaginatedResult` pattern — confirm exact backend field names before wiring `GET /water-quality`
+- Backend list query (code-read): `page` (default 1), `pageSize` (default 10, max 100), `includeDeleted` (no soft-delete column exists, so it does nothing). The result shape is UNVERIFIED: two reports disagree (`{ items, meta }` vs `{ data, meta }`). Confirm with real output before the first list call (Step 21). No `sortBy`, `order` or `filters` yet
 
 ### Timeout
 - Default request timeout: 10s (generous, for weak mobile networks)
 - Sync queue background POSTs get a longer timeout (15-20s)
 - A timeout is treated the same as a network error for sync-queue purposes — the reading stays `pending`
+
+### Response and error envelope (verified only for `/user/me`)
+- Success: `{ success: true, statusCode, data, timestamp }`. The API client unwraps `data`
+- Error: `{ success: false, statusCode, path, message, timestamp }`. `message` is a string, or for validation errors an object `{ statusCode, message: string[], error }` with English strings
+- Client error kinds: `invalid_credentials` (401 on login), `session_ended` (401 on refresh), `unauthorized` (401 on an authenticated call, triggers one refresh and one retry), `validation` (400), `throttled` (429), `network` (offline, timeout, CORS), `server` (5xx), `unknown`. Per-field error codes are a backend follow-up
+
 
 ### Retry policy
 - **Foreground API calls (GET, dashboard data):** no auto-retry — show an error state with a manual "Retry" action instead
@@ -410,6 +418,20 @@ Set up `mobile/`, `desktop/`, `shared/` as per section 3
 - Retry policy per section 8b
 
 ### Step 8: Backend Additions
+### Backend status (audited 2026-10-15, code-read only)
+| Task | Status | Note |
+|---|---|---|
+| 1 Refresh cookie | DONE | httpOnly, Path `/auth/refresh`, flags from env |
+| 2 14-day sliding + grace window | PARTIAL | 14 days fixed from login; no sliding; no grace window |
+| 2b Single active session | NOT STARTED | no family, no takeover, no `session_revoked` |
+| 3 Idempotent create + batch | NOT STARTED | no readings module |
+| 4 Server trust rules | NOT STARTED | no readings module |
+| 5 Audited PATCH | NOT STARTED | no readings module |
+| 6 Error contract | PARTIAL | English strings, no per-field codes; list shape `page/pageSize` |
+
+Extra findings: `/user/me` has no `isSuperAdmin`; permissions are not in the JWT (read live from the DB); an unverified user can log in; password change keeps other sessions alive.
+
+ ## Appendix A: Backend change instruction (for the NestJS backend LLM/session)
 - See Appendix A (done in the separate backend project)
 
 ### Step 9: First UI Screens

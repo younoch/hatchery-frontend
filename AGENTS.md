@@ -142,8 +142,8 @@ Each step ends at a checkpoint (section 3). Steps are deliberately small. If one
 - **Step 18c: History, fix-and-resend.** On a failed record, "Fix and resend" edits the record and sets it back to `pending` (local only; the real send is Step 21).
 - **Step 19: Error handling.** Global Vue error handler, `unhandledrejection`, `ErrorBoundary` at app level (`App.vue`), liveQuery error callbacks, and chunk-load failure handling in the router. Per-view wrapping is a parking lot item.
 
-**Phase E: Backend integration (ask the owner whether the backend tasks are ready; if not, build against a mock adapter and say so)**
-- **Step 20: Auth.** Login, refresh interceptor with a single in-flight refresh, in-memory access token, permission keys in Pinia, local offline session, session-revoked handling.
+**Phase E: Backend integration (auth is ready; readings, tanks and sync are not, so Step 21 uses a mock adapter)**
+- **Step 20: Auth.** Built against the real auth API (login by email, `POST /auth/refresh` with the httpOnly cookie, `POST /auth/refresh/logout`, `GET /user/me`). Login, refresh with a single in-flight promise plus a cross-tab lock, in-memory access token, permission keys in Pinia (from `/user/me` `role.permissions`), local offline session, generic "session ended" handling (no `session_revoked` code exists yet). The API client uses native `fetch`, no axios. Split into 20a (env, types, Zod response schemas, `AuthAdapter`), 20b-1 (`request()` and `httpAuthAdapter`), 20b-2 (`sessionManager`: in-memory token, single-flight refresh, cross-tab lock), 20b-3 (`authedRequest`: one refresh and retry on 401), 20c (Pinia, store, guard, login view), 20d (offline local session).
 - **Step 21: Sync engine.** Batch idempotent sync, retry policy from section 8b, pause when `createdById` differs from the logged-in user.
 - **Step 22: Notifications.** Replace sample data with real events. Which events notify is still undecided in the plan, so ask first.
 

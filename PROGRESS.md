@@ -20,9 +20,8 @@
 | 12 | Desktop shell | deferred | - |
 | 13 | Swipe navigation | deferred | - |
 | 14-pre | Lazy route imports | done | 2026-10-13 |
-| 14a | PWA: plugin, manifest, icons, offline fallback | done | 2026-10-13 |
-| 14b | PWA: install prompt and offline-ready state | not started | - |  - |
-| 14c | PWA: production test on Vercel (real mobile and desktop) | not started | - |
+| 14b | PWA: install prompt and offline-ready state | done | 2026-10-13 |
+| 14c | PWA: production test on Vercel (real mobile and desktop) | done | 2026-10-13 |
 | 15 | Schema | done | 2026-10-10 |
 | 16 | Dexie storage layer | done | 2026-10-11 |
 | 17a | Entry screen, form and save | done | 2026-10-11 |
@@ -31,8 +30,10 @@
 | 18b | History: StatusBadge and pending count | done | 2026-10-12 |
 | 18c | History: fix-and-resend (local only) | done | 2026-10-12 |
 | 19 | Error handling | done | 2026-10-15 |
-| 20a | Auth: env, types, Zod schemas, AuthAdapter | in progress | - |
-| 20b | Auth: API client and refresh (single in-flight, cross-tab lock) | not started | - |
+| 20a | Auth: env, types, Zod schemas, AuthAdapter | in review (`access_token` key unverified) | - |
+| 20b-1 | Auth: request wrapper and httpAuthAdapter | in review | - |
+| 20b-2 | Auth: sessionManager (single-flight refresh, cross-tab lock) | in review | - |
+| 20b-3 | Auth: authedRequest (one refresh and retry on 401) | in review | - |
 | 20c | Auth: store, route guard, login view | not started | - |
 | 20d | Auth: offline local session | not started | - |
 | 21 | Sync engine | not started | - |
@@ -72,8 +73,17 @@
 - 2026-10-13: Step 14b drops `mkcert` HTTPS for now. The real phone test (14c) uses `adb reverse`, because `localhost` is a secure context on the phone. Gating offline entry until "offline ready" moves to Step 20 (it needs login and the first data fetch).
 - 2026-10-14: Owner decision: whatever cannot be tested properly on localhost is tested on production. The app is deployed to Vercel and checked with the real link on a real mobile and desktop. This replaces the `adb reverse` plan for Step 14c.
 - 2026-10-14: Owner confirmed the step sizes (pH 0.1, temperature 0.5, salinity 1, oxygen 0.1) and decided the last value has no age limit.
-- 2026-10-15: Still UNVERIFIED (reports conflict, no real HTTP output yet): real Set-Cookie flags and Max-Age unit; `/user/me` `role` when the user has none and for the super admin; list response shape; login throttle values; `TOKEN_EXPIRATION` default. Step 20a schemas treat `role` as nullable and mark these with `TODO(verify)`.
+- 2026-10-15: Still UNVERIFIED (reports conflict, no real HTTP output yet): real Set-Cookie flags and Max-Age unit; the `access_token` key name; `/user/me` for the super admin; list response shape; login throttle values; `TOKEN_EXPIRATION` default. The auth schemas mark these with `TODO(verify)`.
 - 2026-10-15: Offline token expiry policy: data entry keeps working offline (saves go to Dexie); a 401 during sync means "session ended, log in again" and pending readings stay untouched.
+- 2026-10-16: Native `fetch` is used for the API client, no axios (no new dependency, bundle stays small; the refresh interceptor is custom either way; WebSocket/queue do not depend on the HTTP client).
+- 2026-10-16: `env.ts` lives in `src/shared/utils/env.ts` (not `shared/config`). It is imported first in `main.ts`; a missing or invalid `VITE_API_URL` stops the app at startup. The trailing slash is stripped.
+- 2026-10-15: `/user/me` verified with real output: `role` is `null` for a user without a role; `isSuperAdmin` is not returned. `meSchema` maps it to `AuthUser` (`roleName`, `permissions`, `isSuperAdmin`).
+- 2026-10-16: Error kinds: 401 on login = `invalid_credentials`; 401 on refresh = `session_ended`; 401 on an authenticated call = `unauthorized`, which triggers exactly one refresh and one retry. A network error during refresh keeps the in-memory token (no logout while offline).
+- 2026-10-15: Backend audit (code-read only, app not run; only `/user/me` has since been verified with real output): login is by email; login and refresh return `{ success, statusCode, data: { access_token }, timestamp }` with the refresh token only in an httpOnly cookie named `refresh_token` (Path `/auth/refresh`); the profile endpoint is `GET /user/me`, not `/auth/me`; permissions come only from `/user/me` (`role.permissions`), not from login or the JWT.
+- 2026-10-15: Step 20 is built against the real auth API (no mock for auth). Readings, tanks and batch sync do not exist in the backend, so Step 21 needs a mock adapter.
+- 2026-10-15: Logout calls `POST /auth/refresh/logout` (the cookie Path is `/auth/refresh`, so `/auth/logout` would not receive the cookie).
+- 2026-10-15: Backend gaps the frontend works around, not fixes: refresh token is fixed 14 days from login (not sliding); no grace window, so a lost refresh response can log the user out; no distinguishable error code for a revoked or reused session; a new login does not revoke older sessions; password change keeps other sessions alive; validation errors are English strings, not `{ field, code, params }`; an unverified user can log in.
+- 2026-10-15: A Vercel proxy under a prefix such as `/api` will not work while the refresh cookie Path is fixed to `/auth/refresh`. Cross-site setup needs `COOKIE_SAME_SITE=none`, `COOKIE_SECURE=true` and the Vercel origin in `CORS_ORIGINS`.
 
 ## Parking lot
 - Switch to single "typescript-eslint" package
@@ -90,3 +100,8 @@
 - Architecture/dependency diagram after Step 20.
 - Wrap each route view in ErrorBoundary so a view crash does not take down the tab bar (plan section 8a).
 - Get real curl output from the backend (login with Set-Cookie, `/user/me` for a user with no role and for the super admin, `/user` pagination) and resolve the `TODO(verify)` marks. Ask the backend session to answer: throttle values, `TOKEN_EXPIRATION` default.
+- `AuthError` and `AuthErrorKind` are used for every API call now; rename to `ApiError` and move out of `authAdapter.ts` before Step 21.
+- The refresh race is only reduced, not removed: `navigator.locks` serializes tabs, but a lost refresh response still ends the session (backend task 8: grace window).
+- Real `curl -i` output for login is still missing; it confirms the `access_token` key and the cookie flags (`SameSite`, `Secure`, `Path`, `Max-Age` unit).
+- Backend follow-up list for the backend session: expose `isSuperAdmin` (or an effective permission list) on `/user/me`; make the refresh cookie Path configurable; grace window and family revoke on refresh; sliding TTL; session takeover and a `session_revoked` code; per-field validation codes; decide whether unverified users may log in; confirm the real login throttle and the list response shape (two reports disagree).
+- `env.ts` lives in `src/shared/utils`, not `src/shared/config`; keep the plan's folder list in sync.
