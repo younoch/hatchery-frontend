@@ -41,7 +41,7 @@ export const errorEnvelopeSchema = z.object({
 export type ErrorEnvelope = z.infer<typeof errorEnvelopeSchema>
 
 // POST /auth/login and POST /auth/refresh (the refresh token is a cookie, never in the body)
-// TODO(verify): key name `access_token` comes from code reading, not real output.
+// Verified 2026-10-16: the body is `data.access_token` (real output).
 export const accessTokenSchema = z.object({
   access_token: z.string().min(1),
 })

@@ -30,11 +30,11 @@
 | 18b | History: StatusBadge and pending count | done | 2026-10-12 |
 | 18c | History: fix-and-resend (local only) | done | 2026-10-12 |
 | 19 | Error handling | done | 2026-10-15 |
-| 20a | Auth: env, types, Zod schemas, AuthAdapter | in review (`access_token` key unverified) | - |
+| 20a | Auth: env, types, Zod schemas, AuthAdapter | in review | - |
 | 20b-1 | Auth: request wrapper and httpAuthAdapter | in review | - |
 | 20b-2 | Auth: sessionManager (single-flight refresh, cross-tab lock) | in review | - |
 | 20b-3 | Auth: authedRequest (one refresh and retry on 401) | in review | - |
-| 20c | Auth: store, route guard, login view | not started | - |
+| 20c | Auth: store, route guard, login view | in review | - |
 | 20d | Auth: offline local session | not started | - |
 | 21 | Sync engine | not started | - |
 | 22 | Notifications | not started | - |
@@ -84,6 +84,7 @@
 - 2026-10-15: Logout calls `POST /auth/refresh/logout` (the cookie Path is `/auth/refresh`, so `/auth/logout` would not receive the cookie).
 - 2026-10-15: Backend gaps the frontend works around, not fixes: refresh token is fixed 14 days from login (not sliding); no grace window, so a lost refresh response can log the user out; no distinguishable error code for a revoked or reused session; a new login does not revoke older sessions; password change keeps other sessions alive; validation errors are English strings, not `{ field, code, params }`; an unverified user can log in.
 - 2026-10-15: A Vercel proxy under a prefix such as `/api` will not work while the refresh cookie Path is fixed to `/auth/refresh`. Cross-site setup needs `COOKIE_SAME_SITE=none`, `COOKIE_SECURE=true` and the Vercel origin in `CORS_ORIGINS`.
+- 2026-10-16: Verified in DevTools (local): cookie `refresh_token`, HttpOnly, Secure off, SameSite=Lax, Path starts with `/aut` (full value and Expires not yet read). Production needs `COOKIE_SAME_SITE=none` and `COOKIE_SECURE=true`.
 
 ## Parking lot
 - Switch to single "typescript-eslint" package

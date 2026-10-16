@@ -1,9 +1,102 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
+
+import Button from '@/shared/components/ui/Button.vue'
+import Field from '@/shared/components/ui/Field.vue'
+import Input from '@/shared/components/ui/Input.vue'
+import FieldGrid from '@/shared/components/layout/FieldGrid.vue'
+import PageBody from '@/shared/components/layout/PageBody.vue'
+import PageHeader from '@/shared/components/layout/PageHeader.vue'
+import StickyActionBar from '@/shared/components/layout/StickyActionBar.vue'
+import { AuthError, type AuthErrorKind } from '@/shared/api/authAdapter'
+import { safeRedirect } from '@/shared/lib/safeRedirect'
+import { loginFormSchema } from '@/shared/schemas/login.schema'
+import { useAuthStore } from '@/shared/stores/authStore'
 
 const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
+const auth = useAuthStore()
+
+const ERROR_KEYS: Record<AuthErrorKind, string> = {
+  invalid_credentials: 'auth.error.invalidCredentials',
+  session_ended: 'auth.error.unknown',
+  unauthorized: 'auth.error.unknown',
+  validation: 'auth.error.validation',
+  throttled: 'auth.error.throttled',
+  network: 'auth.error.network',
+  server: 'auth.error.server',
+  unknown: 'auth.error.unknown',
+}
+
+const { errors, defineField, handleSubmit } = useForm({
+  validationSchema: toTypedSchema(loginFormSchema),
+  initialValues: { email: '', password: '' },
+})
+
+const config = { validateOnModelUpdate: false }
+const [email] = defineField('email', config)
+const [password] = defineField('password', config)
+
+const formError = ref<string | undefined>()
+const submitting = ref(false)
+
+const onSubmit = handleSubmit(async values => {
+  formError.value = undefined
+  submitting.value = true
+  try {
+    await auth.login(values)
+    await router.replace(safeRedirect(route.query.redirect))
+  } catch (error) {
+    // Anything that is not an AuthError is a bug: let the global handler report it.
+    if (!(error instanceof AuthError)) throw error
+    formError.value = ERROR_KEYS[error.kind]
+  } finally {
+    submitting.value = false
+  }
+})
 </script>
 
 <template>
-  <p>{{ t('auth.login.title') }}</p>
+  <form novalidate @submit.prevent="onSubmit">
+    <PageHeader :title="t('auth.login.title')" />
+    <PageBody>
+      <FieldGrid :cols="1">
+        <Field :label="t('auth.login.email')" :error-key="errors.email">
+          <template #default="{ id, errorId, hasError }">
+            <Input
+              :id="id"
+              v-model="email"
+              type="email"
+              inputmode="email"
+              autocomplete="username"
+              :invalid="hasError"
+              :error-id="errorId"
+            />
+          </template>
+        </Field>
+        <Field :label="t('auth.login.password')" :error-key="errors.password">
+          <template #default="{ id, errorId, hasError }">
+            <Input
+              :id="id"
+              v-model="password"
+              type="password"
+              autocomplete="current-password"
+              :invalid="hasError"
+              :error-id="errorId"
+            />
+          </template>
+        </Field>
+      </FieldGrid>
+    </PageBody>
+    <StickyActionBar :status-key="formError">
+      <Button type="submit" :disabled="submitting">
+        {{ t(submitting ? 'auth.login.submitting' : 'auth.login.submit') }}
+      </Button>
+    </StickyActionBar>
+  </form>
 </template>
