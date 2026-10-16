@@ -19,6 +19,7 @@ export interface RequestOptions<T extends z.ZodTypeAny> {
 function kindFor(status: number, statusMap?: Partial<Record<number, AuthErrorKind>>): AuthErrorKind {
   const mapped = statusMap?.[status]
   if (mapped) return mapped
+  if (status === 401) return 'unauthorized'
   if (status === 400) return 'validation'
   if (status === 429) return 'throttled'
   if (status >= 500) return 'server'

@@ -29,7 +29,6 @@ export const httpAuthAdapter: AuthAdapter = {
       path: '/user/me',
       schema: meSchema,
       accessToken,
-      statusMap: { 401: 'session_ended' },
     })
   },
 
