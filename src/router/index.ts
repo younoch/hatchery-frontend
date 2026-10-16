@@ -3,6 +3,8 @@ import { useErrorStore } from '@/shared/stores/errorStore'
 import { desktopRoutes } from '@/desktop/router/routes'
 import { mobileRoutes } from '@/mobile/router/routes'
 import { getInitialDeviceClass } from '@/shared/composables/useDeviceClass'
+import { useAuthStore } from '@/shared/stores/authStore'
+import { AuthError } from '@/shared/api/authAdapter'
 
 const devRoutes = import.meta.env.DEV
   ? [
@@ -40,18 +42,38 @@ router.onError(err => {
   }
 })
 
-router.beforeEach(to => {
+router.beforeEach( async (to) => {
   const isPrefixed =
     to.path === '/m' || to.path.startsWith('/m/') || to.path === '/d' || to.path.startsWith('/d/')
   const isDevRoute = import.meta.env.DEV && to.path.startsWith('/dev/')
 
-  if (isPrefixed || isDevRoute) {
-    return true
+  if (!isPrefixed && !isDevRoute) {
+    const deviceClass = getInitialDeviceClass()
+    const path = to.path === '/' ? '/' : to.fullPath
+    const prefix = deviceClass === 'mobile' ? 'm' : 'd'
+    return `/${prefix}${path}`
   }
 
-  const deviceClass = getInitialDeviceClass()
-  const path = to.path === '/' ? '/' : to.fullPath
-  const prefix = deviceClass === 'mobile' ? 'm' : 'd'
+  if (isDevRoute) return true
 
-  return `/${prefix}${path}`
+  const auth = useAuthStore()
+  if (auth.status === 'unknown') {
+    try {
+      await auth.bootstrap()
+    } catch (error) {
+      // Offline or server down: do not trap the user on a blank screen. Step 20d replaces
+      // this with the offline local session.
+      if (!(error instanceof AuthError)) throw error
+      return true
+    }
+  }
+
+  const isPublic = to.meta.public === true
+  if (auth.status === 'anonymous' && !isPublic) {
+    return { path: '/m/login', query: { redirect: to.fullPath } }
+  }
+  if (auth.status === 'authenticated' && isPublic) {
+    return '/m/water'
+  }
+  return true
 })

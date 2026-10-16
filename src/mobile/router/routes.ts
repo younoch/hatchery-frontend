@@ -2,6 +2,11 @@ import type { RouteRecordRaw } from 'vue-router'
 import MobileShell from '@/mobile/layouts/MobileShell.vue'
 
 export const mobileRoutes: RouteRecordRaw[] = [
+    {
+    path: '/m/login',
+    component: () => import('@/mobile/views/LoginView.vue'),
+    meta: { public: true, titleKey: 'auth.login.title' },
+  },
   {
     path: '/m',
     component: MobileShell,

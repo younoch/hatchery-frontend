@@ -89,5 +89,10 @@
     "tabHistoryCount": "History ({count})",
     "historyEmpty": "No entries yet.",
     "fixAndResend": "Fix and resend"
+  },
+  "auth": {
+    "login": {
+      "title": "Login"
+    }
   }
 }

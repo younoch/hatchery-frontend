@@ -1,4 +1,5 @@
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import './style.css'
 import '@/shared/utils/env'
 import App from './App.vue'
@@ -13,6 +14,7 @@ const initialLang = getInitialLanguage()
 document.documentElement.lang = initialLang
 
 const app = createApp(App)
+app.use(createPinia())
 app.use(i18n)
 app.use(router)
 

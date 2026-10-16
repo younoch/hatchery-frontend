@@ -89,5 +89,10 @@
     "tabHistoryCount": "ইতিহাস ({count})",
     "historyEmpty": "এখনো কোনো এন্ট্রি নেই।",
     "fixAndResend": "ঠিক করে পাঠান"
+  },
+  "auth": {
+    "login": {
+      "title": "লগইন"
+    }
   }
 }
