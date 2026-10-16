@@ -18,8 +18,19 @@ export interface Reading {
   needsReview: boolean // server-derived
 }
 
+// Local session: no secrets (no tokens). It lets the app open offline after a cold start.
+export interface LocalSession {
+  key: 'current' // single row
+  userId: string
+  email: string
+  permissions: string[] // snapshot from the last successful /user/me
+  isSuperAdmin: boolean
+  organizationId: string | null // reserved: the backend has no organizations yet
+  savedAt: string // ISO, phone clock
+}
 class HatcheryDB extends Dexie {
   readings!: Table<Reading, string>
+  session!: Table<LocalSession, string>
 
   constructor() {
     super('hatchery-db')
@@ -27,6 +38,11 @@ class HatcheryDB extends Dexie {
     // version 1: initial schema. Never edit or remove this call; add version(2) for changes.
     this.version(1).stores({
       readings: 'id, status, recordedAt, createdById, [createdById+tankId+recordedAt]',
+    })
+    // version 2: adds the local session table. `readings` is repeated unchanged.
+    this.version(2).stores({
+      readings: 'id, status, recordedAt, createdById, [createdById+tankId+recordedAt]',
+      session: 'key',
     })
   }
 }

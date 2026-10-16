@@ -85,6 +85,8 @@
 - 2026-10-15: Backend gaps the frontend works around, not fixes: refresh token is fixed 14 days from login (not sliding); no grace window, so a lost refresh response can log the user out; no distinguishable error code for a revoked or reused session; a new login does not revoke older sessions; password change keeps other sessions alive; validation errors are English strings, not `{ field, code, params }`; an unverified user can log in.
 - 2026-10-15: A Vercel proxy under a prefix such as `/api` will not work while the refresh cookie Path is fixed to `/auth/refresh`. Cross-site setup needs `COOKIE_SAME_SITE=none`, `COOKIE_SECURE=true` and the Vercel origin in `CORS_ORIGINS`.
 - 2026-10-16: Verified in DevTools (local): cookie `refresh_token`, HttpOnly, Secure off, SameSite=Lax, Path starts with `/aut` (full value and Expires not yet read). Production needs `COOKIE_SAME_SITE=none` and `COOKIE_SECURE=true`.
+- 2026-10-16: Verified with real output: login/refresh body is `data.access_token`. Pinia added with the owner's approval. Login has no password-rule check on the client (the backend owns it). Logout lives in the More sheet and always clears the local session; IndexedDB is untouched.
+- 2026-10-16: Logout keeps pending and failed readings. A different user signing in on the same phone cannot see them (filtered by `createdById`), sync stays paused while they exist, and only synced cache of other users is cleared. Deleting unsynced readings is possible only through an explicit confirmed action, never automatically. The local session stores `userId`, a permission snapshot and a reserved `organizationId` (null for now); it is cleared on explicit logout and on `session_ended`.
 
 ## Parking lot
 - Switch to single "typescript-eslint" package
@@ -106,3 +108,7 @@
 - Real `curl -i` output for login is still missing; it confirms the `access_token` key and the cookie flags (`SameSite`, `Secure`, `Path`, `Max-Age` unit).
 - Backend follow-up list for the backend session: expose `isSuperAdmin` (or an effective permission list) on `/user/me`; make the refresh cookie Path configurable; grace window and family revoke on refresh; sliding TTL; session takeover and a `session_revoked` code; per-field validation codes; decide whether unverified users may log in; confirm the real login throttle and the list response shape (two reports disagree).
 - `env.ts` lives in `src/shared/utils`, not `src/shared/config`; keep the plan's folder list in sync.
+- Forgot-password flow: the backend has the endpoints, the frontend has no screen; decide where the email link lands (`FRONTEND_URL`).
+- Warn on logout when pending readings exist.
+- Production login needs a hosted backend with `COOKIE_SAME_SITE=none`, `COOKIE_SECURE=true` and the Vercel origin in `CORS_ORIGINS`; do not push the route guard to Vercel until then.
+- Organization profile (future): users belong to an organization with many staff. Decide: who sees whose readings (permission keys, not role names), whether "last value" is per user or per tank, organization-scoped tanks (Dexie `tanks` table at `version(2)`), and an `organizationId` on readings. The local session already reserves `organizationId` (null until the backend has it).

@@ -50,9 +50,9 @@ async function logout() {
       <Button variant="secondary" class="justify-start" @click="switchDevice">
         {{ t('device.switchToDesktop') }}
       </Button>
-      + <Button variant="red-outline" class="justify-start" @click="logout">
-        + {{ t('auth.logout') }}
-        + </Button>
+       <Button variant="red-outline" class="justify-start" @click="logout">
+         {{ t('auth.logout') }}
+         </Button>
     </FieldGrid>
   </Sheet>
 </template>
