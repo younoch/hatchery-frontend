@@ -31,7 +31,7 @@
 | 18b | History: StatusBadge and pending count | done | 2026-10-12 |
 | 18c | History: fix-and-resend (local only) | done | 2026-10-12 |
 | 19 | Error handling | done | 2026-10-15 |
-| 20a | Auth: env, types, Zod schemas, AuthAdapter | not started | - |
+| 20a | Auth: env, types, Zod schemas, AuthAdapter | in progress | - |
 | 20b | Auth: API client and refresh (single in-flight, cross-tab lock) | not started | - |
 | 20c | Auth: store, route guard, login view | not started | - |
 | 20d | Auth: offline local session | not started | - |
