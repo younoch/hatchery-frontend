@@ -4,7 +4,7 @@ import { AuthError } from '@/shared/api/authAdapter'
 import { httpAuthAdapter } from '@/shared/api/httpAuthAdapter'
 import { getAccessToken, refreshSession, setAccessToken } from '@/shared/api/sessionManager'
 import type { AuthUser, LoginCredentials } from '@/shared/schemas/auth.schema'
-
+import { clearLocalSession, getLocalSession, saveLocalSession } from '@/shared/storage/session'
 export type AuthStatus = 'unknown' | 'authenticated' | 'anonymous'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -27,16 +27,19 @@ export const useAuthStore = defineStore('auth', () => {
     status.value = 'authenticated'
   }
 
-  function clearSession(): void {
+  async function clearSession(): Promise<void> {
     setAccessToken(null)
     user.value = null
     status.value = 'anonymous'
+    await clearLocalSession()
   }
 
   async function login(credentials: LoginCredentials): Promise<void> {
     const token = await httpAuthAdapter.login(credentials)
     setAccessToken(token)
-    setSession(await httpAuthAdapter.fetchMe(token))
+    const me = await httpAuthAdapter.fetchMe(token)
+    setSession(me)
+    await saveLocalSession(me)
   }
 
   // Restores the session after a reload: the refresh cookie gives a new access token.
@@ -45,10 +48,28 @@ export const useAuthStore = defineStore('auth', () => {
   async function bootstrap(): Promise<void> {
     try {
       const token = getAccessToken() ?? (await refreshSession())
-      setSession(await httpAuthAdapter.fetchMe(token))
+      const me = await httpAuthAdapter.fetchMe(token)
+      setSession(me)
+      await saveLocalSession(me)
     } catch (error) {
       if (error instanceof AuthError && (error.kind === 'session_ended' || error.kind === 'unauthorized')) {
-        clearSession()
+        await clearSession()
+        return
+      }
+      // Offline or server down: fall back to the local session if there is one.
+      if (error instanceof AuthError && (error.kind === 'network' || error.kind === 'server')) {
+        const local = await getLocalSession()
+        if (local) {
+          setSession({
+            id: local.userId,
+            email: local.email,
+            roleName: null,
+            permissions: local.permissions,
+            isSuperAdmin: local.isSuperAdmin,
+          })
+          return
+        }
+        status.value = 'anonymous'
         return
       }
       throw error

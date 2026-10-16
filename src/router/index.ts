@@ -4,7 +4,6 @@ import { desktopRoutes } from '@/desktop/router/routes'
 import { mobileRoutes } from '@/mobile/router/routes'
 import { getInitialDeviceClass } from '@/shared/composables/useDeviceClass'
 import { useAuthStore } from '@/shared/stores/authStore'
-import { AuthError } from '@/shared/api/authAdapter'
 
 const devRoutes = import.meta.env.DEV
   ? [
@@ -58,14 +57,7 @@ router.beforeEach( async (to) => {
 
   const auth = useAuthStore()
   if (auth.status === 'unknown') {
-    try {
-      await auth.bootstrap()
-    } catch (error) {
-      // Offline or server down: do not trap the user on a blank screen. Step 20d replaces
-      // this with the offline local session.
-      if (!(error instanceof AuthError)) throw error
-      return true
-    }
+    await auth.bootstrap()
   }
 
   const isPublic = to.meta.public === true
