@@ -16,11 +16,14 @@ import { AuthError, type AuthErrorKind } from '@/shared/api/authAdapter'
 import { safeRedirect } from '@/shared/lib/safeRedirect'
 import { loginFormSchema } from '@/shared/schemas/login.schema'
 import { useAuthStore } from '@/shared/stores/authStore'
+import ToastHost from '@/shared/components/ToastHost.vue'
+import { useToast } from '@/shared/composables/useToast'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
+const toast = useToast()
 
 const ERROR_KEYS: Record<AuthErrorKind, string> = {
   invalid_credentials: 'auth.error.invalidCredentials',
@@ -42,11 +45,10 @@ const config = { validateOnModelUpdate: false }
 const [email] = defineField('email', config)
 const [password] = defineField('password', config)
 
-const formError = ref<string | undefined>()
 const submitting = ref(false)
 
 const onSubmit = handleSubmit(async values => {
-  formError.value = undefined
+  toast.dismiss()
   submitting.value = true
   try {
     await auth.login(values)
@@ -54,7 +56,7 @@ const onSubmit = handleSubmit(async values => {
   } catch (error) {
     // Anything that is not an AuthError is a bug: let the global handler report it.
     if (!(error instanceof AuthError)) throw error
-    formError.value = ERROR_KEYS[error.kind]
+    toast.error(ERROR_KEYS[error.kind])
   } finally {
     submitting.value = false
   }
@@ -93,10 +95,11 @@ const onSubmit = handleSubmit(async values => {
         </Field>
       </FieldGrid>
     </PageBody>
-    <StickyActionBar :status-key="formError">
+    <StickyActionBar>
       <Button type="submit" :disabled="submitting">
         {{ t(submitting ? 'auth.login.submitting' : 'auth.login.submit') }}
       </Button>
     </StickyActionBar>
   </form>
+  <ToastHost />
 </template>

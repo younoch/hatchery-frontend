@@ -6,7 +6,6 @@ import { ToastClose, ToastProvider, ToastRoot, ToastViewport } from 'reka-ui'
 import { cn } from '@/shared/lib/utils'
 import { TOAST_DURATION_MS, useToast, type ToastVariant } from '@/shared/composables/useToast'
 
-withDefaults(defineProps<{ bottomOffset?: number | string }>(), { bottomOffset: 0 })
 
 const { t } = useI18n()
 const { current, dismiss } = useToast()
@@ -69,8 +68,7 @@ const open = computed({
       </ToastClose>
     </ToastRoot>
     <ToastViewport
-      class="fixed left-[0] right-[0] z-50 px-s-4"
-      :style="{ bottom: `${String(bottomOffset).replace(/px$/, '')}px` }"
+      class="fixed right-[0] top-[0] z-50 w-full max-w-[24rem] p-s-4"
     />
   </ToastProvider>
 </template>

@@ -208,6 +208,6 @@ const toast = useToast()
         </FieldGrid>
       </FormSection>
     </SectionStack>
-    <ToastHost :bottom-offset="60" />
+    <ToastHost/>
   </PageBody>
 </template>

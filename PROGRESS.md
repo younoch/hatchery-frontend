@@ -36,8 +36,8 @@
 | 20b-3 | Auth: authedRequest (one refresh and retry on 401) | done | 2026-10-17 |
 | 20c | Auth: store, route guard, login view | done | 2026-10-17 |
 | 20d | Auth: offline local session |  done | 2026-10-17 |
-| 20e | Toast: shared component, useToast, login errors | not started | - |
-| 20.5 | Global Toast: component, useToast, ToastHost, styleguide | not started | - |
+| 20e | Toast: shared component, useToast, login errors | done | 2026-10-17 |
+| 20.5 | Global Toast: component, useToast, ToastHost, styleguide | done | 2026-10-17 |
 | 21 | Sync engine | not started | - |
 | 22 | Notifications | not started | - |
 | 23 | Dashboard | not started | - |
@@ -117,3 +117,4 @@
 - Production login needs a hosted backend with `COOKIE_SAME_SITE=none`, `COOKIE_SECURE=true` and the Vercel origin in `CORS_ORIGINS`; do not push the route guard to Vercel until then.
 - Organization profile (future): users belong to an organization with many staff. Decide: who sees whose readings (permission keys, not role names), whether "last value" is per user or per tank, organization-scoped tanks (Dexie `tanks` table at `version(2)`), and an `organizationId` on readings. The local session already reserves `organizationId` (null until the backend has it).
 - After Step 20.5: show login errors (invalid credentials, network, throttled) as a toast and keep the persistent error line above the form.
+- Login view layout: the form sits at the top with empty space below; give it a full-height column (like WaterEntryView's `flex flex-1 flex-col justify-between` inside a `h-dvh` container) so the button sits at the bottom.
