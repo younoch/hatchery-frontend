@@ -30,12 +30,12 @@
 | 18b | History: StatusBadge and pending count | done | 2026-10-12 |
 | 18c | History: fix-and-resend (local only) | done | 2026-10-12 |
 | 19 | Error handling | done | 2026-10-15 |
-| 20a | Auth: env, types, Zod schemas, AuthAdapter | in review | - |
-| 20b-1 | Auth: request wrapper and httpAuthAdapter | in review | - |
-| 20b-2 | Auth: sessionManager (single-flight refresh, cross-tab lock) | in review | - |
-| 20b-3 | Auth: authedRequest (one refresh and retry on 401) | in review | - |
-| 20c | Auth: store, route guard, login view | in review | - |
-| 20d | Auth: offline local session | in progress | - |
+| 20a | Auth: env, types, Zod schemas, AuthAdapter | done | 2026-10-17 |
+| 20b-1 | Auth: request wrapper and httpAuthAdapter | done | 2026-10-17 |
+| 20b-2 | Auth: sessionManager (single-flight refresh, cross-tab lock) | done | 2026-10-17 |
+| 20b-3 | Auth: authedRequest (one refresh and retry on 401) | done | 2026-10-17 |
+| 20c | Auth: store, route guard, login view | done | 2026-10-17 |
+| 20d | Auth: offline local session |  done | 2026-10-17 |
 | 20e | Toast: shared component, useToast, login errors | not started | - |
 | 20.5 | Global Toast: component, useToast, ToastHost, styleguide | not started | - |
 | 21 | Sync engine | not started | - |
@@ -91,6 +91,7 @@
 - 2026-10-16: Logout keeps pending and failed readings. A different user signing in on the same phone cannot see them (filtered by `createdById`), sync stays paused while they exist, and only synced cache of other users is cleared. Deleting unsynced readings is possible only through an explicit confirmed action, never automatically. The local session stores `userId`, a permission snapshot and a reserved `organizationId` (null for now); it is cleared on explicit logout and on `session_ended`.
 - 2026-10-16: Backend verified with real HTTP output: login and refresh return 201 with `data.access_token`; cookie `refresh_token` Max-Age=1209600 (seconds), Path=/auth/refresh, HttpOnly, SameSite=Lax; refresh TTL is sliding (correcting an earlier "fixed" claim); a reused or logged-out refresh token gives 401; list shape is `{ items, meta }`; there is no login-specific throttle (global 100 per 60 s, no 429 seen in 12 tries); unverified users can log in; the super admin gets `role: null` from `/user/me` (so no permissions until backend task 7); production must set `TOKEN_EXPIRATION` explicitly (unset means 3600).
 - 2026-10-16: Toast is its own step (20.5), not part of Auth. Auth is finished with the inline form error first; the global Toast is built next and then used in login (keeping the persistent error line there).
+- 2026-10-17: Step 20 done after a full manual test. Readings are written and read under the signed-in user's id (no stub id). Old `stub-user` test readings remain on disk but are invisible.
 ## Parking lot
 - Switch to single "typescript-eslint" package
 - Clean up woff files in dist (keep only woff2)
