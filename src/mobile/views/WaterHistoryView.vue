@@ -14,6 +14,7 @@ import { TANKS } from '@/shared/config/tanks'
 import { formatReadingTime } from '@/shared/lib/datetime'
 import type { Reading } from '@/shared/storage/db'
 import { listReadings, retryFailedReading } from '@/shared/storage/readings'
+import { requireUserId } from '@/shared/composables/useCurrentUserId'
 import { useErrorStore } from '@/shared/stores/errorStore'
 
 const { t, locale } = useI18n()
@@ -33,7 +34,7 @@ const tankName = (id: string) => TANKS.find(tank => tank.id === id)?.name ?? id
 
 // liveQuery re-runs when the readings table changes, so a new save shows up here at once.
 onMounted(() => {
-  const subscription = liveQuery(() => listReadings()).subscribe({
+  const subscription = liveQuery(() => listReadings(requireUserId())).subscribe({
     next: rows => {
       readings.value = rows
     },

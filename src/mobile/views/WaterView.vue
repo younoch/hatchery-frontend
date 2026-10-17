@@ -7,8 +7,9 @@ import WaterEntryView from '@/mobile/views/WaterEntryView.vue'
 import WaterHistoryView from '@/mobile/views/WaterHistoryView.vue'
 import PageBody from '@/shared/components/layout/PageBody.vue'
 import Tabs from '@/shared/components/ui/Tabs.vue'
-import { countUnsyncedReadings } from '@/shared/storage/readings'
 import { useErrorStore } from '@/shared/stores/errorStore'
+import { requireUserId } from '@/shared/composables/useCurrentUserId'
+import { countUnsyncedReadings } from '@/shared/storage/readings'
 
 const { t } = useI18n()
 const { report } = useErrorStore()
@@ -28,7 +29,7 @@ const items = computed(() => [
 let unsubscribe: (() => void) | undefined
 
 onMounted(() => {
-  const subscription = liveQuery(() => countUnsyncedReadings()).subscribe({
+  const subscription = liveQuery(() => countUnsyncedReadings(requireUserId())).subscribe({
     next: count => {
       unsyncedCount.value = count
     },

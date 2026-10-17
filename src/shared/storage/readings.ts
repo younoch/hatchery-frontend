@@ -3,15 +3,12 @@ import Dexie from 'dexie'
 import type { WaterReadingInput } from '@/shared/schemas/waterQuality.schema'
 import { db, type Reading } from './db'
 
-// TODO(Step 20): replace with the real logged-in user id.
-export const STUB_USER_ID = 'stub-user'
-
 // Config constant, changeable without a schema migration (plan section 6).
 export const SYNCED_RETENTION_DAYS = 30
 
 export async function createReading(
   input: WaterReadingInput,
-  userId: string = STUB_USER_ID
+  userId: string
 ): Promise<Reading> {
   const reading: Reading = {
     ...input,
@@ -31,7 +28,7 @@ export async function getReading(id: string): Promise<Reading | undefined> {
   return db.readings.get(id)
 }
 
-export async function listReadings(userId: string = STUB_USER_ID): Promise<Reading[]> {
+export async function listReadings(userId: string): Promise<Reading[]> {
   const rows = await db.readings.where('createdById').equals(userId).toArray()
   return rows.sort((a, b) => b.recordedAt.localeCompare(a.recordedAt))
 }
@@ -64,7 +61,7 @@ export async function deletePendingReading(id: string): Promise<boolean> {
 // The current user's own latest reading for a tank (local data only).
 export async function getLatestReading(
   tankId: string,
-  userId: string = STUB_USER_ID
+  userId: string
 ): Promise<Reading | undefined> {
   const rows = await db.readings
     .where('[createdById+tankId+recordedAt]')
@@ -95,7 +92,7 @@ export async function requestPersistentStorage(): Promise<boolean> {
 }
 
 // Readings still waiting to reach the server (pending or syncing). failed is not counted.
-export async function countUnsyncedReadings(userId: string = STUB_USER_ID): Promise<number> {
+export async function countUnsyncedReadings(userId: string): Promise<number> {
   return db.readings
     .where('createdById')
     .equals(userId)

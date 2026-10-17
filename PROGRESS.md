@@ -35,7 +35,9 @@
 | 20b-2 | Auth: sessionManager (single-flight refresh, cross-tab lock) | in review | - |
 | 20b-3 | Auth: authedRequest (one refresh and retry on 401) | in review | - |
 | 20c | Auth: store, route guard, login view | in review | - |
-| 20d | Auth: offline local session | not started | - |
+| 20d | Auth: offline local session | in progress | - |
+| 20e | Toast: shared component, useToast, login errors | not started | - |
+| 20.5 | Global Toast: component, useToast, ToastHost, styleguide | not started | - |
 | 21 | Sync engine | not started | - |
 | 22 | Notifications | not started | - |
 | 23 | Dashboard | not started | - |
@@ -87,7 +89,8 @@
 - 2026-10-16: Verified in DevTools (local): cookie `refresh_token`, HttpOnly, Secure off, SameSite=Lax, Path starts with `/aut` (full value and Expires not yet read). Production needs `COOKIE_SAME_SITE=none` and `COOKIE_SECURE=true`.
 - 2026-10-16: Verified with real output: login/refresh body is `data.access_token`. Pinia added with the owner's approval. Login has no password-rule check on the client (the backend owns it). Logout lives in the More sheet and always clears the local session; IndexedDB is untouched.
 - 2026-10-16: Logout keeps pending and failed readings. A different user signing in on the same phone cannot see them (filtered by `createdById`), sync stays paused while they exist, and only synced cache of other users is cleared. Deleting unsynced readings is possible only through an explicit confirmed action, never automatically. The local session stores `userId`, a permission snapshot and a reserved `organizationId` (null for now); it is cleared on explicit logout and on `session_ended`.
-
+- 2026-10-16: Backend verified with real HTTP output: login and refresh return 201 with `data.access_token`; cookie `refresh_token` Max-Age=1209600 (seconds), Path=/auth/refresh, HttpOnly, SameSite=Lax; refresh TTL is sliding (correcting an earlier "fixed" claim); a reused or logged-out refresh token gives 401; list shape is `{ items, meta }`; there is no login-specific throttle (global 100 per 60 s, no 429 seen in 12 tries); unverified users can log in; the super admin gets `role: null` from `/user/me` (so no permissions until backend task 7); production must set `TOKEN_EXPIRATION` explicitly (unset means 3600).
+- 2026-10-16: Toast is its own step (20.5), not part of Auth. Auth is finished with the inline form error first; the global Toast is built next and then used in login (keeping the persistent error line there).
 ## Parking lot
 - Switch to single "typescript-eslint" package
 - Clean up woff files in dist (keep only woff2)
@@ -112,3 +115,4 @@
 - Warn on logout when pending readings exist.
 - Production login needs a hosted backend with `COOKIE_SAME_SITE=none`, `COOKIE_SECURE=true` and the Vercel origin in `CORS_ORIGINS`; do not push the route guard to Vercel until then.
 - Organization profile (future): users belong to an organization with many staff. Decide: who sees whose readings (permission keys, not role names), whether "last value" is per user or per tank, organization-scoped tanks (Dexie `tanks` table at `version(2)`), and an `organizationId` on readings. The local session already reserves `organizationId` (null until the backend has it).
+- After Step 20.5: show login errors (invalid credentials, network, throttled) as a toast and keep the persistent error line above the form.

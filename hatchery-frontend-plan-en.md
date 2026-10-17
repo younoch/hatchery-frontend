@@ -342,7 +342,7 @@ Screen-reader usage is unlikely in this user base, but most of this is cheap whe
 ## 8b. API Conventions & Resilience
 
 ### Pagination/filter/sort convention
-- Backend list query (code-read): `page` (default 1), `pageSize` (default 10, max 100), `includeDeleted` (no soft-delete column exists, so it does nothing). The result shape is UNVERIFIED: two reports disagree (`{ items, meta }` vs `{ data, meta }`). Confirm with real output before the first list call (Step 21). No `sortBy`, `order` or `filters` yet
+- Backend list query (verified 2026-10-16): `page` (default 1), `pageSize` (default 10, max 100), `includeDeleted` (does nothing). Result: `{ items, meta: { total, page, pageSize, totalPages, hasNextPage } }` inside the response envelope. No `sortBy`, `order` or `filters`.
 
 ### Timeout
 - Default request timeout: 10s (generous, for weak mobile networks)
@@ -422,7 +422,7 @@ Set up `mobile/`, `desktop/`, `shared/` as per section 3
 | Task | Status | Note |
 |---|---|---|
 | 1 Refresh cookie | DONE | httpOnly, Path `/auth/refresh`, flags from env |
-| 2 14-day sliding + grace window | PARTIAL | 14 days fixed from login; no sliding; no grace window |
+| 2 14-day sliding + grace window | PARTIAL | 14 days sliding (verified 2026-10-16); no grace window 
 | 2b Single active session | NOT STARTED | no family, no takeover, no `session_revoked` |
 | 3 Idempotent create + batch | NOT STARTED | no readings module |
 | 4 Server trust rules | NOT STARTED | no readings module |
@@ -430,6 +430,7 @@ Set up `mobile/`, `desktop/`, `shared/` as per section 3
 | 6 Error contract | PARTIAL | English strings, no per-field codes; list shape `page/pageSize` |
 
 Extra findings: `/user/me` has no `isSuperAdmin`; permissions are not in the JWT (read live from the DB); an unverified user can log in; password change keeps other sessions alive.
+Super admin gets role null from /user/me, so no permissions until backend task 7. Production must set TOKEN_EXPIRATION explicitly (unset means 3600 seconds).
 
  ## Appendix A: Backend change instruction (for the NestJS backend LLM/session)
 - See Appendix A (done in the separate backend project)
