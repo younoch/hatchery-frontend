@@ -45,5 +45,9 @@
     "optionB": "সবুজ",
     "optionC": "কমলা",
     "switchToEnglish": "EN",
-    "switchToBangla": "বাংলা"
+    "switchToBangla": "বাংলা",
+    "toast": "টোস্ট",
+    "toastError": "ত্রুটি দেখান",
+    "toastSuccess": "সফল দেখান",
+    "toastInfo": "তথ্য দেখান"
 }

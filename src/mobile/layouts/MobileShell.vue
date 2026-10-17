@@ -3,6 +3,8 @@ import { useI18n } from 'vue-i18n'
 
 import MobileAppBar from '@/mobile/components/nav/MobileAppBar.vue'
 import BottomTabBar from '@/mobile/components/nav/BottomTabBar.vue'
+import { SAVE_BAR_HEIGHT, TAB_BAR_HEIGHT } from '@/mobile/nav/layout'
+import ToastHost from '@/shared/components/ToastHost.vue'
 import { useOnlineStatus } from '@/shared/composables/useOnlineStatus'
 
 const { t } = useI18n()
@@ -37,5 +39,6 @@ const { isOnline } = useOnlineStatus()
       <router-view />
     </main>
     <BottomTabBar />
+    <ToastHost :bottom-offset="TAB_BAR_HEIGHT + SAVE_BAR_HEIGHT" />
   </div>
 </template>

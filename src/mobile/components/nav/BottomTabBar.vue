@@ -4,13 +4,11 @@ import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
 
 import MoreSheet from '@/mobile/components/nav/MoreSheet.vue'
+import { TAB_BAR_HEIGHT } from '@/mobile/nav/layout'
 import { navItems } from '@/mobile/nav/navItems'
 import { cn } from '@/shared/lib/utils'
 
 const { t } = useI18n()
-
-// 3.5rem item + py-s-1 (4px + 4px) = 64px. Keep in sync with the classes below.
-const TAB_BAR_HEIGHT = 64
 
 const columns = computed(() => ({
   gridTemplateColumns: `repeat(${navItems.length + 1}, minmax(0, 1fr))`,

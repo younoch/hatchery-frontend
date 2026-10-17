@@ -110,5 +110,8 @@
       "server": "The server has a problem. Try again later.",
       "unknown": "Something went wrong. Try again."
     }
+  },
+  "toast": {
+    "label": "Notification"
   }
 }

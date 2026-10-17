@@ -45,5 +45,9 @@
     "optionB": "Green",
     "optionC": "Amber",
     "switchToEnglish": "EN",
-    "switchToBangla": "বাংলা"
+    "switchToBangla": "বাংলা",
+    "toast": "Toast",
+    "toastError": "Show error",
+    "toastSuccess": "Show success",
+    "toastInfo": "Show info"
 }

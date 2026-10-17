@@ -5,6 +5,8 @@ import { useI18n } from 'vue-i18n'
 import bnStyleguide from './styleguide.bn.json'
 import enStyleguide from './styleguide.en.json'
 
+import { useToast } from '@/shared/composables/useToast'
+
 import Card from '@/shared/components/Card.vue'
 import Metric from '@/shared/components/Metric.vue'
 import StatusBadge from '@/shared/components/StatusBadge.vue'
@@ -21,6 +23,7 @@ import FormSection from '@/shared/components/layout/FormSection.vue'
 import PageBody from '@/shared/components/layout/PageBody.vue'
 import PageHeader from '@/shared/components/layout/PageHeader.vue'
 import SectionStack from '@/shared/components/layout/SectionStack.vue'
+import ToastHost from '@/shared/components/ToastHost.vue'
 import StickyActionBar from '@/shared/components/layout/StickyActionBar.vue'
 import { useLanguage } from '@/shared/composables/useLanguage'
 import { i18n } from '@/shared/i18n'
@@ -62,6 +65,7 @@ const syncStatuses = ['pending', 'syncing', 'failed', 'synced'] as const
 const languageLabel = computed(() =>
   t(locale.value === 'bn' ? 'styleguide.switchToEnglish' : 'styleguide.switchToBangla')
 )
+const toast = useToast()
 </script>
 
 <template>
@@ -116,33 +120,12 @@ const languageLabel = computed(() =>
         </FieldGrid>
 
         <FieldGrid :cols="1">
-          <StepperInput
-            v-model="stepperValue"
-            :label="currentStyleguide.stepperLabel"
-            unit="°C"
-            :step="1"
-            :min="0"
-            :max="60"
-          />
-          <StepperInput
-            v-model="unconfirmedStepperValue"
-            :label="currentStyleguide.unconfirmedStepperLabel"
-            :hint="currentStyleguide.lastValue"
-            unit="°C"
-            :step="1"
-            :min="0"
-            :max="60"
-            unconfirmed
-          />
-          <StepperInput
-            v-model="disabledStepperValue"
-            :label="currentStyleguide.disabledStepperLabel"
-            unit="°C"
-            :step="1"
-            :min="0"
-            :max="60"
-            disabled
-          />
+          <StepperInput v-model="stepperValue" :label="currentStyleguide.stepperLabel" unit="°C" :step="1" :min="0"
+            :max="60" />
+          <StepperInput v-model="unconfirmedStepperValue" :label="currentStyleguide.unconfirmedStepperLabel"
+            :hint="currentStyleguide.lastValue" unit="°C" :step="1" :min="0" :max="60" unconfirmed />
+          <StepperInput v-model="disabledStepperValue" :label="currentStyleguide.disabledStepperLabel" unit="°C"
+            :step="1" :min="0" :max="60" disabled />
         </FieldGrid>
       </FormSection>
 
@@ -167,11 +150,8 @@ const languageLabel = computed(() =>
       </FormSection>
 
       <FormSection :title="currentStyleguide.sheet" :default-open="true">
-        <Sheet
-          v-model:open="sheetOpen"
-          :title="currentStyleguide.sheetTitle"
-          :description="currentStyleguide.sheetDescription"
-        >
+        <Sheet v-model:open="sheetOpen" :title="currentStyleguide.sheetTitle"
+          :description="currentStyleguide.sheetDescription">
           <template #trigger>
             <Button type="button" @click="sheetOpen = true">
               {{ currentStyleguide.openSheet }}
@@ -214,6 +194,20 @@ const languageLabel = computed(() =>
         <Button type="button" variant="red-outline">{{ currentStyleguide.cancel }}</Button>
         <Button type="button">{{ currentStyleguide.save }}</Button>
       </StickyActionBar>
+      <FormSection :title="currentStyleguide.toast" :default-open="true">
+        <FieldGrid :cols="1">
+          <Button type="button" variant="secondary" @click="toast.error('auth.error.invalidCredentials')">
+            {{ currentStyleguide.toastError }}
+          </Button>
+          <Button type="button" variant="secondary" @click="toast.success('water.saved')">
+            {{ currentStyleguide.toastSuccess }}
+          </Button>
+          <Button type="button" variant="secondary" @click="toast.info('water.cancelled')">
+            {{ currentStyleguide.toastInfo }}
+          </Button>
+        </FieldGrid>
+      </FormSection>
     </SectionStack>
+    <ToastHost :bottom-offset="60" />
   </PageBody>
 </template>
