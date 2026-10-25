@@ -92,6 +92,9 @@
 - 2026-10-16: Backend verified with real HTTP output: login and refresh return 201 with `data.access_token`; cookie `refresh_token` Max-Age=1209600 (seconds), Path=/auth/refresh, HttpOnly, SameSite=Lax; refresh TTL is sliding (correcting an earlier "fixed" claim); a reused or logged-out refresh token gives 401; list shape is `{ items, meta }`; there is no login-specific throttle (global 100 per 60 s, no 429 seen in 12 tries); unverified users can log in; the super admin gets `role: null` from `/user/me` (so no permissions until backend task 7); production must set `TOKEN_EXPIRATION` explicitly (unset means 3600).
 - 2026-10-16: Toast is its own step (20.5), not part of Auth. Auth is finished with the inline form error first; the global Toast is built next and then used in login (keeping the persistent error line there).
 - 2026-10-17: Step 20 done after a full manual test. Readings are written and read under the signed-in user's id (no stub id). Old `stub-user` test readings remain on disk but are invisible.
+- 2026-10-17: This chat is frontend only. Backend changes are done in a separate chat. The frontend keeps a "backend needs" list in the parking lot and builds against mock adapters until the backend delivers.
+
+
 ## Parking lot
 - Switch to single "typescript-eslint" package
 - Clean up woff files in dist (keep only woff2)
