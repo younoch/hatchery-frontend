@@ -93,7 +93,8 @@
 - 2026-10-16: Toast is its own step (20.5), not part of Auth. Auth is finished with the inline form error first; the global Toast is built next and then used in login (keeping the persistent error line there).
 - 2026-10-17: Step 20 done after a full manual test. Readings are written and read under the signed-in user's id (no stub id). Old `stub-user` test readings remain on disk but are invisible.
 - 2026-10-17: This chat is frontend only. Backend changes are done in a separate chat. The frontend keeps a "backend needs" list in the parking lot and builds against mock adapters until the backend delivers.
-
+- 2026-10-26: Backend contract v2 frontend notes: a user with `organizationId` null (super admin) gets an empty state and no tanks or sync calls; `PATCH /users/me/password` returns a new access token, which replaces the in-memory one (no extra refresh). Both are built at delivery, together with username login and the new `/users/me` shape.
+- 2026-10-28: Backend answers (from COORDINATION, to be confirmed in backend progress.md): sync body limit 100 KB (413 `payload_too_large`); a malformed whole request gives 400 `validation_failed` with `errors[]` paths such as `items.2.id`; a `rejected` item is not stored and can be resent with the same id; no new codes for tankId and note (`invalid_uuid`, `required`, `too_long {max}`); `GET /tanks` needs organization membership only (400 `organization_required` for a super admin without an organization, 403 `no_organization` for a user without one). Frontend defence: if a whole-request 400 names `items.N`, that item is marked `failed` and the rest are resent; the whole chunk is never marked `failed`.
 
 ## Parking lot
 - Switch to single "typescript-eslint" package
