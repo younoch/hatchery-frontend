@@ -360,6 +360,7 @@ Screen-reader usage is unlikely in this user base, but most of this is cheap whe
 - **Sync queue POSTs:** auto-retry with exponential backoff (e.g. `attempts: 3, delay: 2000` doubling)
   - 4xx (validation errors): permanent failure — goes straight to `failed`, no retry; the server's per-field error codes are kept on the record so the user can fix and resubmit (this needs a `version(2)` Dexie change to store the error codes)
   - 5xx / timeout / network error: transient — retried with backoff
+  - Sync chunks are sent one after another (never in parallel); a 413 halves the chunk; a whole-request 400 is a frontend bug (chunk stays `pending`, reported)
 
 ## 9. Step-by-Step Implementation Plan
 
