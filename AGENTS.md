@@ -7,11 +7,14 @@ You are building the frontend of a hatchery management app, one small step at a 
 1. `hatchery-frontend-plan-en.md`: the plan. Architecture, offline behavior, security, API conventions, decisions already closed. Do not reopen closed decisions.
 2. `hatchery-water-entry.html`: a clickable **visual prototype**. Open it in a browser and use it (tap "আরও", then "ব্যাচ"; toggle offline; switch language; open the bell). It is a design reference, not production code. Copy its decisions (tokens, spacing, sizes, layout, behavior), never its code.
 3. `PROGRESS.md`: created by you in Step 0. Read it at the start of every session to know where you are.
+4. `COORDINATION.md`: the shared frontend-backend log. Read it at the start of every session; it is identical in both repos.
+5. `COMPONENTS.md`: the catalog of shared components. Check it before building any UI.
 
 ### Which file wins
 - Architecture, data flow, offline, security, API: **the plan**.
 - Visual decisions (spacing, radius, control sizes, layout components, screen composition, type scale): **the prototype**, where it differs from the plan.
 - Anything in neither file: **ask the owner**. Do not invent.
+- Backend contract and API agreements: the backend `progress.md` and Swagger, plus `COORDINATION.md`. For anything new, a COORDINATION.md entry wins over the plan and over older notes in `PROGRESS.md`. Never build on a Notice alone; the backend `progress.md` must say it is delivered.
 
 ### Decided after the plan was written (prototype wins, plan not yet updated)
 - Spacing is a five-step scale only: 4, 8, 12, 16, 24px (`s-1, s-2, s-3, s-4, s-6`). The plan's line "Tailwind default spacing as-is" is outdated.
@@ -31,12 +34,15 @@ You are building the frontend of a hatchery management app, one small step at a 
 ## 2. How to work with the owner
 
 - The owner has about 6 years of frontend experience. Write industry-standard code from the start. Do not simplify first and refine later.
-- **Talk to the owner in English only**, even if he writes Banglish. Keep replies short and plain (the owner wants low token usage). Code, identifiers, comments, commit messages and file names are in English too.
+- **Reply to the owner in pure Bangla script**, even if he writes Banglish. Keep replies short and plain. Code, identifiers, comments, commit messages, file names and docs are in English.
 - Be direct and honest. If the plan or the prototype has a problem, say so with the reason; do not follow it silently.
 - For an existing file, show the exact line-level change (a diff). Do not rewrite a whole file unless asked. A new file is shown in full.
 - Do not run `git commit` or `git push` unless the owner asks. Propose the commit time and a conventional-commit message at every checkpoint.
 - Ask at most one question at a time, and only when blocked. Otherwise take the conventional option and report the choice at the checkpoint.
-- The backend is a separate project. Do not touch it. Backend tasks are in Appendix A of the plan.
+- Docs first, then code. At every step remind the owner which docs to update (`PROGRESS.md`, `COMPONENTS.md`, `COORDINATION.md`, the plan).
+- Diff hygiene: the owner copy-pastes. When unsure, ask him to paste the existing file first and never guess the `-` lines. Tell him to delete the `-` lines and insert the `+` lines without the leading `+` or `-` character, then verify with `grep`. Past mistakes: leaked `+` characters, skipped diffs, auto-import junk (for example `import id from 'zod/v4/...'`).
+- You cannot run the verify command. Say so, ask the owner to run it, and never claim a result you did not see.
+- The backend is a separate project (separate chat). Do not touch it. Its contract is the backend `progress.md` and Swagger. Whenever a frontend step needs a backend change, or a backend change needs a frontend change, tell the owner at once and give a ready `COORDINATION.md` row (F→B or B→F). The file stays identical in both repos.
 
 ## 3. The step loop (follow exactly)
 
@@ -44,13 +50,13 @@ For every step in section 7:
 
 1. **Announce** the step in one line.
 2. **Do only that step.** Smallest working increment. Do not start work that belongs to a later step. No refactors outside the step; note them in the "Parking lot" of `PROGRESS.md` instead.
-3. **Verify:** run `pnpm lint`, `pnpm typecheck` and `pnpm build`, plus tests if the project has them. Report the real results, including failures.
+3. **Verify (the owner runs it):** `pnpm lint && pnpm typecheck && pnpm build && pnpm check:i18n`, then `node scripts/check-layout-classes.mjs`. There is no test runner. Report the real results, including failures.
 4. **Checkpoint:** stop and post the report in section 4. Then **wait**. Do not continue on your own.
 5. **Shared components:** if the step creates or changes a shared component, update COMPONENTS.md in the same step.
-5. **Owner review.**
+6. **Owner review.**
    - If the owner gives suggestions: implement **only those**, verify again, post a short checkpoint update, and wait again. Repeat until there are none.
    - If the owner says there is nothing to change ("ok", "next", "no suggestions" or similar): mark the step done in `PROGRESS.md` and start the next step.
-6. Never skip ahead, never batch steps, never mark a step done without the owner's explicit message. Silence is not approval.
+7. Never skip ahead, never batch steps, never mark a step done without the owner's explicit message. Silence is not approval.
 
 ## 4. Checkpoint report (English, keep it short)
 
@@ -63,6 +69,7 @@ Step N: <name>: ready for review
 - Compared with the prototype: <what matches, what differs and why>   (UI steps only)
 - Reused / extracted: <shared components reused, new ones created, any UI duplicated and why>
 - Choices I made: <anything not dictated by the plan>
+- Backend / COORDINATION: <rows to add, statuses to set, or "none">
 - Problems or doubts: <or "none">
 - Proposed commit: <type(scope): message>
 ```
@@ -82,6 +89,8 @@ Step N: <name>: ready for review
 - Numbers and units display in English numerals and English unit symbols, even in Bangla text.
 - Readings are stored and shown in °C, ppt, mg/L only. Do not build unit conversion.
 - Android phones are the only mobile target. Light mode only for the MVP.
+- Tailwind: use only proven classes; arbitrary values such as `h-[1rem]` and `min-w-[0]` are fine. The Prettier lint rule is off; never run Prettier on `src/mobile`.
+- Backend integration: send only the fields the contract allows; show text from `api.errors.<code>` i18n keys and never the backend `message` once codes are delivered (until then the English-string fallback stays).
 - Reuse rule: before building any UI, check COMPONENTS.md and shared/components/. If the same pattern (same markup and behavior, differing only in text, data or variant) is needed a second time, do not copy it: extract it into shared/components/ (shadcn primitives stay in shared/components/ui/). Text, data and variants come in through props, slots and cva variants, never hardcoded inside. The first use may stay inline, except for these patterns which are shared from the start: Metric (label, value, unit), StatusBadge, Card, SummaryCard.
 
 **Offline:** follow section 6 of the plan exactly (client UUID, `recordedAt` vs `syncedAt`, never delete data for being old, logout never touches IndexedDB, Dexie versioning from version 1).
@@ -91,10 +100,11 @@ Step N: <name>: ready for review
 - Run lint, typecheck, build and the quick manual checks on localhost.
 - Anything that cannot be tested properly on localhost must be tested on production: PWA install, service worker updates, offline behavior, "offline ready", fonts and icons on a real phone, and the real device and browser differences. Deploy to Vercel and test the real link on a real mobile and a real desktop.
 - Do not spend time on workarounds (such as `adb reverse` or local HTTPS) for things the production link can show directly.
+- Do not deploy the login route guard to Vercel until a hosted backend exists, or the demo link only shows the login screen. `VITE_API_URL` must be set on Vercel.
 
 ## 6. Definition of done (every step)
 
-- `pnpm lint`, `pnpm typecheck`, `pnpm build` all pass.
+- `pnpm lint`, `pnpm typecheck`, `pnpm build`, `pnpm check:i18n` and `node scripts/check-layout-classes.mjs` all pass.
 - No hardcoded text, colors or spacing introduced.
 - UI works at 360px width, in Bangla and in English.
 - Touch targets and gaps follow section 1 of this file.
@@ -134,8 +144,8 @@ Each step ends at a checkpoint (section 3). Steps are deliberately small. If one
 
 **Phase D: Water quality (mobile first)**
 - **Step 15: Schema.** Shared Zod schema for a reading (fields named `temperatureC`, `salinityPpt`, `oxygenMgL`, plus optional `note` up to 200 characters; validation ranges still to be confirmed with the owner), i18n error keys. No unit conversion. If you want a test runner for the schema, ask the owner first.
-- **Step 16: Dexie storage layer.** `readings` table at version 1 with the index `[createdById+tankId+recordedAt]` and a helper for "latest reading of this user for this tank", CRUD (edit and delete only while pending), `navigator.storage.persist()`, retention cleanup. Use a stub user id until Step 20.
-- **Step 17a: Entry screen, form and save.** Prototype's entry screen at `/m/water` with VeeValidate + Zod: recorded-at, tank Select (from `src/shared/config/tanks.ts`), four `StepperInput` fields with static unit labels, collapsed "more details" (note), `StickyActionBar` (cancel, save), validate on blur and submit, save to Dexie as `pending`, cancel clears the form, status line. No last-value prefill yet; Save works once all four values are valid.
+- **Step 16: Dexie storage layer.** `readings` table at version 1 with the index `[createdById+tankId+recordedAt]` and a helper for "latest reading of this user for this tank", CRUD (edit and delete only while pending; from Step 21 only until the first send attempt), `navigator.storage.persist()`, retention cleanup. Use a stub user id until Step 20.
+- **Step 17a: Entry screen, form and save.** Prototype's entry screen at `/m/water` with VeeValidate + Zod: recorded-at, tank Select (from `src/shared/config/tanks.ts`, replaced by backend tanks in Step 21b), four `StepperInput` fields with static unit labels, collapsed "more details" (note), `StickyActionBar` (cancel, save), validate on blur and submit, save to Dexie as `pending`, cancel clears the form, status line. No last-value prefill yet; Save works once all four values are valid.
 - **Step 17b: Entry screen, last value.** Last-value pre-fill for the selected tank (the current user's own latest reading, local Dexie data): unconfirmed muted-italic value, "same as last" chip, each of the four fields must be confirmed before Save.
 - **Step 18a: History, sub-tabs and card list.** "New entry" and "History" sub-tabs on `/m/water` (using `Tabs`), card list from local Dexie data (`listReadings`), no badge yet. The save bar shows only on the "New entry" tab.
 - **Step 18b: History, StatusBadge.** Shared `StatusBadge` (pending, syncing, failed, synced; color, icon and text together, with an `aria-label`), used on each card, plus the pending count on the History tab. Styleguide shows all four states.
@@ -144,11 +154,17 @@ Each step ends at a checkpoint (section 3). Steps are deliberately small. If one
 
 **Phase E: Backend integration (auth is ready; readings, tanks and sync are not, so Step 21 uses a mock adapter)**
 - **Step 20: Auth.** Built against the real auth API (login by email, `POST /auth/refresh` with the httpOnly cookie, `POST /auth/refresh/logout`, `GET /user/me`). Login, refresh with a single in-flight promise plus a cross-tab lock, in-memory access token, permission keys in Pinia (from `/user/me` `role.permissions`), local offline session, generic "session ended" handling (no `session_revoked` code exists yet). The API client uses native `fetch`, no axios. Split into 20a (env, types, Zod response schemas, `AuthAdapter`), 20b-1 (`request()` and `httpAuthAdapter`), 20b-2 (`sessionManager`: in-memory token, single-flight refresh, cross-tab lock), 20b-3 (`authedRequest`: one refresh and retry on 401), 20c (Pinia, store, guard, login view), 20d (offline local session).
-- **Step 21: Sync engine.** Batch idempotent sync, retry policy from section 8b, pause when `createdById` differs from the logged-in user.
+- **Step 20.5: Global Toast.** `useToast`, `ToastHost` (top right), styleguide entry, login errors as a toast.
+- **Step 20.6: Rename `AuthError` to `ApiError`.** Move it to `src/shared/api/apiError.ts`.
+- **Step 20.7: Future `recordedAt` guard.** Refuse a time more than 5 minutes in the future at save (the server allows 10) and warn about a wrong phone clock.
+- **Step 21: Sync engine (mock adapter).** `POST /readings/sync` in sequential chunks of 20; per-item results matched by `index` (`created` and `duplicate` become `synced`, `rejected` becomes `failed` with fix-and-resend, `duplicate` with `identical: false` warns); after the first send attempt a pending reading is no longer editable; retry rules in plan section 8b (401, 403, 413, 429, 5xx, network); pause when `createdById` differs from the signed-in user; a user with `organizationId` null gets an empty state. The mock reproduces every case, selected by a dev-only switch (`?mock=ok|fail-4xx|fail-5xx|offline`).
+- **Step 21b: Tanks from the backend.** `GET /tanks` cached in Dexie `tanks`; inactive tanks are hidden from new entries and kept in history; replaces `src/shared/config/tanks.ts`.
+- **Step 21c: Real endpoints.** Switch sync and tanks to the real backend once its `progress.md` says they are delivered.
+- **Step 21d: Backend contract v2.** One step at delivery: `/users/me` and `/users/me/password` paths, one lowercase `username` login, the new `/users/me` shape, forced password-change screen, `user_inactive` handled apart from `session_revoked`. Until then email login and the `/user/me` paths stay.
 - **Step 22: Notifications.** Replace sample data with real events. Which events notify is still undecided in the plan, so ask first.
 
 **Phase F: Remaining screens and verification**
-- **Step 23: Dashboard.** D3 line chart grouped by `recordedAt`.
+- **Step 23: Dashboard.** D3 line chart grouped by `recordedAt`. Decide first whether corrections after sync are allowed (pilot: no edit after sync).
 - **Step 24: Desktop views.** Water quality entry and list (table) in the desktop shell.
 - **Step 25: Batch screen.** Only after the owner gives the real field list. The prototype's batch screen uses invented fields.
 - **Step 26: Verification pass.** The checklist in section 9, Step 10 of the plan, plus the single-session takeover scenario.

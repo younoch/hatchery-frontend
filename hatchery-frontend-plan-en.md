@@ -1,10 +1,12 @@
 # Hatchery Software — Frontend Plan
 
-> **Status (2026-10-13):** updated for decisions made during Steps 0-18 (spacing, radius, controls, units, last value, note, tanks, history, sync badge). Section 10 lists closed and deferred items. This document does not depend on any earlier chat history. Appendix A holds the backend change instruction (to give to a backend LLM/session).
+> **Status (2026-10-29):** updated for decisions made during Steps 0-20.5 (spacing, radius, controls, units, last value, note, tanks, history, sync badge, auth, sync rules). Section 10 lists closed and deferred items. This document does not depend on any earlier chat history.
+>
+> **Backend:** the current contract is the backend `progress.md` (plus Swagger) and the frontend-backend log `COORDINATION.md`. Where this plan disagrees with them on anything backend-related they win, and for new changes a COORDINATION.md entry wins. The old Appendix A (backend change instruction) and the 2026-10-15 backend status table were removed (superseded 2026-10-29).
 >
 > **Where files differ:** the live step list is in `AGENTS.md` (section 7) and progress is in `PROGRESS.md`. For visual details (spacing, sizes, layout) the prototype `hatchery-water-entry.html` wins over this plan. For architecture, offline behavior, security and API conventions this plan wins.
 >
-> **Working notes for the next session:** reply in pure Bangla script (even if the user writes Banglish); backend = trainer-student mode (Socratic, simple-first then industry-level), frontend = industry-standard from the start; for existing files show line-level diffs, do not rewrite whole files unless explicitly asked; suggest commit timing and conventional-commit messages proactively.
+> **Working notes for the next session:** reply in pure Bangla script (even if the user writes Banglish); frontend = industry-standard from the start (the backend is a separate project and chat); for existing files show line-level diffs, do not rewrite whole files unless explicitly asked; suggest commit timing and conventional-commit messages proactively.
 
 ## 1. Context
 
@@ -23,8 +25,8 @@
 | Layer | Choice |
 |---|---|
 | Framework | Vue 3 + Vite + TypeScript (strict mode) |
-| State | Pinia (installed when first needed, Step 20/22) |
-| Validation | **Zod** (pinned to 3.25.76, the peer range of `@vee-validate/zod`) — single source of truth for form shapes, used for form input validation and `.env` validation on both frontend and backend |
+| State | Pinia (added in Step 20c) |
+| Validation | **Zod** (pinned to 3.25.76, the peer range of `@vee-validate/zod`) — single source of truth for form shapes, used for form input validation and `.env` validation. The backend uses Zod 4 and no schema is shared with it (see the `PROGRESS.md` parking lot) |
 | Forms | **VeeValidate v4** with `@vee-validate/zod` (`toTypedSchema`) so the shared Zod schema drives validation and types; fallback if it conflicts with a higher-priority tool: a small custom composable using `schema.safeParse()` |
 | CSS | Tailwind 4 (mobile-first), theme defaults wiped (`--*: initial`), tokens only |
 | UI components | shadcn-vue style primitives on Reka UI headless components, code lives in the project (not an installed component library), so bundle size stays controlled; Reka UI ships keyboard nav, focus trap and ARIA, covering most of section 8c |
@@ -39,7 +41,7 @@ No test runner is installed (owner decision). No new dependency is added without
 
 **Dropped:** Google Charts (doesn't work offline, CDN-dependent), Nuxt (no SEO/SSR need — the whole app sits behind login).
 
-**Conflict priority (decided):** if tools conflict, the order is shadcn-vue > Tailwind > Zod > VeeValidate, and lower ones are sacrificed first. Zod outranks VeeValidate because the schema is shared with the backend; VeeValidate is only the form-binding layer.
+**Conflict priority (decided):** if tools conflict, the order is shadcn-vue > Tailwind > Zod > VeeValidate, and lower ones are sacrificed first. Zod outranks VeeValidate because the schema is the source of truth for form shapes and types; VeeValidate is only the form-binding layer.
 
 ### Zod usage details
 - `shared/schemas/waterQuality.schema.ts` — single Zod schema for the water-quality reading shape (`tankId`, `recordedAt`, `ph`, `temperatureC`, `salinityPpt`, `oxygenMgL`, optional `note` up to 200 characters), imported by both mobile and desktop form components. The form schema adds a preprocess step for typed text input
@@ -213,10 +215,10 @@ src/
 ## 6. Offline Support (First-class requirement)
 
 ### Scope
-- **Read and create only** offline — edit/delete only while a record hasn't synced yet (status: pending), since that is purely local data
+- **Read and create only** offline. Edit and delete only while a record is `pending` and has never been sent (purely local data). After the first send attempt a pending reading is no longer editable, because a lost response plus an edit would come back as `duplicate` with the old values (COORDINATION B→F-08). A `rejected` item stays fixable and can be resent
 - Design assumption: a single user can be offline for at most **5 days**
-- **Correcting an already-synced record (decided):** online-only, edited directly (no separate correction record, so offline edit conflicts cannot exist). The server is the single source of truth; every edit goes to a server-side audit log (who, when, field, old value, new value); the UI shows an "edited" badge and the change history
-- Who may edit is decided by the backend's existing RBAC permission API (e.g. `reading:update`) — the frontend checks permission keys only, never role names, and hiding an edit button in the UI is UX only. Ownership-scoped rules (own vs any record) are not in the backend yet — see section 10
+- **Correcting an already-synced record (pilot decision):** no edit or delete after sync; a correction is a new reading. TEMPORARY: decide before the dashboard (Step 23). The earlier design (online-only audited edit with `reading:update`) is not built
+- Any future edit permission is checked by permission key only, never by role name, and hiding a button in the UI is UX only. Ownership-scoped rules are not needed while there is no edit after sync
 
 ### Core principles
 - Client-generated UUID per record — doubles as the idempotency key
@@ -228,37 +230,35 @@ src/
 ### Record states
 | State | Meaning | Edit/Delete |
 |---|---|---|
-| pending | waiting to sync | Yes |
+| pending | waiting to sync | Yes, until the first send attempt |
 | syncing | currently being sent | No |
-| failed | rejected by server | user fixes and resubmits |
-| synced | reached the server | No offline; online edit only with permission (audited) |
+| failed | rejected by the server (not stored there) | user fixes and resends |
+| synced | reached the server | No (pilot: a correction is a new reading) |
 
 Current status of the UI (Step 18): the history card shows the badge for each state. "Fix and resend" on a failed record only sets it back to `pending` (local). Editing the rejected values and the real send belong to the sync engine (Step 21). Until then real records are only `pending`; the "pending count" on the History tab counts `pending` and `syncing`, not `failed`.
 
 ### Late sync policy (decided — replaces the earlier 24-hour delete idea)
 - Data is **never deleted** for being old — only flagged
 - A reading counts under its `recordedAt` date (the real measurement time), not `syncedAt`: charts and daily/monthly views place a late-synced reading on the day it was measured. Server-side aggregations group by `recordedAt`, and any cached daily aggregate must be invalidated when a late reading arrives
-- `isLate = (syncedAt − recordedAt) > 7 days` — deliberately above the 5-day offline assumption so legitimate offline use is not badged; shown as a "late sync" badge
-- `needsReview = (syncedAt − recordedAt) > 30 days` — an owner reviews/approves it
-- Both thresholds are server config values, not literals
+- `isLate` and `needsReview` are dropped from the pilot (COORDINATION F→B-01). The fields stay in the local `Reading` type and are not used. If they return, the thresholds (7 and 30 days) are server config values
 - Alerts/notifications for late-synced readings: deferred; no schema impact
 
 ### Clock reliability
 - Most Android phones post-2020 auto-sync time, so low risk
-- Server-side sanity check: reject `recordedAt` in the future beyond a small tolerance (config, default 5 min); old readings are flagged per the late sync policy above, never rejected
+- Server-side sanity check: the server rejects a future `recordedAt` beyond 10 minutes (COORDINATION B→F-09); old readings are never rejected. The client is stricter: it refuses a future `recordedAt` beyond 5 minutes at save and warns about a wrong phone clock (Step 20.7)
 
 ### Single active session (decided)
 - One account = one active session (takeover policy). Logging in on a new device revokes the session on the old one; blocking was rejected because an offline device cannot log out and would lock the user out
 - The login screen warns when another device holds the session
 - A revoked offline device discovers it only when the network returns (refresh fails) → login screen; `pending`/`failed` readings stay in IndexedDB and sync after re-login (same `createdById`)
 - Sync-time message must explain: "your session moved to another device, your data is safe"
-- **Backend status (2026-10-15):** not implemented (no family or takeover, no `session_revoked` code). Until it lands, a revoked or expired refresh token is just `401 Invalid or expired refresh token`, and the frontend shows one generic "session ended, log in again" message
+- **Backend status:** takeover and a `session_revoked` code are agreed (COORDINATION F→B-04, backend T16) but count as delivered only when the backend `progress.md` says so. Until then a revoked or expired refresh token is one generic "session ended, log in again" message. When delivered, `user_inactive` is handled apart from `session_revoked` (B→F-07)
 
 ### Logout behavior
 - Field devices are personal phones, so logout only clears auth tokens — it never touches IndexedDB
 - `pending`/`failed` readings are kept so they can sync after the next login
 - `synced` readings stay in the offline cache under the retention rule below
-- Each reading carries a `createdById` field. The server takes the real creator from the auth token only. If pending readings belong to a different user than the one now logged in, sync pauses and the user is told. Until Step 20 a stub user id is used
+- Each reading carries a `createdById` field. The server takes the real creator from the auth token only. If pending readings belong to a different user than the one now logged in, sync pauses and the user is told. Step 20 is done: readings are written and read under the signed-in user's id
 
 ### Offline cache retention (decided)
 - `pending`/`failed` readings are kept indefinitely, with no time limit
@@ -266,9 +266,9 @@ Current status of the UI (Step 18): the history card shows the badge for each st
 - Cleanup runs on app open and after a successful sync; a synced record is removed only if it is confirmed to exist on the server
 
 ### Offline session after token expiry (decided)
-- The access token lives only in memory, so a cold start offline has no token. The app opens on a non-secret **local session** (`userId` + permission snapshot stored in Dexie)
+- The access token lives only in memory, so a cold start offline has no token. The app opens on a non-secret **local session** (`userId`, email, permission snapshot, `isSuperAdmin` and `organizationId` stored in the Dexie `session` table)
 - Offline, it can only create readings and view cached data — no API calls
-- When the network returns: refresh via the httpOnly cookie, then sync pending readings. If refresh fails (expired or revoked), show login; pending data stays untouched in IndexedDB
+- When the network returns: refresh via the httpOnly cookie, then sync pending readings. If refresh fails (expired or revoked), show login; pending data stays untouched in IndexedDB. A network error or a throttled refresh (429) keeps the local session instead of logging out
 - Refresh token: 14 days sliding vs the 5-day max offline (section 8)
 
 ### First-time setup (decided)
@@ -302,7 +302,7 @@ Current status of the UI (Step 18): the history card shows the badge for each st
 - The cookie `Path` is `/auth/refresh`, so it is sent only to `/auth/refresh` and `/auth/refresh/logout`. Logout must call `POST /auth/refresh/logout`
 - Cross-site setup (Vercel and API on different registrable domains) needs `COOKIE_SAME_SITE=none`, `COOKIE_SECURE=true` and the Vercel origin in `CORS_ORIGINS`. A Vercel proxy under a prefix such as `/api` will NOT work while the cookie Path is fixed to `/auth/refresh`
 - Refresh token lifetime: 14 days, sliding — comfortably above the 5-day offline assumption
-- Rotation keeps a short grace window (~20s, config): a just-rotated token presented again once is accepted instead of treated as theft; reuse outside the window revokes the token family
+- Rotation keeps a short grace window (~20s, config; agreed, backend T16, not yet delivered): a just-rotated token presented again once is accepted instead of treated as theft; reuse outside the window revokes the token family
 - No PIN on the offline local session in the MVP; can be added later without a schema change
 
 ### XSS prevention
@@ -349,18 +349,27 @@ Screen-reader usage is unlikely in this user base, but most of this is cheap whe
 - Sync queue background POSTs get a longer timeout (15-20s)
 - A timeout is treated the same as a network error for sync-queue purposes — the reading stays `pending`
 
-### Response and error envelope (verified only for `/user/me`)
+### Response and error envelope (verified with real output, 2026-10-15/16)
 - Success: `{ success: true, statusCode, data, timestamp }`. The API client unwraps `data`
 - Error: `{ success: false, statusCode, path, message, timestamp }`. `message` is a string, or for validation errors an object `{ statusCode, message: string[], error }` with English strings
-- Client error kinds: `invalid_credentials` (401 on login), `session_ended` (401 on refresh), `unauthorized` (401 on an authenticated call, triggers one refresh and one retry), `validation` (400), `throttled` (429), `network` (offline, timeout, CORS), `server` (5xx), `unknown`. Per-field error codes are a backend follow-up
+- Client error kinds: `invalid_credentials` (401 on login), `session_ended` (401 on refresh), `unauthorized` (401 on an authenticated call, triggers one refresh and one retry), `validation` (400), `throttled` (429), `network` (offline, timeout, CORS), `server` (5xx), `unknown`. Backend error `code` values map to i18n keys `api.errors.<code>` and the message text is never shown to the user; the English-string fallback stays until the backend delivers codes (COORDINATION B→F-06)
 
 
 ### Retry policy
-- **Foreground API calls (GET, dashboard data):** no auto-retry — show an error state with a manual "Retry" action instead
-- **Sync queue POSTs:** auto-retry with exponential backoff (e.g. `attempts: 3, delay: 2000` doubling)
-  - 4xx (validation errors): permanent failure — goes straight to `failed`, no retry; the server's per-field error codes are kept on the record so the user can fix and resubmit (this needs a `version(2)` Dexie change to store the error codes)
-  - 5xx / timeout / network error: transient — retried with backoff
-  - Sync chunks are sent one after another (never in parallel); a 413 halves the chunk; a whole-request 400 is a frontend bug (chunk stays `pending`, reported)
+- **Foreground API calls (GET, dashboard data):** no auto-retry; show an error state with a manual "Retry" action.
+- **Sync queue (`POST /readings/sync`):** pending readings are sent in chunks of 20 (the server maximum is 100), one chunk after another, never in parallel. The body is `{ items: [...] }` with only the allowed fields; `createdById`, `syncedAt` and `organizationId` are never sent.
+- **Per-item results** (matched to items by `index`, never by `id`):
+  - `created` and `duplicate` become `synced`. A `duplicate` with `identical: false` shows a warning.
+  - `rejected` becomes `failed`, with the error code kept on the record for the i18n text; the user fixes and resends. A rejected item is not stored on the server, so the same `id` can be resent. `id_conflict` is practically impossible with UUID v4 and is shown as a normal `failed`.
+- **Whole-request outcomes:**
+  - 401: session ended; pending readings stay untouched.
+  - 403 `no_organization`: show "contact your admin"; no retry. 403 `permission_denied`: readings stay `pending`, never deleted.
+  - 429: transient. Readings stay `pending`; wait for `Retry-After` (fallback: backoff, capped at about 60 s). Never mark `failed` because of it.
+  - 413 `payload_too_large`: halve the chunk and resend.
+  - 400 `validation_failed` (only for a bad envelope: `items` missing, not an array, empty or over 100): a frontend bug. The chunk stays `pending` and is reported to `errorStore`.
+  - 5xx, timeout, network error: transient; auto-retry with exponential backoff (about 3 attempts, 2 s doubling). Sync timeout 15-20 s. The readings stay `pending`.
+- A user with `organizationId` null (super admin) never calls `/tanks` or `/readings/sync`; the app shows an empty state.
+- Storing the error code of a `failed` reading needs a Dexie schema change; the version number is decided at Step 21.
 
 ## 9. Step-by-Step Implementation Plan
 
@@ -397,7 +406,7 @@ Set up `mobile/`, `desktop/`, `shared/` as per section 3
 - Swipe navigation (VueUse `useSwipe`)
 
 ### Step 5: Auth API Integration
-- `shared/api/auth.ts`: login, register, refreshToken, logout
+- `shared/api/auth.ts`: login, refreshToken, logout
 - Interceptor: 401 → single in-flight refresh promise
 - Token handling per section 8
 - `useAuth` composable, router guard, `hasPermission()` helper (permission keys held in Pinia; never role-name checks)
@@ -413,28 +422,13 @@ Set up `mobile/`, `desktop/`, `shared/` as per section 3
 
 ### Step 7: Sync Engine
 - online/offline events + app-open + Background Sync API (Android)
-- Idempotent POST (client UUID); batches with per-item results
+- Idempotent POST (client UUID); chunks with per-item results
 - Pause sync and notify if pending records' `createdById` differs from the logged-in user
 - Status update logic (pending → syncing → synced/failed)
 - Retry policy per section 8b
 
-### Step 8: Backend Additions
-### Backend status (audited 2026-10-15, code-read only)
-| Task | Status | Note |
-|---|---|---|
-| 1 Refresh cookie | DONE | httpOnly, Path `/auth/refresh`, flags from env |
-| 2 14-day sliding + grace window | PARTIAL | 14 days sliding (verified 2026-10-16); no grace window 
-| 2b Single active session | NOT STARTED | no family, no takeover, no `session_revoked` |
-| 3 Idempotent create + batch | NOT STARTED | no readings module |
-| 4 Server trust rules | NOT STARTED | no readings module |
-| 5 Audited PATCH | NOT STARTED | no readings module |
-| 6 Error contract | PARTIAL | English strings, no per-field codes; list shape `page/pageSize` |
-
-Extra findings: `/user/me` has no `isSuperAdmin`; permissions are not in the JWT (read live from the DB); an unverified user can log in; password change keeps other sessions alive.
-Super admin gets role null from /user/me, so no permissions until backend task 7. Production must set TOKEN_EXPIRATION explicitly (unset means 3600 seconds).
-
- ## Appendix A: Backend change instruction (for the NestJS backend LLM/session)
-- See Appendix A (done in the separate backend project)
+### Step 8: Backend additions
+See the backend `progress.md` and `COORDINATION.md`. The 2026-10-15 backend status table and Appendix A were removed because they are outdated.
 
 ### Step 9: First UI Screens
 - Login, navigation, water quality entry form, sync-status badge, dashboard (D3 line chart)
@@ -452,7 +446,9 @@ Super admin gets role null from /user/me, so no permissions until backend task 7
 - Late-sync thresholds and `recordedAt`-based grouping verified
 - Single-session takeover scenario
 
-## 9a. Dexie Schema (current, version 1)
+## 9a. Dexie Schema (version 1 shown)
+
+Later versions live in `src/shared/storage/db.ts`: version 2 adds the `session` table (Step 20d). Planned: `tanks` (Step 21b) and the error code of a failed reading (Step 21); version numbers are given in step order.
 
 ```ts
 // shared/storage/db.ts
@@ -472,8 +468,8 @@ export interface Reading {
   syncedAt: string | null // server time, never set by the client
   status: SyncStatus
   createdById: string
-  isLate: boolean // server-derived
-  needsReview: boolean // server-derived
+  isLate: boolean // kept in the local type, unused in the pilot
+  needsReview: boolean // kept in the local type, unused in the pilot
 }
 
 class HatcheryDB extends Dexie {
@@ -482,13 +478,13 @@ class HatcheryDB extends Dexie {
   constructor() {
     super('hatchery-db')
 
-    // version 1: initial schema. Never edit or remove this call; add version(2) for changes.
+    // version 1: initial schema. Never edit or remove this call; add a new version for changes.
     this.version(1).stores({
       readings: 'id, status, recordedAt, createdById, [createdById+tankId+recordedAt]',
     })
 
     // example for a future change (e.g. server error codes on failed records, or a tanks table):
-    // this.version(2).stores({
+    // this.version(N).stores({
     //   readings: 'id, status, recordedAt, createdById, [createdById+tankId+recordedAt]',
     //   tanks: 'id',
     // }).upgrade(tx => {
@@ -505,8 +501,8 @@ export const db = new HatcheryDB()
 ## 10. Decisions Closed / Still Deferred
 
 ### Closed
-- Late sync: never delete, flag only; `recordedAt` governs reporting; `isLate` > 7 days, `needsReview` > 30 days (section 6)
-- Synced-record correction: online-only direct edit, audit log, RBAC-permission based (section 6)
+- Late sync: never delete; `recordedAt` governs reporting; `isLate` and `needsReview` are dropped from the pilot (section 6)
+- Synced-record correction: the pilot has no edit or delete after sync; a correction is a new reading. Temporary: decide before the dashboard (section 6)
 - Offline cache retention: pending/failed forever, synced 30 days (section 6)
 - Offline session after token expiry: local session, 14-day sliding refresh token, 5-day max offline (sections 6 and 8)
 - Form library: VeeValidate + Zod, with the conflict priority in section 2
@@ -520,99 +516,15 @@ export const db = new HatcheryDB()
 - Water module history: sub-tabs "New entry" and "History"; the entry form stays mounted when switching tabs (`v-show`) so typed values are not lost
 - Fix-and-resend on a failed record is local-only until the sync engine (Step 21): it sets the record back to `pending`
 - Formatting is not an ESLint error; Prettier is run by hand on specific files (running it on `src/mobile` rewrites view JSON files)
+- Backend contract: the backend `progress.md`, Swagger and `COORDINATION.md`; this plan carries no backend appendix
+- Sync rules (Step 21): sequential chunks of 20, results matched by `index`, no edit after the first send attempt, 429 is transient, a future `recordedAt` is refused beyond 5 minutes (sections 6 and 8b)
+- Product decisions (owner): no signup; the super admin creates an organization and its single admin, the admin adds users; one user belongs to one organization; login by lowercase username; the last value stays per user and local; organization-wide viewing is online only, later, behind `reading:read-all`
 
 ### Deferred / backend follow-ups
-- Ownership-scoped edit permission (own vs any record) and record creator/owner handling — backend not ready
+- Ownership-scoped edit permission: not needed while there is no edit after sync
 - Alerts/notifications for late-synced or dangerous readings — which events notify is still undecided
 - Optional PIN on the offline local session — post-MVP
-- Tank list: fixed config for the prototype; organization-scoped, backend-driven tanks (and an organization module) after client feedback. Adding `tanks` to Dexie then needs `version(2)`; existing readings stay untouched
+- Tank list: `src/shared/config/tanks.ts` until Step 21b; then `GET /tanks` from the backend, cached in Dexie `tanks`; inactive tanks are hidden from new entries and kept in history. Existing readings stay untouched
 - Notifications sheet, desktop shell, swipe navigation: deferred until client feedback
 - Batch screen: blocked until the owner gives the real field list
 - Real validation ranges and "danger" values for the four parameters: the owner must confirm by production practice
-
-## Appendix A: Backend change instruction (for the NestJS backend LLM/session)
-
-The codebase was not inspected when this was written, so the first step is to verify what already exists.
-
-~~~text
-# Backend changes for the Hatchery offline-first frontend (NestJS)
-
-You are working on an existing NestJS backend (auth, RBAC, BullMQ, health already built).
-A Vue 3 offline-first PWA will consume it. Field users are on weak/no network and may
-stay offline for up to 5 days, then sync a queue of records.
-
-## Rules of engagement
-1. FIRST inspect the codebase and report, for each task below, whether it already
-   exists (fully / partially / not at all). Do not re-implement what exists.
-2. Show a short plan, then implement ONE task at a time. Show exact diffs for existing
-   files. Do not rewrite files wholesale. Do not touch unrelated code.
-3. Every behavior below that has a number must be an env/config value, not a literal.
-4. Add tests for each task (unit + at least one e2e for endpoints).
-5. After each task, suggest a conventional-commit message and stop for review.
-
-## Task 1: Refresh token in httpOnly cookie
-- Currently refresh token travels in the request/response body. Move it to an
-  httpOnly cookie. Never return the refresh token in the response body.
-- Cookie flags from config: Secure, SameSite (Lax if same-site, None if cross-site),
-  Path scoped to the auth refresh route, Max-Age = refresh TTL.
-- Enable CORS with credentials: true and an explicit origin allow-list (no wildcard).
-- Logout clears the cookie. Access token stays in the body (frontend keeps it in memory).
-
-## Task 2: Refresh TTL and rotation with grace window
-- Refresh token TTL: 14 days, sliding (each successful refresh issues a new token
-  with a fresh 14 days). Configurable.
-- Keep rotation, but add a grace window (config, default 20s): if the just-rotated
-  token is presented again within the window, accept it once and return the
-  current valid session instead of treating it as theft. Reason: on weak networks
-  the rotation response may never reach the phone, and the retry must not log the
-  user out.
-- Reuse outside the grace window = revoke the whole token family.
-
-## Task 2b: Single active session per user
-- Track one active refresh-token family per user (session table)
-- A new login revokes the user's previous family (takeover, not block), and the old device's next refresh failure returns a distinguishable code (e.g. session_revoked) so the client can show a clear message
-- Interacts with Task 2's grace window: grace applies within a family only; a revoked family gets no grace
-- Login response/flow should let the client know another session existed, so the login screen can warn beforehand
-
-## Task 3: Idempotent create + batch sync
-- Client generates a UUID per reading (the idempotency key). Store it as a unique
-  column (or the primary key).
-- Creating with a UUID that already exists for the SAME user returns the existing
-  record with a success status (no duplicate). Same UUID from a DIFFERENT user = 409.
-- Add a batch endpoint accepting an array of records. Process each item
-  independently and return a per-item result (created / already_exists / error with
-  code). One bad item must never fail the whole batch. Cap batch size (config).
-
-## Task 4: Server-side trust rules for readings
-- createdById comes ONLY from the authenticated token, never from the payload.
-  Add createdById to the reading entity if missing.
-- Accept client recordedAt. Set syncedAt on the server. Never trust client syncedAt.
-- Reject recordedAt in the future beyond a small tolerance (config, default 5 min).
-- Derive and persist flags: isLate = (syncedAt - recordedAt) > 7 days (config);
-  needsReview = (syncedAt - recordedAt) > 30 days (config). Never delete or reject
-  a record for being old. Flag only.
-- Aggregations (daily/monthly) must group by recordedAt, not by syncedAt/createdAt.
-
-## Task 5: Edit synced records with audit log
-- Add a PATCH endpoint for readings, guarded by the EXISTING RBAC permission system
-  (a permission key such as reading:update). Do not hardcode role names.
-- Every edit writes an audit row: who, when, field, old value, new value.
-- Expose an "edited" indicator and the edit history on read.
-- Do NOT implement ownership-scoped permission (own vs any record) in this task.
-  Only make sure createdById exists so it can be added later. Note it as a follow-up.
-
-## Task 6: Error contract the client depends on
-- 4xx = permanent failure (client marks the record failed, no auto-retry).
-  5xx / timeouts = retryable. Keep this strictly consistent.
-- Validation errors must return machine-readable codes per field
-  (e.g. { field: "ph", code: "out_of_range", params: {min, max} }), NOT translated
-  strings. The frontend localizes (bn/en) by code.
-- List endpoints use one standard shape: { page, limit, sortBy, order, filters },
-  matching the existing DTO conventions.
-
-## Out of scope (do not do)
-- Ownership-scoped permissions, notification/alert logic for late readings,
-  any frontend work.
-~~~
-
-Suggested commits: `feat(auth): move refresh token to httpOnly cookie`, `feat(auth): add refresh rotation grace window and 14d sliding ttl`, `feat(readings): add idempotent create and batch sync endpoint`, `feat(readings): derive isLate and needsReview flags from recordedAt`, `feat(readings): add audited patch endpoint for synced records`.

@@ -37,7 +37,13 @@
 | 20c | Auth: store, route guard, login view | done | 2026-10-17 |
 | 20d | Auth: offline local session |  done | 2026-10-17 |
 | 20e | Toast: shared component, useToast, login errors | done | 2026-10-17 |
-| 20.5 | Global Toast: component, useToast, ToastHost, styleguide | done | 2026-10-17 |
+| 20.5 | Global Toast: component, useToast, ToastHost, styleguide, login errors | done | 2026-10-17 |
+| 20.6 | Rename AuthError to ApiError | in review | - |
+| 20.7 | Future recordedAt guard and phone clock warning (limit 5 minutes) | not started | - |
+| 21 | Sync engine against a mock adapter (chunks of 20, per-item results by index, 429 and 413 rules) | not started | - |
+| 21b | Tanks from the backend (Dexie `tanks` at version 3) | not started | - |
+| 21c | Switch sync and tanks to the real endpoints | blocked by backend | - |
+| 21d | Backend contract v2 switch: `/users` paths, username login, new `/users/me`, forced password screen, `organizationId` null empty state | blocked by backend | - |
 | 21 | Sync engine | not started | - |
 | 22 | Notifications | not started | - |
 | 23 | Dashboard | not started | - |
