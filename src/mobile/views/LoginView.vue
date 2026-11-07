@@ -12,7 +12,7 @@ import FieldGrid from '@/shared/components/layout/FieldGrid.vue'
 import PageBody from '@/shared/components/layout/PageBody.vue'
 import PageHeader from '@/shared/components/layout/PageHeader.vue'
 import StickyActionBar from '@/shared/components/layout/StickyActionBar.vue'
-import { AuthError, type AuthErrorKind } from '@/shared/api/authAdapter'
+import { ApiError, type ApiErrorKind } from '@/shared/api/apiError'
 import { safeRedirect } from '@/shared/lib/safeRedirect'
 import { loginFormSchema } from '@/shared/schemas/login.schema'
 import { useAuthStore } from '@/shared/stores/authStore'
@@ -25,7 +25,7 @@ const router = useRouter()
 const auth = useAuthStore()
 const toast = useToast()
 
-const ERROR_KEYS: Record<AuthErrorKind, string> = {
+const ERROR_KEYS: Record<ApiErrorKind, string> = {
   invalid_credentials: 'auth.error.invalidCredentials',
   session_ended: 'auth.error.unknown',
   unauthorized: 'auth.error.unknown',
@@ -54,8 +54,8 @@ const onSubmit = handleSubmit(async values => {
     await auth.login(values)
     await router.replace(safeRedirect(route.query.redirect))
   } catch (error) {
-    // Anything that is not an AuthError is a bug: let the global handler report it.
-    if (!(error instanceof AuthError)) throw error
+    // Anything that is not an ApiError is a bug: let the global handler report it.
+    if (!(error instanceof ApiError)) throw error
     toast.error(ERROR_KEYS[error.kind])
   } finally {
     submitting.value = false

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import env from '@/shared/utils/env'
-import { AuthError, type AuthErrorKind } from '@/shared/api/authAdapter'
+import { ApiError, type ApiErrorKind } from '@/shared/api/apiError'
 import { envelopeSchema } from '@/shared/schemas/auth.schema'
 
 const DEFAULT_TIMEOUT_MS = 10_000
@@ -13,10 +13,10 @@ export interface RequestOptions<T extends z.ZodTypeAny> {
   accessToken?: string
   timeoutMs?: number
   // Maps an HTTP status to an error kind for this call (e.g. 401 on login).
-  statusMap?: Partial<Record<number, AuthErrorKind>>
+  statusMap?: Partial<Record<number, ApiErrorKind>>
 }
 
-function kindFor(status: number, statusMap?: Partial<Record<number, AuthErrorKind>>): AuthErrorKind {
+function kindFor(status: number, statusMap?: Partial<Record<number, ApiErrorKind>>): ApiErrorKind {
   const mapped = statusMap?.[status]
   if (mapped) return mapped
   if (status === 401) return 'unauthorized'
@@ -44,11 +44,11 @@ export async function request<T extends z.ZodTypeAny>(
     })
   } catch {
     // Offline, DNS failure, CORS failure and timeout all look the same to the caller.
-    throw new AuthError('network')
+    throw new ApiError('network')
   }
 
   if (!response.ok) {
-    throw new AuthError(kindFor(response.status, options.statusMap), response.status)
+    throw new ApiError(kindFor(response.status, options.statusMap), response.status)
   }
 
   if (!options.schema) return undefined as z.infer<T>
@@ -57,10 +57,10 @@ export async function request<T extends z.ZodTypeAny>(
   try {
     json = await response.json()
   } catch {
-    throw new AuthError('unknown', response.status)
+    throw new ApiError('unknown', response.status)
   }
 
   const parsed = envelopeSchema(options.schema).safeParse(json)
-  if (!parsed.success) throw new AuthError('unknown', response.status)
+  if (!parsed.success) throw new ApiError('unknown', response.status)
   return parsed.data.data
 }

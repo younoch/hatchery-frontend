@@ -1,4 +1,5 @@
-import { AuthError, type AuthAdapter } from '@/shared/api/authAdapter'
+import type { AuthAdapter } from '@/shared/api/authAdapter'
+import { ApiError } from '@/shared/api/apiError'
 import { httpAuthAdapter } from '@/shared/api/httpAuthAdapter'
 
 const REFRESH_LOCK = 'hatchery-auth-refresh'
@@ -36,7 +37,7 @@ export function refreshSession(adapter: AuthAdapter = httpAuthAdapter): Promise<
   inFlight = task
     .catch((error: unknown) => {
       // A 401 means the session is over: drop the token. Network errors keep it.
-      if (error instanceof AuthError && error.kind === 'session_ended') accessToken = null
+      if (error instanceof ApiError && error.kind === 'session_ended') accessToken = null
       throw error
     })
     .finally(() => {

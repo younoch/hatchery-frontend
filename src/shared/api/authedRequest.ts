@@ -1,5 +1,5 @@
 import type { z } from 'zod'
-import { AuthError } from '@/shared/api/authAdapter'
+import { ApiError } from '@/shared/api/apiError'
 import { request, type RequestOptions } from '@/shared/api/request'
 import { getAccessToken, refreshSession } from '@/shared/api/sessionManager'
 
@@ -16,7 +16,7 @@ export async function authedRequest<T extends z.ZodTypeAny>(
   try {
     return await request({ ...options, accessToken: token })
   } catch (error) {
-    if (!(error instanceof AuthError) || error.kind !== 'unauthorized') throw error
+    if (!(error instanceof ApiError) || error.kind !== 'unauthorized') throw error
     const fresh = await refreshSession()
     return request({ ...options, accessToken: fresh })
   }

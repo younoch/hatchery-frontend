@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import { AuthError } from '@/shared/api/authAdapter'
+import { ApiError } from '@/shared/api/apiError'
 import { httpAuthAdapter } from '@/shared/api/httpAuthAdapter'
 import { getAccessToken, refreshSession, setAccessToken } from '@/shared/api/sessionManager'
 import type { AuthUser, LoginCredentials } from '@/shared/schemas/auth.schema'
@@ -52,12 +52,12 @@ export const useAuthStore = defineStore('auth', () => {
       setSession(me)
       await saveLocalSession(me)
     } catch (error) {
-      if (error instanceof AuthError && (error.kind === 'session_ended' || error.kind === 'unauthorized')) {
+      if (error instanceof ApiError && (error.kind === 'session_ended' || error.kind === 'unauthorized')) {
         await clearSession()
         return
       }
       // Offline or server down: fall back to the local session if there is one.
-      if (error instanceof AuthError && (error.kind === 'network' || error.kind === 'server')) {
+      if (error instanceof ApiError && (error.kind === 'network' || error.kind === 'server')) {
         const local = await getLocalSession()
         if (local) {
           setSession({
