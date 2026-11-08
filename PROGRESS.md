@@ -38,7 +38,7 @@
 | 20c | Auth: store, route guard, login view | done | 2026-10-17 |
 | 20d | Auth: offline local session | done | 2026-10-17 |
 | 20.5 | Global Toast: component, useToast, ToastHost, styleguide, login errors | done | 2026-10-17 |
-| 20.6 | Rename AuthError to ApiError | in review | - |
+| 20.6 | Rename AuthError to ApiError | done | 2026-11-08 |
 | 20.7 | Future recordedAt guard and phone clock warning (limit 5 minutes) | not started | - |
 | 21 | Sync engine against a mock adapter (chunks of 20, per-item results by index, 429 and 413 rules) | not started | - |
 | 21b | Tanks from the backend (Dexie `tanks` table) | not started | - |
