@@ -39,11 +39,11 @@
 | 20d | Auth: offline local session | done | 2026-10-17 |
 | 20.5 | Global Toast: component, useToast, ToastHost, styleguide, login errors | done | 2026-10-17 |
 | 20.6 | Rename AuthError to ApiError | done | 2026-11-08 |
+| 21d | Backend contract v2 switch: `/users` paths, username login, new `/users/me`,
 | 20.7 | Future recordedAt guard and phone clock warning (limit 5 minutes) | not started | - |
 | 21 | Sync engine against a mock adapter (chunks of 20, per-item results by index, 429 and 413 rules) | not started | - |
 | 21b | Tanks from the backend (Dexie `tanks` table) | not started | - |
-| 21c | Switch sync and tanks to the real endpoints | blocked by backend | - |
-| 21d | Backend contract v2 switch: `/users` paths, username login, new `/users/me`, forced password screen, `organizationId` null empty state | blocked by backend | - |
+| 21c | Switch sync and tanks to the real endpoints | not started | - |
 | 22 | Notifications | not started | - |
 | 23 | Dashboard | not started | - |
 | 24 | Desktop views | not started | - |
@@ -104,6 +104,8 @@
 - 2026-10-29: Step 21 rules (COORDINATION B→F-08, 10, 19, 21): chunks of 20 sent one after another; results matched by `index`; a 429 is transient (keep pending, wait for `Retry-After`, fallback backoff capped at about 60 s, never `failed`); after the first send attempt a pending reading is no longer editable (this replaces the Step 16 rule; `rejected` items keep fix-and-resend); a whole-request 400 is a frontend bug (chunk stays pending, reported to errorStore).
 - 2026-10-29: Step 20.7 (COORDINATION B→F-09): a future `recordedAt` is refused beyond 5 minutes at save (the server allows 10) and a wrong phone clock is warned about.
 - 2026-10-29: Owner decisions recorded: no signup (the super admin creates an organization and its single admin; the admin adds users); one user belongs to one organization; login by lowercase username (at delivery, Step 21d); no edit or delete after sync in the pilot, a correction is a new reading (TEMPORARY, decide before the dashboard); `isLate` and `needsReview` are dropped from the pilot (the fields stay in the local `Reading` type); the last value stays per user and local; organization-wide viewing is online only, later, behind `reading:read-all`.
+- 2026-11-10: Step 21d moves before Step 20.7 and Step 21 (COORDINATION F→B-27): the old `/user…` paths and email login no longer exist, so the app cannot sign in until it is done.
+- 2026-11-10: Owner decisions: (1) work starts on the real backend (local for now), auth first; (2) the organization and organization-role management screens will be built, in a later step after 21d; (3) validation stays at the backend's impossible-value limits for the pilot, and industry-standard review ranges come after release from user feedback.
 
 ## Parking lot
 - Switch to single "typescript-eslint" package
