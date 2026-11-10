@@ -52,12 +52,18 @@ export const useAuthStore = defineStore('auth', () => {
       setSession(me)
       await saveLocalSession(me)
     } catch (error) {
-      if (error instanceof ApiError && (error.kind === 'session_ended' || error.kind === 'unauthorized')) {
+      if (
+        error instanceof ApiError &&
+        (error.kind === 'session_ended' || error.kind === 'unauthorized')
+      ) {
         await clearSession()
         return
       }
-      // Offline or server down: fall back to the local session if there is one.
-      if (error instanceof ApiError && (error.kind === 'network' || error.kind === 'server')) {
+      // Offline, server down or throttled (429): fall back to the local session if there is one.
+      if (
+        error instanceof ApiError &&
+        (error.kind === 'network' || error.kind === 'server' || error.kind === 'throttled')
+      ) {
         const local = await getLocalSession()
         if (local) {
           setSession({
