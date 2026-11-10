@@ -11,12 +11,14 @@ You are building the frontend of a hatchery management app, one small step at a 
 5. `COMPONENTS.md`: the catalog of shared components. Check it before building any UI.
 
 ### Which file wins
+
 - Architecture, data flow, offline, security, API: **the plan**.
 - Visual decisions (spacing, radius, control sizes, layout components, screen composition, type scale): **the prototype**, where it differs from the plan.
 - Anything in neither file: **ask the owner**. Do not invent.
 - Backend contract and API agreements: the backend `progress.md` and Swagger, plus `COORDINATION.md`. For anything new, a COORDINATION.md entry wins over the plan and over older notes in `PROGRESS.md`. Never build on a Notice alone; the backend `progress.md` must say it is delivered.
 
 ### Decided after the plan was written (prototype wins, plan not yet updated)
+
 - Spacing is a five-step scale only: 4, 8, 12, 16, 24px (`s-1, s-2, s-3, s-4, s-6`). The plan's line "Tailwind default spacing as-is" is outdated.
 - Radius: control 10px, card 12px, sheet 20px.
 - Controls: field, primary button and cancel button are 44px on touch (36px with a mouse). Sub-tabs, chips and small inline buttons look 32px but keep a 44px touch area through invisible padding.
@@ -79,6 +81,7 @@ Step N: <name>: ready for review
 **Stack (fixed):** Vue 3 + Vite + TypeScript (strict), Pinia, Zod, VeeValidate v4 through shadcn-vue's Form with `@vee-validate/zod`, Tailwind, shadcn-vue (Reka UI), vue-i18n, Dexie, vite-plugin-pwa, D3 for calculation only, pnpm. On conflict the priority is shadcn-vue > Tailwind > Zod > VeeValidate. Add no new dependency without asking.
 
 **Code:**
+
 - Never use `v-html` or assign `innerHTML`.
 - No hardcoded UI text. Every string is an i18n key (`bn` default, `en`). Validation messages are keys plus params.
 - No hardcoded colors, px sizes or spacing in components. Use tokens and the layout components. Pages do not set their own margins or padding.
@@ -116,6 +119,7 @@ Step N: <name>: ready for review
 Each step ends at a checkpoint (section 3). Steps are deliberately small. If one turns out too big, split it and tell the owner.
 
 **Phase A: Foundation**
+
 - **Step 0: Orientation.** The owner has already created the Vue project (Vite + `vue-ts`, pnpm); do not scaffold it again. Read both reference files. Report what you understood, any conflict or gap you found, what the existing project contains, and the versions of Node and pnpm. Check the current shadcn-vue Form docs and Zod / `@vee-validate/zod` version compatibility. Create `PROGRESS.md` (step list with status, decisions log, parking lot). No code.
 - **Step 1: Project setup.** Verify the existing Vite `vue-ts` project (do not re-create it). Then add: strict `tsconfig` with `@/*` alias, ESLint + Prettier, `.env` with Zod validation, and `lint` / `typecheck` scripts. Install only the packages this step needs; the other packages from the plan are installed in the step that first uses them. Done when `lint`, `typecheck` and `build` pass.
 - **Step 2: Tailwind and shadcn-vue init.** Tailwind with the Vite plugin, shadcn-vue init. No components yet beyond what init creates.
@@ -124,6 +128,7 @@ Each step ends at a checkpoint (section 3). Steps are deliberately small. If one
 - **Step 5: Folder structure and routing.** `mobile/`, `desktop/`, `shared/`, root router, device detection with a manual toggle, placeholder views only.
 
 **Phase B: Components**
+
 - **Step 6: Button.** Variants: primary, red-outline cancel, small (32px look, 44px touch area). Built with `cva`.
 - **Step 7: Field and Input.** Form field wrapper (label, control, error), numeric input with a static unit label, numeric stepper input (−/+, long-press repeat, 44px buttons), Select.
 - **Step 8: Sheet and Tabs.** Bottom Sheet with focus trap, Esc, scrim, and focus returning to the trigger; sub-tabs with the small-control touch area.
@@ -132,6 +137,7 @@ Each step ends at a checkpoint (section 3). Steps are deliberately small. If one
 - **Step 10b: Styleguide, heavy screen.** One stress-test screen (about 14 fields in sections) added to the styleguide, 360px in bn and en.
 
 **Phase C: Shells**
+
 - **Step 11a: Mobile shell, app bar.** `MobileShell` structure (app bar, scrolling content area, offline banner) and the app bar
 - **Step 11b: Mobile shell, tab bar.** `BottomTabBar` (items from a `navItems` config, one for now, plus a fixed "More" tab, `aria-current`, 56px items) and `MoreSheet` (opens above the tab bar, desktop-view switch only), built on the existing `Sheet`. Vertical slice: more modules are added on client demand.
 - **Step 11c: Mobile shell, notifications.** Notifications sheet (sample data, bell opens it, mark-all-read), and fix the `Sheet` height so it is relative to the app container, not the viewport. Scrim becomes `bg-foreground/50`.
@@ -143,6 +149,7 @@ Each step ends at a checkpoint (section 3). Steps are deliberately small. If one
 - **Step 14c: PWA, production test.** Deploy to Vercel (`vercel.json` rewrites for the SPA). The owner runs a checklist on the production link on a real Android phone and a desktop browser: first open online, "offline ready", install, airplane mode, save a reading offline, and an update after a second deploy..
 
 **Phase D: Water quality (mobile first)**
+
 - **Step 15: Schema.** Shared Zod schema for a reading (fields named `temperatureC`, `salinityPpt`, `oxygenMgL`, plus optional `note` up to 200 characters; validation ranges still to be confirmed with the owner), i18n error keys. No unit conversion. If you want a test runner for the schema, ask the owner first.
 - **Step 16: Dexie storage layer.** `readings` table at version 1 with the index `[createdById+tankId+recordedAt]` and a helper for "latest reading of this user for this tank", CRUD (edit and delete only while pending; from Step 21 only until the first send attempt), `navigator.storage.persist()`, retention cleanup. Use a stub user id until Step 20.
 - **Step 17a: Entry screen, form and save.** Prototype's entry screen at `/m/water` with VeeValidate + Zod: recorded-at, tank Select (from `src/shared/config/tanks.ts`, replaced by backend tanks in Step 21b), four `StepperInput` fields with static unit labels, collapsed "more details" (note), `StickyActionBar` (cancel, save), validate on blur and submit, save to Dexie as `pending`, cancel clears the form, status line. No last-value prefill yet; Save works once all four values are valid.
@@ -153,17 +160,20 @@ Each step ends at a checkpoint (section 3). Steps are deliberately small. If one
 - **Step 19: Error handling.** Global Vue error handler, `unhandledrejection`, `ErrorBoundary` at app level (`App.vue`), liveQuery error callbacks, and chunk-load failure handling in the router. Per-view wrapping is a parking lot item.
 
 **Phase E: Backend integration (auth is ready; readings, tanks and sync are not, so Step 21 uses a mock adapter)**
+
 - **Step 20: Auth.** Built against the real auth API (login by email, `POST /auth/refresh` with the httpOnly cookie, `POST /auth/refresh/logout`, `GET /user/me`). Login, refresh with a single in-flight promise plus a cross-tab lock, in-memory access token, permission keys in Pinia (from `/user/me` `role.permissions`), local offline session, generic "session ended" handling (no `session_revoked` code exists yet). The API client uses native `fetch`, no axios. Split into 20a (env, types, Zod response schemas, `AuthAdapter`), 20b-1 (`request()` and `httpAuthAdapter`), 20b-2 (`sessionManager`: in-memory token, single-flight refresh, cross-tab lock), 20b-3 (`authedRequest`: one refresh and retry on 401), 20c (Pinia, store, guard, login view), 20d (offline local session).
 - **Step 20.5: Global Toast.** `useToast`, `ToastHost` (top right), styleguide entry, login errors as a toast.
 - **Step 20.6: Rename `AuthError` to `ApiError`.** Move it to `src/shared/api/apiError.ts`.
+- **Step 21d: Backend contract v2.** One step, before Step 20.7 and Step 21: `/users/me` and `/users/me/password` paths; one lowercase `username` login (the frontend only trims and lowercases; the username and password rules stay in the backend and are not copied); the new `/users/me` shape; a forced password-change screen (full screen, only logout is reachable, online only, the new `access_token` from the response is kept); `user_inactive` handled apart from `session_revoked`; logout is online only, asks for confirmation when unsent readings exist, and then clears all local data (a forced logout clears it too); `ApiError` also carries the response `code` and `errors[]`, and the UI maps `api.errors.<code>`, never the message text.
 - **Step 20.7: Future `recordedAt` guard.** Refuse a time more than 5 minutes in the future at save (the server allows 10) and warn about a wrong phone clock.
 - **Step 21: Sync engine (mock adapter).** `POST /readings/sync` in sequential chunks of 20; per-item results matched by `index` (`created` and `duplicate` become `synced`, `rejected` becomes `failed` with fix-and-resend, `duplicate` with `identical: false` warns); after the first send attempt a pending reading is no longer editable; retry rules in plan section 8b (401, 403, 413, 429, 5xx, network); pause when `createdById` differs from the signed-in user; a user with `organizationId` null gets an empty state. The mock reproduces every case, selected by a dev-only switch (`?mock=ok|fail-4xx|fail-5xx|offline`).
 - **Step 21b: Tanks from the backend.** `GET /tanks` cached in Dexie `tanks`; inactive tanks are hidden from new entries and kept in history; replaces `src/shared/config/tanks.ts`.
 - **Step 21c: Real endpoints.** Switch sync and tanks to the real backend once its `progress.md` says they are delivered.
-- **Step 21d: Backend contract v2.** One step at delivery: `/users/me` and `/users/me/password` paths, one lowercase `username` login, the new `/users/me` shape, forced password-change screen, `user_inactive` handled apart from `session_revoked`. Until then email login and the `/user/me` paths stay.
+- **Step 21e: Clear cache and reload.** A button that clears the local readings and tanks (not the login session) and fetches them again from the server. Online only; the same unsent-readings warning as logout. Needs backend `GET /readings` (COORDINATION F→B-28).
 - **Step 22: Notifications.** Replace sample data with real events. Which events notify is still undecided in the plan, so ask first.
 
 **Phase F: Remaining screens and verification**
+
 - **Step 23: Dashboard.** D3 line chart grouped by `recordedAt`. Decide first whether corrections after sync are allowed (pilot: no edit after sync).
 - **Step 24: Desktop views.** Water quality entry and list (table) in the desktop shell.
 - **Step 25: Batch screen.** Only after the owner gives the real field list. The prototype's batch screen uses invented fields.

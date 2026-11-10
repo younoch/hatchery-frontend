@@ -44,6 +44,7 @@
 | 21 | Sync engine against a mock adapter (chunks of 20, per-item results by index, 429 and 413 rules) | not started | - |
 | 21b | Tanks from the backend (Dexie `tanks` table) | not started | - |
 | 21c | Switch sync and tanks to the real endpoints | not started | - |
+| 21e | Clear cache and reload button (needs backend `GET /readings`, F→B-28) | blocked by backend | - |
 | 22 | Notifications | not started | - |
 | 23 | Dashboard | not started | - |
 | 24 | Desktop views | not started | - |
@@ -106,6 +107,8 @@
 - 2026-10-29: Owner decisions recorded: no signup (the super admin creates an organization and its single admin; the admin adds users); one user belongs to one organization; login by lowercase username (at delivery, Step 21d); no edit or delete after sync in the pilot, a correction is a new reading (TEMPORARY, decide before the dashboard); `isLate` and `needsReview` are dropped from the pilot (the fields stay in the local `Reading` type); the last value stays per user and local; organization-wide viewing is online only, later, behind `reading:read-all`.
 - 2026-11-10: Step 21d moves before Step 20.7 and Step 21 (COORDINATION F→B-27): the old `/user…` paths and email login no longer exist, so the app cannot sign in until it is done.
 - 2026-11-10: Owner decisions: (1) work starts on the real backend (local for now), auth first; (2) the organization and organization-role management screens will be built, in a later step after 21d; (3) validation stays at the backend's impossible-value limits for the pilot, and industry-standard review ranges come after release from user feedback.
+- 2026-11-10: Step 21d decisions: (1) forced password change is a full screen, only logout is reachable, online only, the new access token from the response is kept; (2) logout is online only; with unsent readings it asks "N readings are not sent yet. They will be deleted if you log out. Log out anyway?", then clears all local data and the next user fetches everything online (Step 21 adds: sync pending readings before logout); (3) a forced logout (`session_revoked`, `user_inactive`, session ended) clears all local data too, so unsent readings are lost (accepted); (4) login: the frontend only trims and lowercases the username, the format and password rules belong to the backend and are not copied, and errors map by `code` (`invalid_username`, `username_taken`, `weak_password`, `too_short`), never by message; `ApiError` also carries the response `code` and `errors[]`.
+- 2026-11-10: A "Clear cache and reload" button (Step 21e) clears local readings and tanks, keeps the login session, and fetches again from the server; online only, with the same unsent-readings warning. It waits for backend `GET /readings` (F→B-28). Until then, history and the last value are empty after any logout. A per-reading `userId` is not needed because logout clears everything.
 
 ## Parking lot
 - Switch to single "typescript-eslint" package
