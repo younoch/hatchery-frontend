@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import env from '@/shared/utils/env'
-import { ApiError, type ApiErrorKind } from '@/shared/api/apiError'
+import { ApiError, parseErrorBody, type ApiErrorKind } from '@/shared/api/apiError'
 import { envelopeSchema } from '@/shared/schemas/auth.schema'
 
 const DEFAULT_TIMEOUT_MS = 10_000
@@ -48,7 +48,8 @@ export async function request<T extends z.ZodTypeAny>(
   }
 
   if (!response.ok) {
-    throw new ApiError(kindFor(response.status, options.statusMap), response.status)
+    const details = await response.json().then(parseErrorBody, () => ({}))
+    throw new ApiError(kindFor(response.status, options.statusMap), response.status, details)
   }
 
   if (!options.schema) return undefined as z.infer<T>
