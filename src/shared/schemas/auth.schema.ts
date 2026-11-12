@@ -25,22 +25,6 @@ export function envelopeSchema<T extends z.ZodTypeAny>(data: T) {
     timestamp: z.string(),
   })
 }
-// Error envelope: validation errors carry an object in `message`, others a string.
-export const errorEnvelopeSchema = z.object({
-  success: z.literal(false),
-  statusCode: z.number(),
-  path: z.string(),
-  message: z.union([
-    z.string(),
-    z.object({
-      statusCode: z.number(),
-      message: z.array(z.string()),
-      error: z.string(),
-    }),
-  ]),
-  timestamp: z.string(),
-})
-export type ErrorEnvelope = z.infer<typeof errorEnvelopeSchema>
 
 // POST /auth/login and POST /auth/refresh (the refresh token is a cookie, never in the body)
 // Verified 2026-10-16: the body is `data.access_token` (real output).
