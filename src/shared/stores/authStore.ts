@@ -4,6 +4,7 @@ import { ApiError } from '@/shared/api/apiError'
 import { httpAuthAdapter } from '@/shared/api/httpAuthAdapter'
 import { getAccessToken, refreshSession, setAccessToken } from '@/shared/api/sessionManager'
 import type { AuthUser, ChangePasswordInput, LoginCredentials } from '@/shared/schemas/auth.schema'
+import { clearAllLocalData } from '@/shared/storage/localData'
 import { clearLocalSession, getLocalSession, saveLocalSession } from '@/shared/storage/session'
 export type AuthStatus = 'unknown' | 'authenticated' | 'anonymous'
 
@@ -27,11 +28,14 @@ export const useAuthStore = defineStore('auth', () => {
     status.value = 'authenticated'
   }
 
+  // Ends the session and clears everything stored on this phone (readings and session), so the
+  // next user starts from nothing. Used by logout and by a forced logout (the session ended or
+  // the user is inactive): unsent readings are lost, by decision.
   async function clearSession(): Promise<void> {
     setAccessToken(null)
     user.value = null
     status.value = 'anonymous'
-    await clearLocalSession()
+    await clearAllLocalData()
   }
 
   // A user who must change the password has no local session until the change is done, so an
@@ -102,16 +106,17 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  // Local logout always succeeds, even if the server call fails (offline).
-  // Logout never touches IndexedDB: pending readings stay.
+  // Logout needs the server, like login. If the call fails (offline, server down, throttled) the
+  // error is thrown and nothing is cleared. A 401 means the session is already over, so it
+  // counts as done.
   async function logout(): Promise<void> {
     try {
       await httpAuthAdapter.logout()
-    } catch {
-      // ignored on purpose
-    } finally {
-      clearSession()
+    } catch (error) {
+      const sessionAlreadyOver = error instanceof ApiError && error.status === 401
+      if (!sessionAlreadyOver) throw error
     }
+    await clearSession()
   }
 
   return {

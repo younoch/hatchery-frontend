@@ -6,10 +6,7 @@ import { db, type Reading } from './db'
 // Config constant, changeable without a schema migration (plan section 6).
 export const SYNCED_RETENTION_DAYS = 30
 
-export async function createReading(
-  input: WaterReadingInput,
-  userId: string
-): Promise<Reading> {
+export async function createReading(input: WaterReadingInput, userId: string): Promise<Reading> {
   const reading: Reading = {
     ...input,
     note: input.note ? input.note : undefined,
@@ -100,6 +97,12 @@ export async function countUnsyncedReadings(userId: string): Promise<number> {
     .count()
 }
 
+// Readings that exist only on this phone: pending, syncing and failed. The logout warning
+// uses it, and it counts every user because logout clears everything.
+export async function countUnsentReadings(): Promise<number> {
+  return db.readings.where('status').notEqual('synced').count()
+}
+
 // Local only until the sync engine (Step 21): puts a failed record back in the queue.
 export async function retryFailedReading(id: string): Promise<boolean> {
   return db.transaction('rw', db.readings, async () => {
@@ -109,4 +112,3 @@ export async function retryFailedReading(id: string): Promise<boolean> {
     return true
   })
 }
-
