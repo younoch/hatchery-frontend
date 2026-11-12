@@ -41,7 +41,7 @@ router.onError(err => {
   }
 })
 
-router.beforeEach( async (to) => {
+router.beforeEach(async to => {
   const isPrefixed =
     to.path === '/m' || to.path.startsWith('/m/') || to.path === '/d' || to.path.startsWith('/d/')
   const isDevRoute = import.meta.env.DEV && to.path.startsWith('/dev/')
@@ -58,6 +58,14 @@ router.beforeEach( async (to) => {
   const auth = useAuthStore()
   if (auth.status === 'unknown') {
     await auth.bootstrap()
+  }
+
+  // A user who must change the password can reach nothing else (Step 21d-4).
+  if (auth.status === 'authenticated') {
+    const mustChange = auth.user?.mustChangePassword === true
+    const onChangeScreen = to.path === '/m/change-password'
+    if (mustChange && !onChangeScreen) return '/m/change-password'
+    if (!mustChange && onChangeScreen) return '/m/water'
   }
 
   const isPublic = to.meta.public === true

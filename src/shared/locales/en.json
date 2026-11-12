@@ -47,6 +47,7 @@
   },
   "validation": {
     "required": "Enter a value",
+    "passwordMismatch": "The two passwords do not match.",
     "number": "Enter a number",
     "ph": {
       "outOfRange": "Enter a value between {min} and {max}"
@@ -98,6 +99,17 @@
       "submit": "Log in",
       "submitting": "Logging in…"
     },
+    "changePassword": {
+      "title": "Set a new password",
+      "hint": "For safety, you must change your password after the first sign-in.",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "New password again",
+      "submit": "Change password",
+      "submitting": "Changing…",
+      "wrongCurrent": "The current password is wrong.",
+      "success": "Your password was changed."
+    },
     "logout": "Log out",
     "error": {
       "invalidCredentials": "Wrong username or password.",
@@ -113,6 +125,8 @@
       "invalid_credentials": "Wrong username or password.",
       "user_inactive": "Your account is disabled. Contact your admin.",
       "too_short": "The password is too short.",
+      "weak_password": "The password is not strong enough.",
+      "too_long": "The password is too long.",
       "invalid_username": "The username is not valid.",
       "rate_limited": "Too many attempts. Wait a minute and try again."
     }

@@ -6,6 +6,8 @@ const CODE_KEYS: Partial<Record<string, string>> = {
   invalid_credentials: 'api.errors.invalid_credentials',
   user_inactive: 'api.errors.user_inactive',
   too_short: 'api.errors.too_short',
+  weak_password: 'api.errors.weak_password',
+  too_long: 'api.errors.too_long',
   invalid_username: 'api.errors.invalid_username',
   rate_limited: 'api.errors.rate_limited',
 }
