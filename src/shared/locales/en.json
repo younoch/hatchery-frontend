@@ -111,6 +111,13 @@
       "success": "Your password was changed."
     },
     "logout": "Log out",
+    "logoutNeedsInternet": "You need internet to log out.",
+    "logoutConfirm": {
+      "title": "Log out?",
+      "message": "{count} readings are not sent yet. They will be deleted if you log out. Log out anyway?",
+      "cancel": "Go back",
+      "confirm": "Delete and log out"
+    },
     "error": {
       "invalidCredentials": "Wrong username or password.",
       "validation": "Check your username and password.",

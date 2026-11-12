@@ -60,26 +60,14 @@ const onSubmit = handleSubmit(async values => {
       <FieldGrid :cols="1">
         <Field :label="t('auth.login.username')" :error-key="errors.username">
           <template #default="{ id, errorId, hasError }">
-            <Input
-              :id="id"
-              v-model="username"
-              type="text"
-              autocomplete="username"
-              :invalid="hasError"
-              :error-id="errorId"
-            />
+            <Input :id="id" v-model="username" type="text" autocomplete="username" :invalid="hasError"
+              :error-id="errorId" />
           </template>
         </Field>
         <Field :label="t('auth.login.password')" :error-key="errors.password">
           <template #default="{ id, errorId, hasError }">
-            <Input
-              :id="id"
-              v-model="password"
-              type="password"
-              autocomplete="current-password"
-              :invalid="hasError"
-              :error-id="errorId"
-            />
+            <Input :id="id" v-model="password" type="password" autocomplete="current-password" :invalid="hasError"
+              :error-id="errorId" />
           </template>
         </Field>
       </FieldGrid>

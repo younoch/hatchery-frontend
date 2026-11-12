@@ -12,9 +12,11 @@ import FieldGrid from '@/shared/components/layout/FieldGrid.vue'
 import PageBody from '@/shared/components/layout/PageBody.vue'
 import PageHeader from '@/shared/components/layout/PageHeader.vue'
 import StickyActionBar from '@/shared/components/layout/StickyActionBar.vue'
+import LogoutConfirmSheet from '@/shared/components/LogoutConfirmSheet.vue'
 import ToastHost from '@/shared/components/ToastHost.vue'
 import { ApiError } from '@/shared/api/apiError'
 import { errorMessageKey } from '@/shared/api/errorKey'
+import { useLogout } from '@/shared/composables/useLogout'
 import { useToast } from '@/shared/composables/useToast'
 import { changePasswordFormSchema } from '@/shared/schemas/changePassword.schema'
 import { useAuthStore } from '@/shared/stores/authStore'
@@ -63,10 +65,7 @@ const onSubmit = handleSubmit(async values => {
   }
 })
 
-async function logout() {
-  await auth.logout()
-  await router.replace('/m/login')
-}
+const { requestLogout } = useLogout()
 </script>
 
 <template>
@@ -77,38 +76,20 @@ async function logout() {
       <FieldGrid :cols="1">
         <Field :label="t('auth.changePassword.current')" :error-key="errors.currentPassword">
           <template #default="{ id, errorId, hasError }">
-            <Input
-              :id="id"
-              v-model="currentPassword"
-              type="password"
-              autocomplete="current-password"
-              :invalid="hasError"
-              :error-id="errorId"
-            />
+            <Input :id="id" v-model="currentPassword" type="password" autocomplete="current-password"
+              :invalid="hasError" :error-id="errorId" />
           </template>
         </Field>
         <Field :label="t('auth.changePassword.new')" :error-key="errors.newPassword">
           <template #default="{ id, errorId, hasError }">
-            <Input
-              :id="id"
-              v-model="newPassword"
-              type="password"
-              autocomplete="new-password"
-              :invalid="hasError"
-              :error-id="errorId"
-            />
+            <Input :id="id" v-model="newPassword" type="password" autocomplete="new-password" :invalid="hasError"
+              :error-id="errorId" />
           </template>
         </Field>
         <Field :label="t('auth.changePassword.confirm')" :error-key="errors.confirmPassword">
           <template #default="{ id, errorId, hasError }">
-            <Input
-              :id="id"
-              v-model="confirmPassword"
-              type="password"
-              autocomplete="new-password"
-              :invalid="hasError"
-              :error-id="errorId"
-            />
+            <Input :id="id" v-model="confirmPassword" type="password" autocomplete="new-password" :invalid="hasError"
+              :error-id="errorId" />
           </template>
         </Field>
       </FieldGrid>
@@ -117,10 +98,11 @@ async function logout() {
       <Button type="submit" :disabled="submitting">
         {{ t(submitting ? 'auth.changePassword.submitting' : 'auth.changePassword.submit') }}
       </Button>
-      <Button variant="red-outline" :disabled="submitting" @click="logout">
+      <Button variant="red-outline" :disabled="submitting" @click="requestLogout">
         {{ t('auth.logout') }}
       </Button>
     </StickyActionBar>
   </form>
   <ToastHost />
+  <LogoutConfirmSheet />
 </template>

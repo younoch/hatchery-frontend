@@ -1,22 +1,20 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 
 import Button from '@/shared/components/ui/Button.vue'
 import Sheet from '@/shared/components/ui/Sheet.vue'
 import FieldGrid from '@/shared/components/layout/FieldGrid.vue'
 import { useDeviceClass } from '@/shared/composables/useDeviceClass'
+import { useLogout } from '@/shared/composables/useLogout'
 import { usePwa } from '@/shared/composables/usePwa'
-import { useAuthStore } from '@/shared/stores/authStore'
 
 defineProps<{ bottomOffset?: number }>()
 
 const { t } = useI18n()
 const { toggleDeviceClass } = useDeviceClass()
 const { offlineReady, canInstall, install } = usePwa()
-const auth = useAuthStore()
-const router = useRouter()
+const { requestLogout } = useLogout()
 const open = ref(false)
 
 function switchDevice() {
@@ -26,8 +24,7 @@ function switchDevice() {
 
 async function logout() {
   open.value = false
-  await auth.logout()
-  await router.replace('/m/login')
+  await requestLogout()
 }
 </script>
 
@@ -50,9 +47,9 @@ async function logout() {
       <Button variant="secondary" class="justify-start" @click="switchDevice">
         {{ t('device.switchToDesktop') }}
       </Button>
-       <Button variant="red-outline" class="justify-start" @click="logout">
-         {{ t('auth.logout') }}
-         </Button>
+      <Button variant="red-outline" class="justify-start" @click="logout">
+        {{ t('auth.logout') }}
+      </Button>
     </FieldGrid>
   </Sheet>
 </template>
