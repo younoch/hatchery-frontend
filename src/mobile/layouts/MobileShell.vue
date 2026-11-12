@@ -4,8 +4,6 @@ import { useI18n } from 'vue-i18n'
 import MobileAppBar from '@/mobile/components/nav/MobileAppBar.vue'
 import BottomTabBar from '@/mobile/components/nav/BottomTabBar.vue'
 import LogoutConfirmSheet from '@/shared/components/LogoutConfirmSheet.vue'
-import LogoutConfirmSheet from '@/shared/components/LogoutConfirmSheet.vue'
-import LogoutConfirmSheet from '@/shared/components/LogoutConfirmSheet.vue'
 import ToastHost from '@/shared/components/ToastHost.vue'
 import { useOnlineStatus } from '@/shared/composables/useOnlineStatus'
 

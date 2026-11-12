@@ -65,7 +65,9 @@
       "required": "Choose a tank"
     },
     "recordedAt": {
-      "invalid": "Enter a valid time"
+      "invalid": "Enter a valid time",
+      "inFuture": "The time cannot be in the future",
+      "tooOld": "The time is too old. Check the phone's date"
     },
     "note": {
       "tooLong": "At most {max} characters"

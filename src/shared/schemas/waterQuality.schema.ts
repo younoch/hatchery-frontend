@@ -10,6 +10,12 @@ export const WATER_RANGES = {
 
 export const NOTE_MAX_LENGTH = 200
 
+// Mirrors the server (openapi.json, COORDINATION B→F-28): it rejects a time more than 10 minutes
+// ahead and a time before 2020-01-01 UTC. The frontend is stricter on the future side (5 minutes,
+// B→F-09), so a phone clock slightly ahead of the server's does not get readings rejected.
+export const RECORDED_AT_MAX_FUTURE_MS = 5 * 60_000
+export const RECORDED_AT_MIN_MS = Date.UTC(2020, 0, 1)
+
 // Error messages are i18n keys. Params for t(key, params) come from waterErrorParams.
 export const waterErrorParams: Record<string, Record<string, number>> = {
   'validation.ph.outOfRange': WATER_RANGES.ph,
@@ -38,7 +44,16 @@ export const waterReadingSchema = z.object({
     .min(1, 'validation.tank.required'),
   recordedAt: z
     .string({ required_error: 'validation.recordedAt.invalid' })
-    .refine(value => !Number.isNaN(Date.parse(value)), 'validation.recordedAt.invalid'),
+    .superRefine((value, ctx) => {
+      const time = Date.parse(value)
+      if (Number.isNaN(time)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'validation.recordedAt.invalid' })
+      } else if (time > Date.now() + RECORDED_AT_MAX_FUTURE_MS) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'validation.recordedAt.inFuture' })
+      } else if (time < RECORDED_AT_MIN_MS) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'validation.recordedAt.tooOld' })
+      }
+    }),
   ph: reading('ph'),
   temperatureC: reading('temperatureC'),
   salinityPpt: reading('salinityPpt'),
