@@ -26,7 +26,7 @@ export const httpAuthAdapter: AuthAdapter = {
 
   fetchMe(accessToken) {
     return request({
-      path: '/user/me',
+      path: '/users/me',
       schema: meSchema,
       accessToken,
     })

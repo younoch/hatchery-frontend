@@ -38,11 +38,11 @@ const ERROR_KEYS: Record<ApiErrorKind, string> = {
 
 const { errors, defineField, handleSubmit } = useForm({
   validationSchema: toTypedSchema(loginFormSchema),
-  initialValues: { email: '', password: '' },
+  initialValues: { username: '', password: '' },
 })
 
 const config = { validateOnModelUpdate: false }
-const [email] = defineField('email', config)
+const [username] = defineField('username', config)
 const [password] = defineField('password', config)
 
 const submitting = ref(false)
@@ -68,13 +68,12 @@ const onSubmit = handleSubmit(async values => {
     <PageHeader :title="t('auth.login.title')" />
     <PageBody>
       <FieldGrid :cols="1">
-        <Field :label="t('auth.login.email')" :error-key="errors.email">
+        <Field :label="t('auth.login.username')" :error-key="errors.username">
           <template #default="{ id, errorId, hasError }">
             <Input
               :id="id"
-              v-model="email"
-              type="email"
-              inputmode="email"
+              v-model="username"
+              type="text"
               autocomplete="username"
               :invalid="hasError"
               :error-id="errorId"

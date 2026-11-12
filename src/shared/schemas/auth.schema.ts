@@ -1,16 +1,19 @@
 import { z } from 'zod'
 
 export interface LoginCredentials {
-  email: string
+  username: string
   password: string
 }
 
 export interface AuthUser {
   id: string
-  email: string
+  username: string
+  name: string | null
+  organizationId: string | null
   roleName: string | null
   permissions: string[]
   isSuperAdmin: boolean
+  mustChangePassword: boolean
 }
 
 // Success envelope: { success, statusCode, data, timestamp }
@@ -46,27 +49,27 @@ export const accessTokenSchema = z.object({
   access_token: z.string().min(1),
 })
 
-// GET /user/me
-// Verified 2026-10-15: `role` is `null` for a user without a role.
-// Verified 2026-10-15: `isSuperAdmin` is not returned yet (backend task 7).
+// GET /users/me (MeResponseDto in openapi.json): every field is always present.
 export const meSchema = z
   .object({
     id: z.string(),
-    email: z.string(),
-    role: z
-      .object({
-        name: z.string(),
-        permissions: z.array(z.string()),
-      })
-      .nullish(),
-    isSuperAdmin: z.boolean().optional(),
+    username: z.string(),
+    name: z.string().nullable(),
+    isSuperAdmin: z.boolean(),
+    organizationId: z.string().nullable(),
+    permissions: z.array(z.string()),
+    mustChangePassword: z.boolean(),
+    role: z.object({ name: z.string() }).nullable(),
   })
   .transform(
     (me): AuthUser => ({
       id: me.id,
-      email: me.email,
+      username: me.username,
+      name: me.name,
+      organizationId: me.organizationId,
       roleName: me.role?.name ?? null,
-      permissions: me.role?.permissions ?? [],
-      isSuperAdmin: me.isSuperAdmin ?? false,
+      permissions: me.permissions,
+      isSuperAdmin: me.isSuperAdmin,
+      mustChangePassword: me.mustChangePassword,
     }),
   )

@@ -7,10 +7,11 @@ export async function saveLocalSession(user: AuthUser): Promise<void> {
   await db.session.put({
     key: KEY,
     userId: user.id,
-    email: user.email,
+    username: user.username,
     permissions: user.permissions,
     isSuperAdmin: user.isSuperAdmin,
-    organizationId: null,
+    organizationId: user.organizationId,
+    mustChangePassword: user.mustChangePassword,
     savedAt: new Date().toISOString(),
   })
 }

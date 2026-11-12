@@ -47,9 +47,6 @@
   },
   "validation": {
     "required": "Enter a value",
-    "email": {
-      "invalid": "Enter a valid email"
-    },
     "number": "Enter a number",
     "ph": {
       "outOfRange": "Enter a value between {min} and {max}"
@@ -96,15 +93,15 @@
   "auth": {
     "login": {
       "title": "Log in",
-      "email": "Email",
+      "username": "Username",
       "password": "Password",
       "submit": "Log in",
       "submitting": "Logging in…"
     },
     "logout": "Log out",
     "error": {
-      "invalidCredentials": "Wrong email or password.",
-      "validation": "Check your email and password.",
+      "invalidCredentials": "Wrong username or password.",
+      "validation": "Check your username and password.",
       "throttled": "Too many attempts. Wait a minute and try again.",
       "network": "No connection to the server. Check your internet and try again.",
       "server": "The server has a problem. Try again later.",

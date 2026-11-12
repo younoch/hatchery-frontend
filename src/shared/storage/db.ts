@@ -22,10 +22,11 @@ export interface Reading {
 export interface LocalSession {
   key: 'current' // single row
   userId: string
-  email: string
-  permissions: string[] // snapshot from the last successful /user/me
+  username: string
+  permissions: string[] // snapshot from the last successful /users/me
   isSuperAdmin: boolean
-  organizationId: string | null // reserved: the backend has no organizations yet
+  organizationId: string | null
+  mustChangePassword: boolean
   savedAt: string // ISO, phone clock
 }
 class HatcheryDB extends Dexie {

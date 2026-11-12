@@ -16,7 +16,7 @@ export const useAuthStore = defineStore('auth', () => {
   const permissions = computed(() => new Set(user.value?.permissions ?? []))
 
   // Permission keys only, never role names. Hiding a button is UX; the backend enforces.
-  // TODO(verify): the backend does not expose isSuperAdmin yet (backend task 7).
+  
   function hasPermission(key: string): boolean {
     if (user.value?.isSuperAdmin) return true
     return permissions.value.has(key)
@@ -68,10 +68,13 @@ export const useAuthStore = defineStore('auth', () => {
         if (local) {
           setSession({
             id: local.userId,
-            email: local.email,
+            username: local.username,
+            name: null,
+            organizationId: local.organizationId,
             roleName: null,
             permissions: local.permissions,
             isSuperAdmin: local.isSuperAdmin,
+            mustChangePassword: local.mustChangePassword,
           })
           return
         }
