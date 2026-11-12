@@ -108,6 +108,15 @@
       "unknown": "Something went wrong. Try again."
     }
   },
+  "api": {
+    "errors": {
+      "invalid_credentials": "Wrong username or password.",
+      "user_inactive": "Your account is disabled. Contact your admin.",
+      "too_short": "The password is too short.",
+      "invalid_username": "The username is not valid.",
+      "rate_limited": "Too many attempts. Wait a minute and try again."
+    }
+  },
   "toast": {
     "label": "Notification"
   }

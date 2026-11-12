@@ -25,7 +25,6 @@ export function envelopeSchema<T extends z.ZodTypeAny>(data: T) {
     timestamp: z.string(),
   })
 }
-
 // Error envelope: validation errors carry an object in `message`, others a string.
 export const errorEnvelopeSchema = z.object({
   success: z.literal(false),
