@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import { ApiError } from '@/shared/api/apiError'
 import { httpAuthAdapter } from '@/shared/api/httpAuthAdapter'
 import { getAccessToken, refreshSession, setAccessToken } from '@/shared/api/sessionManager'
-import type { AuthUser, LoginCredentials } from '@/shared/schemas/auth.schema'
+import type { AuthUser, ChangePasswordInput, LoginCredentials } from '@/shared/schemas/auth.schema'
 import { clearLocalSession, getLocalSession, saveLocalSession } from '@/shared/storage/session'
 export type AuthStatus = 'unknown' | 'authenticated' | 'anonymous'
 
@@ -16,7 +16,7 @@ export const useAuthStore = defineStore('auth', () => {
   const permissions = computed(() => new Set(user.value?.permissions ?? []))
 
   // Permission keys only, never role names. Hiding a button is UX; the backend enforces.
-  
+
   function hasPermission(key: string): boolean {
     if (user.value?.isSuperAdmin) return true
     return permissions.value.has(key)
@@ -34,12 +34,29 @@ export const useAuthStore = defineStore('auth', () => {
     await clearLocalSession()
   }
 
+  // A user who must change the password has no local session until the change is done, so an
+  // offline start cannot skip the forced screen.
+  async function persistSession(me: AuthUser): Promise<void> {
+    if (me.mustChangePassword) await clearLocalSession()
+    else await saveLocalSession(me)
+  }
+
   async function login(credentials: LoginCredentials): Promise<void> {
     const token = await httpAuthAdapter.login(credentials)
     setAccessToken(token)
     const me = await httpAuthAdapter.fetchMe(token)
     setSession(me)
-    await saveLocalSession(me)
+    await persistSession(me)
+  }
+
+  // The response carries a new access token and a new refresh cookie. It does not return the
+  // user, so the user is fetched again to pick up `mustChangePassword: false`.
+  async function changePassword(input: ChangePasswordInput): Promise<void> {
+    const token = await httpAuthAdapter.changePassword(input)
+    setAccessToken(token)
+    const me = await httpAuthAdapter.fetchMe(token)
+    setSession(me)
+    await persistSession(me)
   }
 
   // Restores the session after a reload: the refresh cookie gives a new access token.
@@ -50,7 +67,7 @@ export const useAuthStore = defineStore('auth', () => {
       const token = getAccessToken() ?? (await refreshSession())
       const me = await httpAuthAdapter.fetchMe(token)
       setSession(me)
-      await saveLocalSession(me)
+      await persistSession(me)
     } catch (error) {
       if (
         error instanceof ApiError &&
@@ -97,5 +114,15 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { user, status, isAuthenticated, hasPermission, login, bootstrap, logout, clearSession }
+  return {
+    user,
+    status,
+    isAuthenticated,
+    hasPermission,
+    login,
+    changePassword,
+    bootstrap,
+    logout,
+    clearSession,
+  }
 })

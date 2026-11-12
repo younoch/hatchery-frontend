@@ -5,6 +5,11 @@ export interface LoginCredentials {
   password: string
 }
 
+export interface ChangePasswordInput {
+  currentPassword: string
+  newPassword: string
+}
+
 export interface AuthUser {
   id: string
   username: string
@@ -32,6 +37,13 @@ export const accessTokenSchema = z.object({
   access_token: z.string().min(1),
 })
 
+// PATCH /users/me/password (PasswordChangedResponseDto): a new access token; the new refresh
+// cookie is set by the response itself.
+export const passwordChangedSchema = z.object({
+  message: z.string(),
+  access_token: z.string().min(1),
+})
+
 // GET /users/me (MeResponseDto in openapi.json): every field is always present.
 export const meSchema = z
   .object({
@@ -44,15 +56,13 @@ export const meSchema = z
     mustChangePassword: z.boolean(),
     role: z.object({ name: z.string() }).nullable(),
   })
-  .transform(
-    (me): AuthUser => ({
-      id: me.id,
-      username: me.username,
-      name: me.name,
-      organizationId: me.organizationId,
-      roleName: me.role?.name ?? null,
-      permissions: me.permissions,
-      isSuperAdmin: me.isSuperAdmin,
-      mustChangePassword: me.mustChangePassword,
-    }),
-  )
+  .transform((me): AuthUser => ({
+    id: me.id,
+    username: me.username,
+    name: me.name,
+    organizationId: me.organizationId,
+    roleName: me.role?.name ?? null,
+    permissions: me.permissions,
+    isSuperAdmin: me.isSuperAdmin,
+    mustChangePassword: me.mustChangePassword,
+  }))

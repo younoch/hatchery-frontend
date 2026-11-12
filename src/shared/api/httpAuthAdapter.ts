@@ -1,6 +1,7 @@
 import type { AuthAdapter } from '@/shared/api/authAdapter'
+import { authedRequest } from '@/shared/api/authedRequest'
 import { request } from '@/shared/api/request'
-import { accessTokenSchema, meSchema } from '@/shared/schemas/auth.schema'
+import { accessTokenSchema, meSchema, passwordChangedSchema } from '@/shared/schemas/auth.schema'
 
 export const httpAuthAdapter: AuthAdapter = {
   async login(credentials) {
@@ -30,6 +31,16 @@ export const httpAuthAdapter: AuthAdapter = {
       schema: meSchema,
       accessToken,
     })
+  },
+
+  async changePassword(input) {
+    const data = await authedRequest({
+      method: 'PATCH',
+      path: '/users/me/password',
+      body: input,
+      schema: passwordChangedSchema,
+    })
+    return data.access_token
   },
 
   async logout() {
