@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, reactive, ref, watch, type Ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch, type Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
@@ -11,9 +11,11 @@ import Select from '@/shared/components/ui/Select.vue'
 import StepperInput from '@/shared/components/ui/StepperInput.vue'
 import FieldGrid from '@/shared/components/layout/FieldGrid.vue'
 import FormSection from '@/shared/components/layout/FormSection.vue'
+import NoticeBanner from '@/shared/components/layout/NoticeBanner.vue'
 import PageBody from '@/shared/components/layout/PageBody.vue'
 import StickyActionBar from '@/shared/components/layout/StickyActionBar.vue'
 import { TANKS } from '@/shared/config/tanks'
+import { CLOCK_SKEW_WARN_MS, clockSkewMs } from '@/shared/lib/clockSkew'
 import { localInputToIso, toLocalInputValue } from '@/shared/lib/datetime'
 import {
   WATER_RANGES,
@@ -26,6 +28,13 @@ import { requireUserId } from '@/shared/composables/useCurrentUserId'
 
 const { t } = useI18n()
 const userId = requireUserId()
+
+// Warns only (never blocks) when the phone clock is far from the server's.
+const clockOff = computed(
+  () => clockSkewMs.value !== null && Math.abs(clockSkewMs.value) > CLOCK_SKEW_WARN_MS,
+)
+const clockAhead = computed(() => (clockSkewMs.value ?? 0) > 0)
+const clockOffMinutes = computed(() => Math.round(Math.abs(clockSkewMs.value ?? 0) / 60_000))
 
 // Step sizes are samples until the owner confirms them.
 const FIELDS = [
@@ -179,6 +188,9 @@ onBeforeUnmount(() => window.clearTimeout(statusTimer))
 
 <template>
   <form class="flex flex-1 flex-col justify-between" novalidate @submit.prevent="onFormSubmit">
+    <NoticeBanner v-if="clockOff">
+      {{ t(clockAhead ? 'water.clockAhead' : 'water.clockBehind', { minutes: clockOffMinutes }) }}
+    </NoticeBanner>
     <PageBody>
       <FieldGrid :cols="1">
         <Field :label="t('water.recordedAt')" :error-key="errors.recordedAt"

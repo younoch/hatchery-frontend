@@ -75,6 +75,8 @@
   },
   "water": {
     "recordedAt": "Tested at",
+    "clockAhead": "The phone clock is about {minutes} minutes ahead of the server. Readings may be rejected until you fix the time.",
+    "clockBehind": "The phone clock is about {minutes} minutes behind the server. Please fix the time.",
     "tank": "Tank / pond",
     "ph": "pH",
     "temperature": "Temperature",

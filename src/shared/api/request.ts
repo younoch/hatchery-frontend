@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import env from '@/shared/utils/env'
 import { ApiError, parseErrorBody, type ApiErrorKind } from '@/shared/api/apiError'
+import { recordServerTime } from '@/shared/lib/clockSkew'
 import { envelopeSchema } from '@/shared/schemas/auth.schema'
 
 const DEFAULT_TIMEOUT_MS = 10_000
@@ -33,6 +34,7 @@ export async function request<T extends z.ZodTypeAny>(
   if (options.body !== undefined) headers['Content-Type'] = 'application/json'
   if (options.accessToken) headers.Authorization = `Bearer ${options.accessToken}`
 
+  const sentAt = Date.now()
   let response: Response
   try {
     response = await fetch(`${env.VITE_API_URL}${options.path}`, {
@@ -47,6 +49,7 @@ export async function request<T extends z.ZodTypeAny>(
     throw new ApiError('network')
   }
 
+  const receivedAt = Date.now()
   if (!response.ok) {
     const details = await response.json().then(parseErrorBody, () => ({}))
     throw new ApiError(kindFor(response.status, options.statusMap), response.status, details)
@@ -63,5 +66,6 @@ export async function request<T extends z.ZodTypeAny>(
 
   const parsed = envelopeSchema(options.schema).safeParse(json)
   if (!parsed.success) throw new ApiError('unknown', response.status)
+  recordServerTime(parsed.data.timestamp, sentAt, receivedAt)
   return parsed.data.data
 }
