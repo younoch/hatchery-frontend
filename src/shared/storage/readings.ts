@@ -30,14 +30,19 @@ export async function listReadings(userId: string): Promise<Reading[]> {
   return rows.sort((a, b) => b.recordedAt.localeCompare(a.recordedAt))
 }
 
-// Edit and delete are allowed only while the record is still pending (plan section 6).
+// Editable and deletable only while pending and never sent: after the first send attempt the
+// server may already hold the reading (owner decision 2026-11-13).
+export function isEditable(reading: Reading): boolean {
+  return reading.status === 'pending' && (reading.attempts ?? 0) === 0
+}
+
 export async function updatePendingReading(
   id: string,
   changes: Partial<WaterReadingInput>
 ): Promise<boolean> {
   return db.transaction('rw', db.readings, async () => {
     const current = await db.readings.get(id)
-    if (!current || current.status !== 'pending') return false
+    if (!current || !isEditable(current)) return false
     await db.readings.update(id, {
       ...changes,
       note: changes.note ? changes.note : undefined,
@@ -49,7 +54,7 @@ export async function updatePendingReading(
 export async function deletePendingReading(id: string): Promise<boolean> {
   return db.transaction('rw', db.readings, async () => {
     const current = await db.readings.get(id)
-    if (!current || current.status !== 'pending') return false
+    if (!current || !isEditable(current)) return false
     await db.readings.delete(id)
     return true
   })
@@ -111,4 +116,65 @@ export async function retryFailedReading(id: string): Promise<boolean> {
     await db.readings.update(id, { status: 'pending' })
     return true
   })
+}
+
+// ---- Sync engine helpers (Step 21) ----
+
+// Pending readings, oldest first.
+export async function listPendingForSync(): Promise<Reading[]> {
+  const rows = await db.readings.where('status').equals('pending').toArray()
+  return rows.sort((a, b) => a.recordedAt.localeCompare(b.recordedAt))
+}
+
+// A chunk is about to be sent: the readings become `syncing` and the attempt is counted, so they
+// are no longer editable.
+export async function markSending(ids: string[]): Promise<void> {
+  await db.readings
+    .where('id')
+    .anyOf(ids)
+    .modify(reading => {
+      reading.status = 'syncing'
+      reading.attempts = (reading.attempts ?? 0) + 1
+    })
+}
+
+// The server has the readings (created or duplicate).
+export async function markSynced(ids: string[]): Promise<void> {
+  await db.readings
+    .where('id')
+    .anyOf(ids)
+    .modify(reading => {
+      reading.status = 'synced'
+      delete reading.errorCode
+      delete reading.errorField
+    })
+}
+
+// The server rejected the reading: it keeps the error code so the card can say why.
+export async function markFailed(
+  id: string,
+  errorCode: string,
+  errorField?: string
+): Promise<void> {
+  await db.readings
+    .where('id')
+    .equals(id)
+    .modify(reading => {
+      reading.status = 'failed'
+      reading.errorCode = errorCode
+      if (errorField) reading.errorField = errorField
+      else delete reading.errorField
+    })
+}
+
+// The request did not finish (offline, throttled, server down): the readings go back in the
+// queue. `attempts` stays, so they remain locked.
+export async function markPending(ids: string[]): Promise<void> {
+  await db.readings.where('id').anyOf(ids).modify({ status: 'pending' })
+}
+
+// At app start no request is running, so a `syncing` record is left over from a closed app.
+// Sending it again is safe: the server answers `duplicate`.
+export async function resetSyncingToPending(): Promise<number> {
+  return db.readings.where('status').equals('syncing').modify({ status: 'pending' })
 }

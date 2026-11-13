@@ -16,6 +16,9 @@ export interface Reading {
   createdById: string
   isLate: boolean // server-derived
   needsReview: boolean // server-derived
+  attempts?: number // send attempts so far; a reading is editable only while this is 0 (2026-11-13)
+  errorCode?: string // `failed` only: the error code the server gave
+  errorField?: string // `failed` only: the field that code is about, when the server named one
 }
 
 // A tank of the user's organization, cached from GET /tanks. `position` keeps the server's order.

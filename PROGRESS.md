@@ -1,59 +1,58 @@
 # Progress
 
-| Step   | Name                                                                                                                                          | Status      | Approved on |
-| ------ | --------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ----------- |
-| 0      | Orientation                                                                                                                                   | done        | 2026-10-03  |
-| 1      | Project setup                                                                                                                                 | done        | 2026-10-03  |
-| 2      | Tailwind and shadcn-vue init                                                                                                                  | done        | 2026-10-03  |
-| 3      | Design tokens (Layer 1)                                                                                                                       | done        | 2026-10-04  |
-| 4      | i18n                                                                                                                                          | done        | 2026-10-06  |
-| 5      | Folder structure and routing                                                                                                                  | done        | 2026-10-06  |
-| 6      | Button                                                                                                                                        | done        | 2026-10-06  |
-| 7      | Field and Input                                                                                                                               | done        | 2026-10-07  |
-| 8      | Sheet and Tabs                                                                                                                                | done        | 2026-10-09  |
-| 9      | Layout components                                                                                                                             | done        | 2026-10-09  |
-| 10a    | Styleguide: components                                                                                                                        | done        | 2026-10-09  |
-| 10b    | Styleguide: heavy screen                                                                                                                      | done        | 2026-10-10  |
-| 11a    | Mobile shell, app bar                                                                                                                         | done        | 2026-10-10  |
-| 11b    | Mobile shell, tab bar                                                                                                                         | done        | 2026-10-10  |
-| 11c    | Mobile shell, notifications                                                                                                                   | deferred    | -           |
-| 12     | Desktop shell                                                                                                                                 | deferred    | -           |
-| 13     | Swipe navigation                                                                                                                              | deferred    | -           |
-| 14-pre | Lazy route imports                                                                                                                            | done        | 2026-10-13  |
-| 14a    | PWA: plugin and manifest                                                                                                                      | done        | 2026-10-13  |
-| 14b    | PWA: install prompt and offline-ready state                                                                                                   | done        | 2026-10-13  |
-| 14c    | PWA: production test on Vercel (real mobile and desktop)                                                                                      | done        | 2026-10-13  |
-| 15     | Schema                                                                                                                                        | done        | 2026-10-10  |
-| 16     | Dexie storage layer                                                                                                                           | done        | 2026-10-11  |
-| 17a    | Entry screen, form and save                                                                                                                   | done        | 2026-10-11  |
-| 17b    | Entry screen, last value                                                                                                                      | done        | 2026-10-12  |
-| 18a    | History: sub-tabs and card list                                                                                                               | done        | 2026-10-12  |
-| 18b    | History: StatusBadge and pending count                                                                                                        | done        | 2026-10-12  |
-| 18c    | History: fix-and-resend (local only)                                                                                                          | done        | 2026-10-12  |
-| 19     | Error handling                                                                                                                                | done        | 2026-10-15  |
-| 20a    | Auth: env, types, Zod schemas, AuthAdapter                                                                                                    | done        | 2026-10-17  |
-| 20b-1  | Auth: request wrapper and httpAuthAdapter                                                                                                     | done        | 2026-10-17  |
-| 20b-2  | Auth: sessionManager (single-flight refresh, cross-tab lock)                                                                                  | done        | 2026-10-17  |
-| 20b-3  | Auth: authedRequest (one refresh and retry on 401)                                                                                            | done        | 2026-10-17  |
-| 20c    | Auth: store, route guard, login view                                                                                                          | done        | 2026-10-17  |
-| 20d    | Auth: offline local session                                                                                                                   | done        | 2026-10-17  |
-| 20.5   | Global Toast: component, useToast, ToastHost, styleguide, login errors                                                                        | done        | 2026-10-17  |
-| 20.6   | Rename AuthError to ApiError                                                                                                                  | done        | 2026-11-08  |
-| 21d    | Backend contract v2 switch: `/users` paths, username login, new `/users/me`, forced password screen, online-only logout, error codes          | done        | 2026-11-13  |
-| 20.7   | recordedAt guards (future 5 minutes, before 2020) and phone clock warning                                                                     | not started | -           |
-| 21-pre | Align WATER_RANGES with the backend limits                                                                                                    | done        | 2026-11-13  |
-| 21b    | Tanks from the backend (Dexie `tanks` table, UUID tank ids, empty state without an organization)                                              | not started | -           |
-| 21     | Sync engine (real backend): chunks of 20, per-item results by index, attempts count, failed cards with fix-and-resend and delete, retry rules | not started | -           |
-| 21c    | Absorbed into 21 and 21b (real endpoints from the start, no mock)                                                                             | dropped     | -           |
-| 21e    | Restore the last 30 days of own readings after login, and the clear cache and reload button (backend `GET /readings` delivered, B→F-34)       | not started | -           |
-| 22     | Notifications                                                                                                                                 | not started | -           |
-| 23     | Dashboard                                                                                                                                     | not started | -           |
-| 24     | Desktop views                                                                                                                                 | not started | -           |
-| 25     | Batch screen                                                                                                                                  | not started | -           |
-| 26     | Verification pass                                                                                                                             | not started | -           |
+| Step | Name | Status | Approved on |
+|---|---|---|---|
+| 0 | Orientation | done | 2026-10-03 |
+| 1 | Project setup | done | 2026-10-03 |
+| 2 | Tailwind and shadcn-vue init | done | 2026-10-03 |
+| 3 | Design tokens (Layer 1) | done | 2026-10-04 |
+| 4 | i18n | done | 2026-10-06 |
+| 5 | Folder structure and routing | done | 2026-10-06 |
+| 6 | Button | done | 2026-10-06 |
+| 7 | Field and Input | done | 2026-10-07 |
+| 8 | Sheet and Tabs | done | 2026-10-09 |
+| 9 | Layout components | done | 2026-10-09 |
+| 10a | Styleguide: components | done | 2026-10-09 |
+| 10b | Styleguide: heavy screen | done | 2026-10-10 |
+| 11a | Mobile shell, app bar | done | 2026-10-10 |
+| 11b | Mobile shell, tab bar | done | 2026-10-10 |
+| 11c | Mobile shell, notifications | deferred | - |
+| 12 | Desktop shell | deferred | - |
+| 13 | Swipe navigation | deferred | - |
+| 14-pre | Lazy route imports | done | 2026-10-13 |
+| 14a | PWA: plugin and manifest | done | 2026-10-13 |
+| 14b | PWA: install prompt and offline-ready state | done | 2026-10-13 |
+| 14c | PWA: production test on Vercel (real mobile and desktop) | done | 2026-10-13 |
+| 15 | Schema | done | 2026-10-10 |
+| 16 | Dexie storage layer | done | 2026-10-11 |
+| 17a | Entry screen, form and save | done | 2026-10-11 |
+| 17b | Entry screen, last value | done | 2026-10-12 |
+| 18a | History: sub-tabs and card list | done | 2026-10-12 |
+| 18b | History: StatusBadge and pending count | done | 2026-10-12 |
+| 18c | History: fix-and-resend (local only) | done | 2026-10-12 |
+| 19 | Error handling | done | 2026-10-15 |
+| 20a | Auth: env, types, Zod schemas, AuthAdapter | done | 2026-10-17 |
+| 20b-1 | Auth: request wrapper and httpAuthAdapter | done | 2026-10-17 |
+| 20b-2 | Auth: sessionManager (single-flight refresh, cross-tab lock) | done | 2026-10-17 |
+| 20b-3 | Auth: authedRequest (one refresh and retry on 401) | done | 2026-10-17 |
+| 20c | Auth: store, route guard, login view | done | 2026-10-17 |
+| 20d | Auth: offline local session | done | 2026-10-17 |
+| 20.5 | Global Toast: component, useToast, ToastHost, styleguide, login errors | done | 2026-10-17 |
+| 20.6 | Rename AuthError to ApiError | done | 2026-11-08 |
+| 21d | Backend contract v2 switch: `/users` paths, username login, new `/users/me`, forced password screen, online-only logout, error codes | done | 2026-11-13 |
+| 20.7 | recordedAt guards (future 5 minutes, before 2020) and phone clock warning | not started | - |
+| 21-pre | Align WATER_RANGES with the backend limits | done | 2026-11-13 |
+| 21b | Tanks from the backend (Dexie `tanks` table, UUID tank ids, empty state without an organization) | done | 2026-11-14 |
+| 21 | Sync engine (real backend): chunks of 20, per-item results by index, attempts count, failed cards with fix-and-resend and delete, retry rules | not started | - |
+| 21c | Absorbed into 21 and 21b (real endpoints from the start, no mock) | dropped | - |
+| 21e | Restore the last 30 days of own readings after login, and the clear cache and reload button (backend `GET /readings` delivered, B→F-34) | not started | - |
+| 22 | Notifications | not started | - |
+| 23 | Dashboard | not started | - |
+| 24 | Desktop views | not started | - |
+| 25 | Batch screen | not started | - |
+| 26 | Verification pass | not started | - |
 
 ## Decisions log
-
 - 2026-10-03: Zod version must be compatible with @vee-validate/zod (peer zod ^3.24.0); latest Zod is 4.x. Resolve at Step 1.
 - 2026-10-06: Shared form primitives are built as reusable UI pieces in `src/shared/components/ui/` with generic label/hint/error slots and no screen-level hardcoded content.
 - 2026-10-03: Zod pinned to 3.25.76 for @vee-validate/zod compatibility (resolved in Step 1).
@@ -113,12 +112,9 @@
 - 2026-11-10: A "Clear cache and reload" button (Step 21e) clears local readings and tanks, keeps the login session, and fetches again from the server; online only, with the same unsent-readings warning. It waits for backend `GET /readings` (F→B-28). Until then, history and the last value are empty after any logout. A per-reading `userId` is not needed because logout clears everything.
 - 2026-11-12: Forced password change (Step 21d-4) decisions: (1) no local session is saved while `mustChangePassword` is true; it is saved only after the password is changed, so an offline start shows the login screen; (2) the form has three fields (current, new, new again); the frontend only checks that the two new passwords match, it does not copy the length or character rules and maps `weak_password`, `too_short` and `too_long` from the response; (3) a wrong current password (403 `permission_denied`) gets its own message on this screen only; (4) after success the new access token is kept, `/users/me`is fetched again, then the app opens.
 - 2026-11-13: Step 20.7 decisions: (1) at save, a `recordedAt` more than 5 minutes in the future or before 2020-01-01 UTC is refused (the backend limits are 10 minutes and 2020-01-01, B→F-28); (2) when online, the `timestamp` of server responses is compared with the phone clock, and the reading form warns only when they differ by more than 5 minutes (the backend's 10 minutes minus the frontend's 5); it never blocks and is shown on the reading form only; (3) offline, only the save-time refusal applies.
-- 2026-11-13: Step 21 decisions: (1) no mock adapter, real backend from the start; the engine is written against a small adapter interface; (2) order: 21-pre (limits), 21b (tanks, UUID ids, the old local test readings are deleted), 21 (sync); 21c is absorbed; (3) chunks of 20 (the server maximum is 100); (4) sync runs at start and login, on `online`, after each save, when the app returns to the foreground and before logout, never on a timer, one run at a time (Web Lock); (5) readings get an `attempts` count, editable only while it is 0, and `syncing` records go back to `pending` at start; (6) a `failed` reading shows its reason and offers fix-and-resend (the entry form opens with the stored values, same id) and delete with a confirmation; (7) a 401 during sync first tries a refresh; if the session ended, the forced logout clears all local data including unsent readings (this replaces the 2026-10-15 rule "pending readings stay untouched"; (the risk is only more than 14 days offline with unsent readings).
-- 2026-11-13: Step 21b decisions: (1) tanks are fetched after login, at app start when online, on `online` and when the reading form opens (at most once every 10 minutes); the whole list replaces the cache each time and offline uses the cache; (2) empty states on the water screens: no organization, no active tank, and a failed first load with an empty cache (with a retry button); (3) inactive tanks are hidden from new readings but their names stay in the history, the order is the server's, and the backend accepts a reading for an inactive tank of the user's own organization (F→B-30); (4) the old local test readings are deleted by the Dexie version 3 upgrade.
-- 2026-11-13: Step 21e decisions (backend `GET /readings` delivered, B→F-34): after login the last 30 days of the user's own readings are restored (pages of 100, newest first) and the last value of a tank is taken from them, with no extra request; the clear cache button uses the same call. F→B-31 (change markers) is open; the 10-minute tank refresh is replaced by it if the backend delivers it.).
+- 2026-11-13: Step 21 decisions: (1) no mock adapter, real backend from the start; the engine is written against a small adapter interface; (2) order: 21-pre (limits), 21b (tanks, UUID ids, the old local test readings are deleted), 21 (sync); 21c is absorbed; (3) chunks of 20 (the server maximum is 100); (4) sync runs at start and login, on `online`, after each save, when the app returns to the foreground and before logout, never on a timer, one run at a time (Web Lock); (5) readings get an `attempts` count, editable only while it is 0, and `syncing` records go back to `pending` at start; (6) a `failed` reading shows its reason and offers fix-and-resend (the entry form opens with the stored values, same id) and delete with a confirmation; (7) a 401 during sync first tries a refresh; if the session ended, the forced logout clears all local data including unsent readings (this replaces the 2026-10-15 rule "pending readings stay untouched"; the risk is only more than 14 days offline with unsent readings).
 
 ## Parking lot
-
 - Switch to single "typescript-eslint" package
 - Clean up woff files in dist (keep only woff2)
 - Check vue-i18n CSP behavior in the browser console by serving dist with script-src 'self' and no unsafe-eval; now unblocked because the Step 5 placeholder calls t()
