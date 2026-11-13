@@ -1,11 +1,12 @@
 import { z } from 'zod'
 
-// Sample physical limits, NOT danger thresholds. Confirm real values with the owner.
+// The backend's impossible-value limits (openapi.json ReadingItemDto, COORDINATION B→F-28), NOT
+// danger thresholds. Industry review ranges come after release, from user feedback (2026-11-10).
 export const WATER_RANGES = {
   ph: { min: 0, max: 14 },
-  temperatureC: { min: 0, max: 50 },
-  salinityPpt: { min: 0, max: 60 },
-  oxygenMgL: { min: 0, max: 20 },
+  temperatureC: { min: 0, max: 60 },
+  salinityPpt: { min: 0, max: 100 },
+  oxygenMgL: { min: 0, max: 30 },
 } as const
 
 export const NOTE_MAX_LENGTH = 200
