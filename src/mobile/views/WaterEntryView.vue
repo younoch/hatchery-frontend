@@ -13,6 +13,7 @@ import FieldGrid from '@/shared/components/layout/FieldGrid.vue'
 import FormSection from '@/shared/components/layout/FormSection.vue'
 import NoticeBanner from '@/shared/components/layout/NoticeBanner.vue'
 import PageBody from '@/shared/components/layout/PageBody.vue'
+import StateMessage from '@/shared/components/layout/StateMessage.vue'
 import StickyActionBar from '@/shared/components/layout/StickyActionBar.vue'
 import { CLOCK_SKEW_WARN_MS, clockSkewMs } from '@/shared/lib/clockSkew'
 import { localInputToIso, toLocalInputValue } from '@/shared/lib/datetime'
@@ -44,6 +45,16 @@ const FIELDS = [
   { name: 'salinityPpt', labelKey: 'water.salinity', unit: 'ppt', step: 1, decimals: 0 },
   { name: 'oxygenMgL', labelKey: 'water.oxygen', unit: 'mg/L', step: 0.1, decimals: 1 },
 ] as const
+
+// Shown instead of the form when no tank can be offered.
+const EMPTY_KEYS = {
+  noOrganization: 'water.noOrganization',
+  noTank: 'water.noTank',
+  failed: 'water.tanksFailed',
+} as const
+const emptyKey = computed(() =>
+  tankStore.emptyReason ? EMPTY_KEYS[tankStore.emptyReason] : undefined,
+)
 
 // Inactive tanks are not offered for new readings; the history still shows their names.
 const tankOptions = computed(() =>
@@ -209,7 +220,16 @@ onBeforeUnmount(() => window.clearTimeout(statusTimer))
     <NoticeBanner v-if="clockOff">
       {{ t(clockAhead ? 'water.clockAhead' : 'water.clockBehind', { minutes: clockOffMinutes }) }}
     </NoticeBanner>
-    <PageBody>
+    <StateMessage v-if="emptyKey">
+      {{ t(emptyKey) }}
+      <template #action>
+        <Button v-if="tankStore.emptyReason === 'failed'" :disabled="tankStore.loading"
+          @click="tankStore.refresh(true)">
+          {{ t('water.retry') }}
+        </Button>
+      </template>
+    </StateMessage>
+    <PageBody v-else>
       <FieldGrid :cols="1">
         <Field :label="t('water.recordedAt')" :error-key="errors.recordedAt"
           :error-params="errorParams(errors.recordedAt)" required>
@@ -248,7 +268,7 @@ onBeforeUnmount(() => window.clearTimeout(statusTimer))
       </FieldGrid>
     </PageBody>
 
-    <StickyActionBar :status-key="statusKey">
+    <StickyActionBar v-if="!emptyKey" :status-key="statusKey">
       <Button variant="red-outline" :disabled="isSaving" @click="onCancel">
         {{ t('common.cancel') }}
       </Button>

@@ -33,6 +33,16 @@ export const useTankStore = defineStore('tanks', () => {
 
   const activeTanks = computed(() => tanks.value.filter(tank => tank.isActive))
 
+  // Why the reading form cannot offer a tank (null when it can). Nothing is reported until the
+  // cache has been read and no fetch is running, so the form never flashes a message.
+  const emptyReason = computed<'noOrganization' | 'noTank' | 'failed' | null>(() => {
+    const user = auth.user
+    if (auth.status !== 'authenticated' || user === null) return null
+    if (user.organizationId === null) return 'noOrganization'
+    if (!loaded.value || loading.value || activeTanks.value.length > 0) return null
+    return failed.value && tanks.value.length === 0 ? 'failed' : 'noTank'
+  })
+
   function nameOf(id: string): string | undefined {
     return tanks.value.find(tank => tank.id === id)?.name
   }
@@ -78,5 +88,17 @@ export const useTankStore = defineStore('tanks', () => {
     lastFetchedAt = 0
   }
 
-  return { tanks, activeTanks, loaded, loading, failed, eligible, nameOf, loadFromCache, refresh, reset }
+  return {
+    tanks,
+    activeTanks,
+    emptyReason,
+    loaded,
+    loading,
+    failed,
+    eligible,
+    nameOf,
+    loadFromCache,
+    refresh,
+    reset,
+  }
 })
