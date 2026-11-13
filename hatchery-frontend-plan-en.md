@@ -250,7 +250,7 @@ Current status of the UI (Step 18): the history card shows the badge for each st
 ### Single active session (decided)
 - One account = one active session (takeover policy). Logging in on a new device revokes the session on the old one; blocking was rejected because an offline device cannot log out and would lock the user out
 - The login screen warns when another device holds the session
-- A revoked offline device discovers it only when the network returns (refresh fails) → login screen; `pending`/`failed` readings stay in IndexedDB and sync after re-login (same `createdById`)
+- A revoked offline device discovers it only when the network returns (refresh fails) → the forced logout clears all local data, unsent readings included (2026-11-10 decision), and the login screen shows
 - Sync-time message must explain: "your session moved to another device, your data is safe"
 - **Backend status:** takeover and a `session_revoked` code are agreed (COORDINATION F→B-04, backend T16) but count as delivered only when the backend `progress.md` says so. Until then a revoked or expired refresh token is one generic "session ended, log in again" message. When delivered, `user_inactive` is handled apart from `session_revoked` (B→F-07)
 
@@ -258,7 +258,7 @@ Current status of the UI (Step 18): the history card shows the badge for each st
 - Field devices are personal phones, so logout only clears auth tokens — it never touches IndexedDB
 - `pending`/`failed` readings are kept so they can sync after the next login
 - `synced` readings stay in the offline cache under the retention rule below
-- Each reading carries a `createdById` field. The server takes the real creator from the auth token only. If pending readings belong to a different user than the one now logged in, sync pauses and the user is told. Step 20 is done: readings are written and read under the signed-in user's id
+- Each reading carries a `createdById` field. The server takes the real creator from the auth token only. Logout clears everything on the phone, so readings of two users never share it. Step 20 is done: readings are written and read under the signed-in user's id
 
 ### Offline cache retention (decided)
 - `pending`/`failed` readings are kept indefinitely, with no time limit
@@ -268,7 +268,7 @@ Current status of the UI (Step 18): the history card shows the badge for each st
 ### Offline session after token expiry (decided)
 - The access token lives only in memory, so a cold start offline has no token. The app opens on a non-secret **local session** (`userId`, email, permission snapshot, `isSuperAdmin` and `organizationId` stored in the Dexie `session` table)
 - Offline, it can only create readings and view cached data — no API calls
-- When the network returns: refresh via the httpOnly cookie, then sync pending readings. If refresh fails (expired or revoked), show login; pending data stays untouched in IndexedDB. A network error or a throttled refresh (429) keeps the local session instead of logging out
+- When the network returns: refresh via the httpOnly cookie, then sync pending readings. If refresh fails (expired or revoked), the session ends, all local data is cleared and the login screen shows. A network error or a throttled refresh (429) keeps the local session instead of logging out
 - Refresh token: 14 days sliding vs the 5-day max offline (section 8)
 
 ### First-time setup (decided)
@@ -362,7 +362,7 @@ Screen-reader usage is unlikely in this user base, but most of this is cheap whe
   - `created` and `duplicate` become `synced`. A `duplicate` with `identical: false` shows a warning.
   - `rejected` becomes `failed`, with the error code kept on the record for the i18n text; the user fixes and resends. A rejected item is not stored on the server, so the same `id` can be resent. `id_conflict` is practically impossible with UUID v4 and is shown as a normal `failed`.
 - **Whole-request outcomes:**
-  - 401: session ended; pending readings stay untouched.
+  - 401: refresh once; if the session has ended, all local data is cleared (unsent readings included) and the login screen shows.
   - 403 `no_organization`: show "contact your admin"; no retry. 403 `permission_denied`: readings stay `pending`, never deleted.
   - 429: transient. Readings stay `pending`; wait for `Retry-After` (fallback: backoff, capped at about 60 s). Never mark `failed` because of it.
   - 413 `payload_too_large`: halve the chunk and resend.
@@ -423,7 +423,6 @@ Set up `mobile/`, `desktop/`, `shared/` as per section 3
 ### Step 7: Sync Engine
 - online/offline events + app-open + Background Sync API (Android)
 - Idempotent POST (client UUID); chunks with per-item results
-- Pause sync and notify if pending records' `createdById` differs from the logged-in user
 - Status update logic (pending → syncing → synced/failed)
 - Retry policy per section 8b
 
@@ -524,7 +523,7 @@ export const db = new HatcheryDB()
 - Ownership-scoped edit permission: not needed while there is no edit after sync
 - Alerts/notifications for late-synced or dangerous readings — which events notify is still undecided
 - Optional PIN on the offline local session — post-MVP
-- Tank list: `src/shared/config/tanks.ts` until Step 21b; then `GET /tanks` from the backend, cached in Dexie `tanks`; inactive tanks are hidden from new entries and kept in history. Existing readings stay untouched
+- Tank list: `src/shared/config/tanks.ts` until Step 21b; then `GET /tanks` from the backend, cached in Dexie `tanks`; inactive tanks are hidden from new entries and kept in history. The old local test readings (tank ids `A1`…) are deleted in Step 21b
 - Notifications sheet, desktop shell, swipe navigation: deferred until client feedback
 - Batch screen: blocked until the owner gives the real field list
 - Real validation ranges and "danger" values for the four parameters: the owner must confirm by production practice

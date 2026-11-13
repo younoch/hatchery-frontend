@@ -41,9 +41,10 @@
 | 20.6 | Rename AuthError to ApiError | done | 2026-11-08 |
 | 21d | Backend contract v2 switch: `/users` paths, username login, new `/users/me`, forced password screen, online-only logout, error codes | done | 2026-11-13 |
 | 20.7 | recordedAt guards (future 5 minutes, before 2020) and phone clock warning | not started | - |
-| 21 | Sync engine against a mock adapter (chunks of 20, per-item results by index, 429 and 413 rules) | not started | - |
-| 21b | Tanks from the backend (Dexie `tanks` table) | not started | - |
-| 21c | Switch sync and tanks to the real endpoints | not started | - |
+| 21-pre | Align WATER_RANGES with the backend limits | not started | - |
+| 21b | Tanks from the backend (Dexie `tanks` table, UUID tank ids, empty state without an organization) | not started | - |
+| 21 | Sync engine (real backend): chunks of 20, per-item results by index, attempts count, failed cards with fix-and-resend and delete, retry rules | not started | - |
+| 21c | Absorbed into 21 and 21b (real endpoints from the start, no mock) | dropped | - |
 | 21e | Clear cache and reload button (needs backend `GET /readings`, F→B-28) | blocked by backend | - |
 | 22 | Notifications | not started | - |
 | 23 | Dashboard | not started | - |
@@ -111,6 +112,7 @@
 - 2026-11-10: A "Clear cache and reload" button (Step 21e) clears local readings and tanks, keeps the login session, and fetches again from the server; online only, with the same unsent-readings warning. It waits for backend `GET /readings` (F→B-28). Until then, history and the last value are empty after any logout. A per-reading `userId` is not needed because logout clears everything.
 - 2026-11-12: Forced password change (Step 21d-4) decisions: (1) no local session is saved while `mustChangePassword` is true; it is saved only after the password is changed, so an offline start shows the login screen; (2) the form has three fields (current, new, new again); the frontend only checks that the two new passwords match, it does not copy the length or character rules and maps `weak_password`, `too_short` and `too_long` from the response; (3) a wrong current password (403 `permission_denied`) gets its own message on this screen only; (4) after success the new access token is kept, `/users/me`is fetched again, then the app opens.
 - 2026-11-13: Step 20.7 decisions: (1) at save, a `recordedAt` more than 5 minutes in the future or before 2020-01-01 UTC is refused (the backend limits are 10 minutes and 2020-01-01, B→F-28); (2) when online, the `timestamp` of server responses is compared with the phone clock, and the reading form warns only when they differ by more than 5 minutes (the backend's 10 minutes minus the frontend's 5); it never blocks and is shown on the reading form only; (3) offline, only the save-time refusal applies.
+- 2026-11-13: Step 21 decisions: (1) no mock adapter, real backend from the start; the engine is written against a small adapter interface; (2) order: 21-pre (limits), 21b (tanks, UUID ids, the old local test readings are deleted), 21 (sync); 21c is absorbed; (3) chunks of 20 (the server maximum is 100); (4) sync runs at start and login, on `online`, after each save, when the app returns to the foreground and before logout, never on a timer, one run at a time (Web Lock); (5) readings get an `attempts` count, editable only while it is 0, and `syncing` records go back to `pending` at start; (6) a `failed` reading shows its reason and offers fix-and-resend (the entry form opens with the stored values, same id) and delete with a confirmation; (7) a 401 during sync first tries a refresh; if the session ended, the forced logout clears all local data including unsent readings (this replaces the 2026-10-15 rule "pending readings stay untouched"; the risk is only more than 14 days offline with unsent readings).
 
 ## Parking lot
 - Switch to single "typescript-eslint" package
