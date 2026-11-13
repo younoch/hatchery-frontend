@@ -10,15 +10,16 @@ import Button from '@/shared/components/ui/Button.vue'
 import CardList from '@/shared/components/layout/CardList.vue'
 import FieldGrid from '@/shared/components/layout/FieldGrid.vue'
 import PageBody from '@/shared/components/layout/PageBody.vue'
-import { TANKS } from '@/shared/config/tanks'
 import { formatReadingTime } from '@/shared/lib/datetime'
 import type { Reading } from '@/shared/storage/db'
 import { listReadings, retryFailedReading } from '@/shared/storage/readings'
 import { requireUserId } from '@/shared/composables/useCurrentUserId'
 import { useErrorStore } from '@/shared/stores/errorStore'
+import { useTankStore } from '@/shared/stores/tankStore'
 
 const { t, locale } = useI18n()
 const { report } = useErrorStore()
+const tankStore = useTankStore()
 
 const METRICS = [
   { name: 'ph', labelKey: 'water.ph', unit: undefined },
@@ -30,7 +31,7 @@ const METRICS = [
 const readings = ref<Reading[]>([])
 let unsubscribe: (() => void) | undefined
 
-const tankName = (id: string) => TANKS.find(tank => tank.id === id)?.name ?? id
+const tankName = (id: string) => tankStore.nameOf(id) ?? t('water.unknownTank')
 
 // liveQuery re-runs when the readings table changes, so a new save shows up here at once.
 onMounted(() => {

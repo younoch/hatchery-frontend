@@ -14,7 +14,6 @@ import FormSection from '@/shared/components/layout/FormSection.vue'
 import NoticeBanner from '@/shared/components/layout/NoticeBanner.vue'
 import PageBody from '@/shared/components/layout/PageBody.vue'
 import StickyActionBar from '@/shared/components/layout/StickyActionBar.vue'
-import { TANKS } from '@/shared/config/tanks'
 import { CLOCK_SKEW_WARN_MS, clockSkewMs } from '@/shared/lib/clockSkew'
 import { localInputToIso, toLocalInputValue } from '@/shared/lib/datetime'
 import {
@@ -25,9 +24,11 @@ import {
 import type { Reading } from '@/shared/storage/db'
 import { createReading, getLatestReading } from '@/shared/storage/readings'
 import { requireUserId } from '@/shared/composables/useCurrentUserId'
+import { useTankStore } from '@/shared/stores/tankStore'
 
 const { t } = useI18n()
 const userId = requireUserId()
+const tankStore = useTankStore()
 
 // Warns only (never blocks) when the phone clock is far from the server's.
 const clockOff = computed(
@@ -44,11 +45,14 @@ const FIELDS = [
   { name: 'oxygenMgL', labelKey: 'water.oxygen', unit: 'mg/L', step: 0.1, decimals: 1 },
 ] as const
 
-const tankOptions = TANKS.map(tank => ({ label: tank.name, value: tank.id }))
+// Inactive tanks are not offered for new readings; the history still shows their names.
+const tankOptions = computed(() =>
+  tankStore.activeTanks.map(tank => ({ label: tank.name, value: tank.id })),
+)
 
 function emptyValues() {
   return {
-    tankId: TANKS[0].id as string,
+    tankId: tankStore.activeTanks[0]?.id ?? '',
     recordedAt: toLocalInputValue(),
     ph: '',
     temperatureC: '',
@@ -146,7 +150,21 @@ function onFormSubmit() {
 }
 
 watch(tankId, () => void applyLast())
+
+// The tank list can arrive after the form opens (cache read, then fetch): pick the first tank when
+// none is chosen, or when the chosen one is no longer offered.
+watch(
+  () => tankStore.activeTanks,
+  tanks => {
+    if (tanks.some(tank => tank.id === tankId.value)) return
+    setFieldValue('tankId', tanks[0]?.id ?? '', false)
+  },
+  { immediate: true },
+)
+
 onMounted(() => void applyLast())
+// Opening the form asks for a fresh list, at most once every 10 minutes (the store enforces it).
+onMounted(() => void tankStore.refresh())
 
 const isSaving = ref(false)
 const statusKey = ref<string>()
