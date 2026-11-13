@@ -17,6 +17,16 @@ export interface RequestOptions<T extends z.ZodTypeAny> {
   statusMap?: Partial<Record<number, ApiErrorKind>>
 }
 
+// `Retry-After` is seconds (or an HTTP date). Across origins the browser only lets us read it if
+// the backend exposes it; undefined when absent or unreadable.
+function parseRetryAfter(value: string | null): number | undefined {
+  if (!value) return undefined
+  const seconds = Number(value)
+  if (Number.isFinite(seconds)) return Math.max(0, seconds) * 1000
+  const date = Date.parse(value)
+  return Number.isNaN(date) ? undefined : Math.max(0, date - Date.now())
+}
+
 function kindFor(status: number, statusMap?: Partial<Record<number, ApiErrorKind>>): ApiErrorKind {
   const mapped = statusMap?.[status]
   if (mapped) return mapped
@@ -28,7 +38,7 @@ function kindFor(status: number, statusMap?: Partial<Record<number, ApiErrorKind
 }
 
 export async function request<T extends z.ZodTypeAny>(
-  options: RequestOptions<T>,
+  options: RequestOptions<T>
 ): Promise<z.infer<T>> {
   const headers: Record<string, string> = {}
   if (options.body !== undefined) headers['Content-Type'] = 'application/json'
@@ -52,7 +62,11 @@ export async function request<T extends z.ZodTypeAny>(
   const receivedAt = Date.now()
   if (!response.ok) {
     const details = await response.json().then(parseErrorBody, () => ({}))
-    throw new ApiError(kindFor(response.status, options.statusMap), response.status, details)
+    const retryAfterMs = parseRetryAfter(response.headers.get('Retry-After'))
+    throw new ApiError(kindFor(response.status, options.statusMap), response.status, {
+      ...details,
+      retryAfterMs,
+    })
   }
 
   if (!options.schema) return undefined as z.infer<T>

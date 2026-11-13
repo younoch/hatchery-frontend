@@ -12,24 +12,23 @@ export type ApiErrorKind =
 
 // The error body the backend sends: `code` always, `errors[]` for validation_failed.
 // Parsed leniently: a body that does not match (HTML from a proxy, an empty body) is ignored.
-const errorBodySchema = z.object({
-  code: z.string().optional(),
-  errors: z
-    .array(
-      z.object({
-        field: z.string(),
-        code: z.string(),
-        params: z.record(z.string(), z.unknown()).optional(),
-      })
-    )
-    .optional(),
+export const fieldErrorSchema = z.object({
+  field: z.string(),
+  code: z.string(),
+  params: z.record(z.string(), z.unknown()).optional(),
 })
 
-export type ApiFieldError = NonNullable<z.infer<typeof errorBodySchema>['errors']>[number]
+const errorBodySchema = z.object({
+  code: z.string().optional(),
+  errors: z.array(fieldErrorSchema).optional(),
+})
+
+export type ApiFieldError = z.infer<typeof fieldErrorSchema>
 
 export interface ApiErrorDetails {
   code?: string
   errors?: ApiFieldError[]
+  retryAfterMs?: number // from the `Retry-After` header of a 429, when readable
 }
 
 export function parseErrorBody(json: unknown): ApiErrorDetails {
@@ -41,6 +40,7 @@ export class ApiError extends Error {
   readonly status?: number
   readonly code?: string
   readonly errors: ApiFieldError[]
+  readonly retryAfterMs?: number
 
   constructor(kind: ApiErrorKind, status?: number, details: ApiErrorDetails = {}) {
     super(kind)
@@ -49,5 +49,6 @@ export class ApiError extends Error {
     this.status = status
     this.code = details.code
     this.errors = details.errors ?? []
+    this.retryAfterMs = details.retryAfterMs
   }
 }
