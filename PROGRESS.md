@@ -41,7 +41,7 @@
 | 20.6 | Rename AuthError to ApiError | done | 2026-11-08 |
 | 21d | Backend contract v2 switch: `/users` paths, username login, new `/users/me`, forced password screen, online-only logout, error codes | done | 2026-11-13 |
 | 20.7 | recordedAt guards (future 5 minutes, before 2020) and phone clock warning | not started | - |
-| 21-pre | Align WATER_RANGES with the backend limits | not started | - |
+| 21-pre | Align WATER_RANGES with the backend limits | done | 2026-11-13 |
 | 21b | Tanks from the backend (Dexie `tanks` table, UUID tank ids, empty state without an organization) | not started | - |
 | 21 | Sync engine (real backend): chunks of 20, per-item results by index, attempts count, failed cards with fix-and-resend and delete, retry rules | not started | - |
 | 21c | Absorbed into 21 and 21b (real endpoints from the start, no mock) | dropped | - |
