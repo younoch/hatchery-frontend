@@ -17,6 +17,7 @@ import StateMessage from '@/shared/components/layout/StateMessage.vue'
 import StickyActionBar from '@/shared/components/layout/StickyActionBar.vue'
 import { CLOCK_SKEW_WARN_MS, clockSkewMs } from '@/shared/lib/clockSkew'
 import { localInputToIso, toLocalInputValue } from '@/shared/lib/datetime'
+import { requestSync } from '@/shared/lib/syncRunner'
 import {
   WATER_RANGES,
   waterErrorParams,
@@ -202,6 +203,7 @@ const onSubmit = handleSubmit(async values => {
     resetForm({ values: emptyValues() })
     void applyLast()
     say('water.saved')
+    void requestSync()
   } finally {
     isSaving.value = false
   }

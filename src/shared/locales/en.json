@@ -136,6 +136,9 @@
       "unknown": "Something went wrong. Try again."
     }
   },
+  "sync": {
+    "differentDuplicate": "Some readings were already on the server with different values."
+  },
   "api": {
     "errors": {
       "invalid_credentials": "Wrong username or password.",

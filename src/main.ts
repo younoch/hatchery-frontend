@@ -8,6 +8,7 @@ import { getInitialLanguage } from '@/shared/composables/useLanguage'
 import { cleanupSyncedReadings, requestPersistentStorage } from '@/shared/storage/readings'
 import { router } from './router'
 import { initPwa } from '@/shared/composables/usePwa'
+import { startSync } from '@/shared/lib/syncRunner'
 import { startTankSync } from '@/shared/lib/tankSync'
 import { useErrorStore } from '@/shared/stores/errorStore'
 
@@ -32,4 +33,5 @@ app.mount('#app')
 void requestPersistentStorage()
 void cleanupSyncedReadings()
 startTankSync(router)
+startSync()
 initPwa()

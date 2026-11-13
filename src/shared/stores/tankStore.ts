@@ -21,15 +21,7 @@ export const useTankStore = defineStore('tanks', () => {
   let inFlight: Promise<void> | null = null
 
   // Only a signed-in user with an organization and no password change due can call /tanks.
-  const eligible = computed(() => {
-    const user = auth.user
-    return (
-      auth.status === 'authenticated' &&
-      user !== null &&
-      user.organizationId !== null &&
-      !user.mustChangePassword
-    )
-  })
+  const eligible = computed(() => auth.canUseOrganization)
 
   const activeTanks = computed(() => tanks.value.filter(tank => tank.isActive))
 

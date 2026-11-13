@@ -14,6 +14,18 @@ export const useAuthStore = defineStore('auth', () => {
   const status = ref<AuthStatus>('unknown')
 
   const isAuthenticated = computed(() => status.value === 'authenticated')
+
+  // A signed-in user with an organization and no password change due: the only kind that may
+  // use organization data (tanks, reading sync).
+  const canUseOrganization = computed(() => {
+    const current = user.value
+    return (
+      status.value === 'authenticated' &&
+      current !== null &&
+      current.organizationId !== null &&
+      !current.mustChangePassword
+    )
+  })
   const permissions = computed(() => new Set(user.value?.permissions ?? []))
 
   // Permission keys only, never role names. Hiding a button is UX; the backend enforces.
@@ -123,6 +135,7 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     status,
     isAuthenticated,
+    canUseOrganization,
     hasPermission,
     login,
     changePassword,
