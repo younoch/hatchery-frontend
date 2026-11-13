@@ -4,7 +4,7 @@ export type SyncStatus = 'pending' | 'syncing' | 'failed' | 'synced'
 
 export interface Reading {
   id: string // client UUID, also the idempotency key
-  tankId: string // fixed tank key for now
+  tankId: string // tank UUID from the backend
   ph: number
   temperatureC: number
   salinityPpt: number
@@ -16,6 +16,14 @@ export interface Reading {
   createdById: string
   isLate: boolean // server-derived
   needsReview: boolean // server-derived
+}
+
+// A tank of the user's organization, cached from GET /tanks. `position` keeps the server's order.
+export interface Tank {
+  id: string // UUID
+  name: string
+  isActive: boolean
+  position: number
 }
 
 // Local session: no secrets (no tokens). It lets the app open offline after a cold start.
@@ -32,6 +40,7 @@ export interface LocalSession {
 class HatcheryDB extends Dexie {
   readings!: Table<Reading, string>
   session!: Table<LocalSession, string>
+  tanks!: Table<Tank, string>
 
   constructor() {
     super('hatchery-db')
@@ -45,6 +54,15 @@ class HatcheryDB extends Dexie {
       readings: 'id, status, recordedAt, createdById, [createdById+tankId+recordedAt]',
       session: 'key',
     })
+    // version 3: adds the tanks cache. The old test readings used fixed tank ids (`A1`…) that the
+    // server would never accept, so the upgrade deletes them (owner decision 2026-11-13).
+    this.version(3)
+      .stores({
+        readings: 'id, status, recordedAt, createdById, [createdById+tankId+recordedAt]',
+        session: 'key',
+        tanks: 'id, position',
+      })
+      .upgrade(tx => tx.table('readings').clear())
   }
 }
 
