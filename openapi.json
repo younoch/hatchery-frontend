@@ -5593,6 +5593,158 @@
           "Readings"
         ]
       }
+    },
+    "/sync/state": {
+      "get": {
+        "operationId": "SyncController_state",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "statusCode",
+                    "data",
+                    "timestamp"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SyncStateResponseDto"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in: unauthorized, user_inactive",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponseDto"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "statusCode": {
+                          "type": "integer",
+                          "enum": [
+                            401
+                          ]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "unauthorized",
+                            "user_inactive"
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed: must_change_password, no_organization",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponseDto"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "statusCode": {
+                          "type": "integer",
+                          "enum": [
+                            403
+                          ]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "must_change_password",
+                            "no_organization"
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited: rate_limited",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds to wait before the next request",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponseDto"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "statusCode": {
+                          "type": "integer",
+                          "enum": [
+                            429
+                          ]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "rate_limited"
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "tags": [
+          "Sync"
+        ]
+      }
     }
   },
   "info": {
@@ -6108,6 +6260,32 @@
           "temporaryPassword"
         ]
       },
+      "OrgPermissionKey": {
+        "type": "string",
+        "enum": [
+          "user:create",
+          "user:read",
+          "user:write",
+          "user:reset-password",
+          "organization-role:write",
+          "tank:create",
+          "tank:write",
+          "reading:create",
+          "reading:read-all"
+        ],
+        "description": "- `user:read`: List the users of the organization (GET /users)\n- `user:create`: Create a user with a temporary password (POST /users)\n- `user:write`: Change another user's role, name or active flag (PATCH /users/{id})\n- `user:reset-password`: Set a temporary password for a user and end the user's sessions (POST /users/{id}/reset-password)\n- `organization-role:write`: Change what a role may do in the organization (PATCH /organization-roles/{id})\n- `tank:create`: Create a tank (POST /tanks)\n- `tank:write`: Rename, activate or deactivate a tank (PATCH /tanks/{id})\n- `reading:create`: Record and sync water readings (POST /readings/sync)\n- `reading:read-all`: Reserved: see every reading of the organization (no endpoint uses it yet)",
+        "x-enumDescriptions": {
+          "user:read": "List the users of the organization (GET /users)",
+          "user:create": "Create a user with a temporary password (POST /users)",
+          "user:write": "Change another user's role, name or active flag (PATCH /users/{id})",
+          "user:reset-password": "Set a temporary password for a user and end the user's sessions (POST /users/{id}/reset-password)",
+          "organization-role:write": "Change what a role may do in the organization (PATCH /organization-roles/{id})",
+          "tank:create": "Create a tank (POST /tanks)",
+          "tank:write": "Rename, activate or deactivate a tank (PATCH /tanks/{id})",
+          "reading:create": "Record and sync water readings (POST /readings/sync)",
+          "reading:read-all": "Reserved: see every reading of the organization (no endpoint uses it yet)"
+        }
+      },
       "RoleResponseDto": {
         "type": "object",
         "properties": {
@@ -6119,10 +6297,10 @@
             "example": "manager"
           },
           "permissions": {
-            "description": "Template; the real permissions are per organization",
             "type": "array",
+            "description": "Template; the real permissions are per organization",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/OrgPermissionKey"
             }
           }
         },
@@ -6147,18 +6325,7 @@
               "user:read"
             ],
             "items": {
-              "type": "string",
-              "enum": [
-                "user:create",
-                "user:read",
-                "user:write",
-                "user:reset-password",
-                "organization-role:write",
-                "tank:create",
-                "tank:write",
-                "reading:create",
-                "reading:read-all"
-              ]
+              "$ref": "#/components/schemas/OrgPermissionKey"
             }
           }
         },
@@ -6182,18 +6349,7 @@
               "user:read"
             ],
             "items": {
-              "type": "string",
-              "enum": [
-                "user:create",
-                "user:read",
-                "user:write",
-                "user:reset-password",
-                "organization-role:write",
-                "tank:create",
-                "tank:write",
-                "reading:create",
-                "reading:read-all"
-              ]
+              "$ref": "#/components/schemas/OrgPermissionKey"
             }
           }
         }
@@ -6344,7 +6500,7 @@
           "permissions": {
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/OrgPermissionKey"
             }
           },
           "editable": {
@@ -6367,18 +6523,7 @@
             "type": "array",
             "description": "The full new permission list (org-level keys only)",
             "items": {
-              "type": "string",
-              "enum": [
-                "user:create",
-                "user:read",
-                "user:write",
-                "user:reset-password",
-                "organization-role:write",
-                "tank:create",
-                "tank:write",
-                "reading:create",
-                "reading:read-all"
-              ]
+              "$ref": "#/components/schemas/OrgPermissionKey"
             }
           }
         },
@@ -6650,6 +6795,37 @@
         "required": [
           "items",
           "nextCursor"
+        ]
+      },
+      "SyncStateResponseDto": {
+        "type": "object",
+        "properties": {
+          "organization": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2026-11-13T10:00:00.000Z",
+            "description": "Change marker of the organization itself; null when never written. Opaque: refetch when it differs from the stored one"
+          },
+          "tanks": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2026-11-13T10:00:00.000Z",
+            "description": "Change marker of the tank list (create, rename, activate, deactivate); null when never written"
+          },
+          "organizationRoles": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2026-11-13T10:00:00.000Z",
+            "description": "Change marker of the organization role list (permissions); null when never written"
+          }
+        },
+        "required": [
+          "organization",
+          "tanks",
+          "organizationRoles"
         ]
       }
     }
