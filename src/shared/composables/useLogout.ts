@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { ApiError } from '@/shared/api/apiError'
 import { errorMessageKey } from '@/shared/api/errorKey'
 import { useToast } from '@/shared/composables/useToast'
+import { requestSync } from '@/shared/lib/syncRunner'
 import { countUnsentReadings } from '@/shared/storage/readings'
 import { useAuthStore } from '@/shared/stores/authStore'
 
@@ -32,12 +33,22 @@ export function useLogout() {
     }
   }
 
-  // Logout needs the internet. If readings exist only on this phone it asks first, because
-  // logging out deletes them.
+  // Logout needs the internet. It first tries to send what is waiting, so only readings the server
+  // did not take are lost; if any are left (pending or failed) it asks first, because logging out
+  // deletes them.
   async function requestLogout(): Promise<void> {
+    if (loggingOut.value) return
     if (!navigator.onLine) {
       toast.error('auth.logoutNeedsInternet')
       return
+    }
+    loggingOut.value = true
+    try {
+      toast.info('auth.logoutSyncing')
+      await requestSync()
+      toast.dismiss()
+    } finally {
+      loggingOut.value = false
     }
     const count = await countUnsentReadings()
     if (count === 0) {

@@ -5,7 +5,7 @@ import { runSync, type SyncOutcome } from '@/shared/lib/syncEngine'
 import { useAuthStore } from '@/shared/stores/authStore'
 import { useErrorStore } from '@/shared/stores/errorStore'
 
-let running = false
+let current: Promise<void> | null = null
 let rerun = false
 
 // What to do when a run stopped early. Offline, a failing server and permission_denied stay
@@ -36,22 +36,25 @@ async function runOnce(): Promise<void> {
   if (outcome) await handle(outcome)
 }
 
-// Asks for a sync. A request that arrives while a run is going makes it run once more at the end,
-// so a reading saved meanwhile does not wait for the next trigger.
-export async function requestSync(): Promise<void> {
-  if (running) {
+// Asks for a sync and returns a promise that resolves when it is done. A request that arrives
+// while a run is going makes it run once more at the end, so a reading saved meanwhile does not
+// wait for the next trigger; the caller gets the same promise, so logout can wait for the run.
+export function requestSync(): Promise<void> {
+  if (current) {
     rerun = true
-    return
+    return current
   }
-  running = true
-  try {
-    do {
-      rerun = false
-      await runOnce()
-    } while (rerun)
-  } finally {
-    running = false
-  }
+  current = (async () => {
+    try {
+      do {
+        rerun = false
+        await runOnce()
+      } while (rerun)
+    } finally {
+      current = null
+    }
+  })()
+  return current
 }
 
 // Wires the triggers: login or app start, `online`, coming back to the app. A save calls
@@ -64,7 +67,7 @@ export function startSync(): void {
     can => {
       if (can) void requestSync()
     },
-    { immediate: true },
+    { immediate: true }
   )
 
   window.addEventListener('online', () => void requestSync())
