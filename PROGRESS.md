@@ -40,17 +40,17 @@
 | 20.5 | Global Toast: component, useToast, ToastHost, styleguide, login errors | done | 2026-10-17 |
 | 20.6 | Rename AuthError to ApiError | done | 2026-11-08 |
 | 21d | Backend contract v2 switch: `/users` paths, username login, new `/users/me`, forced password screen, online-only logout, error codes | done | 2026-11-13 |
-| 20.7 | recordedAt guards (future 5 minutes, before 2020) and phone clock warning | not started | - |
+| 20.7 | recordedAt guards (future 5 minutes, before 2020) and phone clock warning | done | 2026-11-13 |
 | 21-pre | Align WATER_RANGES with the backend limits | done | 2026-11-13 |
 | 21b | Tanks from the backend (Dexie `tanks` table, UUID tank ids, empty state without an organization) | done | 2026-11-14 |
 | 21-1 | Sync: attempts count, error code and the status helpers on readings | done | 2026-11-14 |
 | 21-2 | Sync: adapter, response schema and Retry-After on ApiError | done | 2026-11-14 |
 | 21-3 | Sync: the engine (chunks, per-item results, retry and stop rules) | done | 2026-11-14 |
 | 21-4 | Sync: triggers (login, app start, online, foreground, after a save) | done | 2026-11-14 |
-| 21-5a | Failed card: reason message from the error code | not started | - |
-| 21-5b | ConfirmSheet and delete of a failed reading | not started | - |
-| 21-5c | Edit mode of the reading form: fix and resend a failed reading | not started | - |
-| 21-5d | Sync before logout | not started | - |
+| 21-5a | Failed card: reason message from the error code | done | 2026-11-14 |
+| 21-5b | ConfirmSheet and delete of a failed reading | done | 2026-11-14 |
+| 21-5c | Edit mode of the reading form: fix and resend a failed reading | done | 2026-11-14 |
+| 21-5d | Sync before logout | done | 2026-11-14 |
 | 21c | Absorbed into 21 and 21b (real endpoints from the start, no mock) | dropped | - |
 | 21e | Restore the last 30 days of own readings after login, and the clear cache and reload button (backend `GET /readings` delivered, B→F-34) | not started | - |
 | 22 | Notifications | not started | - |
@@ -123,6 +123,7 @@
 the 10-minute tank refresh is replaced by it if the backend delivers it.
 - 2026-11-14: Step 21 implementation details (21-1 to 21-4): (1) a reading carries `attempts`, `errorCode` and `errorField` (no new Dexie version) and is editable and deletable only while pending with `attempts` 0; (2) the adapter sends only the fields the server accepts, with a 20 s timeout; `ApiError` carries `retryAfterMs` from `Retry-After`, which a browser reads across origins only if the backend exposes it in CORS, so in local development the fallback backoff (2 s, 4 s, at most 3 attempts, capped at 60 s) usually applies; (3) a single reading that still gets 413 becomes `failed` (`payload_too_large`); a reading with no result in the response stays `pending` and is reported as a bug; (4) sync runs at login and app start, on `online`, when the app becomes visible again and after each save, one run at a time (Web Lock), and a request that arrives during a run makes it run once more; (5) a stopped run: 401 with a failed refresh clears the session and all local data, `no_organization` shows a message, 400 or an unexplained response is reported to `errorStore`, and offline, server trouble and `permission_denied` stay silent with the readings `pending`; (6) `authStore.canUseOrganization` is the single check for tanks and sync.
 - 2026-11-14: Step 21-5 decisions: (1) rejections that can be fixed and resent: `out_of_range`, `recorded_at_in_future`, `tank_not_found`, `invalid_datetime`, `invalid_format`, `invalid_type`, `required`, `too_long`, `not_allowed`; delete only: `id_conflict`, `payload_too_large`, `invalid_uuid` and any unknown code; (2) a failed card shows a message by code (one message each for `out_of_range`, `recorded_at_in_future`, `tank_not_found`, `id_conflict` and `payload_too_large`, a general one for the other field codes and one for an unknown code); (3) fix and resend opens the reading form in edit mode (`/m/water/edit/:id`) with the stored values and the same id, and saving makes the reading `pending` again and starts a sync; (4) deleting a failed reading asks first, through a general `ConfirmSheet`; (5) logout first tries to send the pending readings, then counts what is left (pending and failed) for the warning.
+- 2026-11-14: Step 21-5 implementation details: (1) fix and resend opens the reading form in edit mode (`/m/water/edit/:id`; `WaterEditView` wraps `WaterEntryView` with `editId`); for `tank_not_found` the tank is left empty so the user chooses one, and an inactive tank the reading already uses stays in the list; saving calls `fixFailedReading` (same id, `attempts` kept so the reading is locked again, error fields cleared) and returns to the history tab; (2) the old `retryFailedReading` is removed and the fix button shows only for fixable codes; (3) `requestSync()` returns a promise that resolves when the run, extra run included, is done; logout awaits it, shows a message while waiting, then counts what is left (pending and failed) for the warning; (4) a duplicate top-level `sync` key in the locale files had hidden the status badge labels; `check-i18n-keys.ts` does not look for duplicate keys (parking lot).
 
 ## Parking lot
 - Switch to single "typescript-eslint" package
@@ -140,7 +141,6 @@ the 10-minute tank refresh is replaced by it if the backend delivers it.
 - The refresh race is only reduced, not removed: `navigator.locks` serializes tabs, but a lost refresh response still ends the session (backend task 8: grace window).
 - `env.ts` lives in `src/shared/utils`, not `src/shared/config`; keep the plan's folder list in sync.
 - Forgot-password flow: the backend has the endpoints, the frontend has no screen; decide where the email link lands (`FRONTEND_URL`).
-- Warn on logout when pending readings exist.
 - Production login needs a hosted backend with `COOKIE_SAME_SITE=none`, `COOKIE_SECURE=true` and the Vercel origin in `CORS_ORIGINS`; do not push the route guard to Vercel until then.
 - Organization-wide viewing of readings (`reading:read-all`, online only) comes later. The last value stays per user and local. Tanks come from the backend in Step 21b.
 - Login view layout: the form sits at the top with empty space below; give it a full-height column (like WaterEntryView's `flex flex-1 flex-col justify-between` inside a `h-dvh` container) so the button sits at the bottom.
@@ -152,3 +152,7 @@ the 10-minute tank refresh is replaced by it if the backend delivers it.
 - Owner decision pending in COORDINATION: B→F-11 (a domain for `app.` and `api.`).
 - COORDINATION.md rule 1 `diff` path (`../hatchery-backend`) is wrong on this machine; put in the real backend repo path.
 - `SummaryCard`: AGENTS.md lists it as shared from the start, but COMPONENTS.md has no entry. Check whether it exists.,
+- `scripts/check-i18n-keys.ts` should also fail on a duplicate key inside one JSON object (a duplicate `sync` key hid labels on 2026-11-14).
+- Move the offline banner in MobileShell to `NoticeBanner` (same look, it can reuse it).
+- Local `synced` readings keep `syncedAt: null` until Step 21e restores them from `GET /readings`; check that nothing depends on it.
+- In local development the browser cannot read `Retry-After` unless the backend exposes it in CORS; low priority request for the backend, production is same-origin through the Vercel rewrite.
