@@ -178,7 +178,8 @@ Each step ends at a checkpoint (section 3). Steps are deliberately small. If one
 - **Step 23: Dashboard.** D3 line chart grouped by `recordedAt`. Decide first whether corrections after sync are allowed (pilot: no edit after sync).
 - **Step 24: Desktop views.** Water quality entry and list (table) in the desktop shell.
 - **Step 25: Batch screen.** Only after the owner gives the real field list. The prototype's batch screen uses invented fields.
-- **Step 26: Verification pass.** The checklist in section 9, Step 10 of the plan, plus the single-session takeover scenario.
+- **Step 26: Organization and organization-role management screens.** Needed (owner decision 2026-11-14): create and edit organizations and their roles from the app (`GET/PATCH /organization-roles`, B→F-26). The `organization-role:read` key is not shown. Plan the screens with the owner first (who sees them, and which permissions).
+- **Step 27: Verification pass.** The checklist in section 9, Step 10 of the plan on a real Android phone (flight mode included), updated for what is built: without the swipe check (Step 13 is deferred) and the late-sync thresholds (`isLate` is not in the pilot), and with logout and sync before logout, the restore after login, fixing a failed reading, the clock warning and the single-session takeover with unsent readings (the forced logout clears them).
 
 ## 8. PROGRESS.md format
 

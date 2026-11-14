@@ -447,7 +447,7 @@ Set up `mobile/`, `desktop/`, `shared/` as per section 3
 - `useAuth` composable, router guard, `hasPermission()` helper (permission keys held in Pinia; never role-name checks)
 - Local offline session (`userId` + permission snapshot, no secrets) per section 6
 - Logout clears tokens only
-- Handle session-revoked (takeover) on refresh failure; never touch IndexedDB
+- Handle session-revoked (takeover) on refresh failure: the forced logout clears all local data (2026-11-10 decision)
 
 ### Step 6: Storage Layer (Dexie)
 
@@ -479,11 +479,11 @@ See the backend `progress.md` and `COORDINATION.md`. The 2026-10-15 backend stat
 - Real Android phone flight-mode testing
 - Duplicate-sync prevention check
 - Refresh-token race-condition test
-- Swipe gesture vs Android system gesture conflict check
 - Confirm no `v-html` usage anywhere
 - 5-day offline scenario: refresh token still valid on return, pending queue syncs in batches
-- Late-sync thresholds and `recordedAt`-based grouping verified
-- Single-session takeover scenario
+- `recordedAt`-based grouping verified (late-sync thresholds are not in the pilot)
+- Single-session takeover scenario, including a phone with unsent readings (the forced logout clears them)
+- Logout: sync first, the unsent-readings warning, offline message; restore of the last 30 days after login; fixing and deleting a failed reading; the clock warning
 
 ## 9a. Dexie Schema (version 1 shown)
 
