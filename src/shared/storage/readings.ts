@@ -1,5 +1,6 @@
 import Dexie from 'dexie'
 
+import type { ReadingItem } from '@/shared/schemas/readingList.schema'
 import type { WaterReadingInput } from '@/shared/schemas/waterQuality.schema'
 import { db, type Reading } from './db'
 
@@ -194,5 +195,39 @@ export async function deleteFailedReading(id: string): Promise<boolean> {
     if (!current || current.status !== 'failed') return false
     await db.readings.delete(id)
     return true
+  })
+}
+
+// Readings restored from the server, stored as `synced`. A record that already exists locally is
+// left alone: it may be a pending or failed reading with local state.
+export async function addRestoredReadings(items: ReadingItem[], userId: string): Promise<void> {
+  if (items.length === 0) return
+  await db.transaction('rw', db.readings, async () => {
+    const existing = new Set(
+      await db.readings
+        .where('id')
+        .anyOf(items.map(item => item.id))
+        .primaryKeys(),
+    )
+    const fresh = items
+      .filter(item => !existing.has(item.id))
+      .map(
+        (item): Reading => ({
+          id: item.id,
+          tankId: item.tankId,
+          recordedAt: item.recordedAt,
+          ph: item.ph,
+          temperatureC: item.temperatureC,
+          salinityPpt: item.salinityPpt,
+          oxygenMgL: item.oxygenMgL,
+          ...(item.note ? { note: item.note } : {}),
+          syncedAt: item.syncedAt,
+          status: 'synced',
+          createdById: userId,
+          isLate: false,
+          needsReview: false,
+        }),
+      )
+    await db.readings.bulkAdd(fresh)
   })
 }

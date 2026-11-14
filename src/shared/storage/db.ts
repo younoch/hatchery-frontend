@@ -29,6 +29,12 @@ export interface Tank {
   position: number
 }
 
+// Small local flags, such as "the user's readings were restored from the server".
+export interface Meta {
+  key: string
+  value: string
+}
+
 // Local session: no secrets (no tokens). It lets the app open offline after a cold start.
 export interface LocalSession {
   key: 'current' // single row
@@ -44,6 +50,7 @@ class HatcheryDB extends Dexie {
   readings!: Table<Reading, string>
   session!: Table<LocalSession, string>
   tanks!: Table<Tank, string>
+  meta!: Table<Meta, string>
 
   constructor() {
     super('hatchery-db')
@@ -66,6 +73,13 @@ class HatcheryDB extends Dexie {
         tanks: 'id, position',
       })
       .upgrade(tx => tx.table('readings').clear())
+    // version 4: a small key-value table for local flags.
+    this.version(4).stores({
+      readings: 'id, status, recordedAt, createdById, [createdById+tankId+recordedAt]',
+      session: 'key',
+      tanks: 'id, position',
+      meta: 'key',
+    })
   }
 }
 

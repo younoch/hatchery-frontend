@@ -1,6 +1,7 @@
 import { watch } from 'vue'
 
 import { useToast } from '@/shared/composables/useToast'
+import { restoreOwnReadings } from '@/shared/lib/restoreReadings'
 import { runSync, type SyncOutcome } from '@/shared/lib/syncEngine'
 import { useAuthStore } from '@/shared/stores/authStore'
 import { useErrorStore } from '@/shared/stores/errorStore'
@@ -65,12 +66,18 @@ export function startSync(): void {
   watch(
     () => auth.canUseOrganization,
     can => {
-      if (can) void requestSync()
+      if (can) {
+        void requestSync()
+        void restoreOwnReadings()
+      }
     },
     { immediate: true }
   )
 
-  window.addEventListener('online', () => void requestSync())
+  window.addEventListener('online', () => {
+    void requestSync()
+    void restoreOwnReadings()
+  })
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') void requestSync()
   })
