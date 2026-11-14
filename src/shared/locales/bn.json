@@ -113,7 +113,8 @@
     "tabHistory": "ইতিহাস",
     "tabHistoryCount": "ইতিহাস ({count})",
     "historyEmpty": "এখনো কোনো এন্ট্রি নেই।",
-    "fixAndResend": "ঠিক করে পাঠান"
+    "fixAndResend": "ঠিক করে পাঠান",
+    "editTitle": "রিডিং ঠিক করুন"
   },
   "auth": {
     "login": {

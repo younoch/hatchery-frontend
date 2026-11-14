@@ -113,7 +113,8 @@
     "tabHistory": "History",
     "tabHistoryCount": "History ({count})",
     "historyEmpty": "No entries yet.",
-    "fixAndResend": "Fix and resend"
+    "fixAndResend": "Fix and resend",
+    "editTitle": "Fix the reading"
   },
   "auth": {
     "login": {

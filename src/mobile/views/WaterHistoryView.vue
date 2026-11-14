@@ -2,6 +2,7 @@
 import { liveQuery } from 'dexie'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 import Card from '@/shared/components/Card.vue'
 import ConfirmSheet from '@/shared/components/ConfirmSheet.vue'
@@ -12,9 +13,8 @@ import CardList from '@/shared/components/layout/CardList.vue'
 import FieldGrid from '@/shared/components/layout/FieldGrid.vue'
 import PageBody from '@/shared/components/layout/PageBody.vue'
 import { formatReadingTime } from '@/shared/lib/datetime'
-import { rejectionMessageKey } from '@/shared/lib/rejection'
+import { deleteFailedReading, listReadings } from '@/shared/storage/readings'
 import type { Reading } from '@/shared/storage/db'
-import { deleteFailedReading, listReadings, retryFailedReading } from '@/shared/storage/readings'
 import { requireUserId } from '@/shared/composables/useCurrentUserId'
 import { useErrorStore } from '@/shared/stores/errorStore'
 import { useTankStore } from '@/shared/stores/tankStore'
@@ -22,6 +22,12 @@ import { useTankStore } from '@/shared/stores/tankStore'
 const { t, locale } = useI18n()
 const { report } = useErrorStore()
 const tankStore = useTankStore()
+const router = useRouter()
+
+// Fix and resend opens the reading form in edit mode.
+function fix(id: string) {
+  void router.push(`/m/water/edit/${id}`)
+}
 
 const METRICS = [
   { name: 'ph', labelKey: 'water.ph', unit: undefined },
@@ -99,11 +105,11 @@ onBeforeUnmount(() => unsubscribe?.())
               {{ t(rejectionMessageKey(reading.errorCode)) }}
             </p>
             <Button
-              v-if="reading.status === 'failed'"
+              v-if="reading.status === 'failed' && isFixable(reading.errorCode)"
               type="button"
               variant="secondary"
               size="sm"
-              @click="retryFailedReading(reading.id)"
+              @click="fix(reading.id)"
             >
               {{ t('water.fixAndResend') }}
             </Button>

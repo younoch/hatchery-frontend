@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch, type Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 
@@ -17,6 +18,7 @@ import StateMessage from '@/shared/components/layout/StateMessage.vue'
 import StickyActionBar from '@/shared/components/layout/StickyActionBar.vue'
 import { CLOCK_SKEW_WARN_MS, clockSkewMs } from '@/shared/lib/clockSkew'
 import { localInputToIso, toLocalInputValue } from '@/shared/lib/datetime'
+import { isFixable, rejectionMessageKey } from '@/shared/lib/rejection'
 import { requestSync } from '@/shared/lib/syncRunner'
 import {
   WATER_RANGES,
@@ -24,13 +26,23 @@ import {
   waterReadingFormSchema,
 } from '@/shared/schemas/waterQuality.schema'
 import type { Reading } from '@/shared/storage/db'
-import { createReading, getLatestReading } from '@/shared/storage/readings'
+import {
+  createReading,
+  fixFailedReading,
+  getLatestReading,
+  getReading,
+} from '@/shared/storage/readings'
 import { requireUserId } from '@/shared/composables/useCurrentUserId'
 import { useTankStore } from '@/shared/stores/tankStore'
 
+// With `editId` the form fixes a failed reading (edit mode) instead of creating one.
+const props = defineProps<{ editId?: string }>()
+
 const { t } = useI18n()
+const router = useRouter()
 const userId = requireUserId()
 const tankStore = useTankStore()
+const editing = ref<Reading>() // the failed reading being fixed
 
 // Warns only (never blocks) when the phone clock is far from the server's.
 const clockOff = computed(
@@ -58,9 +70,16 @@ const emptyKey = computed(() =>
 )
 
 // Inactive tanks are not offered for new readings; the history still shows their names.
-const tankOptions = computed(() =>
-  tankStore.activeTanks.map(tank => ({ label: tank.name, value: tank.id })),
-)
+const tankOptions = computed(() => {
+  const options = tankStore.activeTanks.map(tank => ({ label: tank.name, value: tank.id }))
+  // An inactive tank the failed reading already uses stays visible while it is being fixed.
+  const current = editing.value?.tankId
+  const name = current ? tankStore.nameOf(current) : undefined
+  if (current && name && !options.some(option => option.value === current)) {
+    options.push({ label: name, value: current })
+  }
+  return options
+})
 
 function emptyValues() {
   return {
@@ -119,6 +138,7 @@ function setUnconfirmed(value: boolean) {
 }
 
 async function applyLast() {
+  if (props.editId) return // edit mode shows the stored values, not the last reading
   const token = ++loadToken
   lastReading.value = undefined
   setUnconfirmed(false)
@@ -168,13 +188,41 @@ watch(tankId, () => void applyLast())
 watch(
   () => tankStore.activeTanks,
   tanks => {
+    if (props.editId) return // the user must choose a tank again when `tank_not_found`
     if (tanks.some(tank => tank.id === tankId.value)) return
     setFieldValue('tankId', tanks[0]?.id ?? '', false)
   },
   { immediate: true },
 )
 
-onMounted(() => void applyLast())
+const HISTORY_ROUTE = { path: '/m/water', query: { tab: 'history' } }
+
+// Edit mode: only a failed reading with a fixable code can be fixed; otherwise go back.
+async function loadForEdit(id: string) {
+  const reading = await getReading(id)
+  if (!reading || reading.status !== 'failed' || !isFixable(reading.errorCode)) {
+    await router.replace(HISTORY_ROUTE)
+    return
+  }
+  editing.value = reading
+  resetForm({
+    values: {
+      // tank_not_found: the stored tank is wrong, so the user chooses one.
+      tankId: reading.errorCode === 'tank_not_found' ? '' : reading.tankId,
+      recordedAt: toLocalInputValue(new Date(reading.recordedAt)),
+      ph: String(reading.ph),
+      temperatureC: String(reading.temperatureC),
+      salinityPpt: String(reading.salinityPpt),
+      oxygenMgL: String(reading.oxygenMgL),
+      note: reading.note ?? '',
+    },
+  })
+}
+
+onMounted(() => {
+  if (props.editId) void loadForEdit(props.editId)
+  else void applyLast()
+})
 // Opening the form asks for a fresh list, at most once every 10 minutes (the store enforces it).
 onMounted(() => void tankStore.refresh())
 
@@ -193,13 +241,14 @@ function say(key: string) {
 const onSubmit = handleSubmit(async values => {
   isSaving.value = true
   try {
-    await createReading(
-      {
-        ...values,
-        recordedAt: localInputToIso(values.recordedAt),
-      },
-      userId,
-    )
+    const input = { ...values, recordedAt: localInputToIso(values.recordedAt) }
+    if (props.editId) {
+      const fixed = await fixFailedReading(props.editId, input)
+      if (fixed) void requestSync()
+      await router.replace(HISTORY_ROUTE)
+      return
+    }
+    await createReading(input, userId)
     resetForm({ values: emptyValues() })
     void applyLast()
     say('water.saved')
@@ -210,6 +259,10 @@ const onSubmit = handleSubmit(async values => {
 })
 
 function onCancel() {
+  if (props.editId) {
+    void router.replace(HISTORY_ROUTE)
+    return
+  }
   resetForm({ values: emptyValues() })
   say('water.cancelled')
 }
@@ -221,6 +274,9 @@ onBeforeUnmount(() => window.clearTimeout(statusTimer))
   <form class="flex flex-1 flex-col justify-between" novalidate @submit.prevent="onFormSubmit">
     <NoticeBanner v-if="clockOff">
       {{ t(clockAhead ? 'water.clockAhead' : 'water.clockBehind', { minutes: clockOffMinutes }) }}
+    </NoticeBanner>
+    <NoticeBanner v-if="editing">
+      {{ t(rejectionMessageKey(editing.errorCode)) }}
     </NoticeBanner>
     <StateMessage v-if="emptyKey">
       {{ t(emptyKey) }}
@@ -274,7 +330,9 @@ onBeforeUnmount(() => window.clearTimeout(statusTimer))
       <Button variant="red-outline" :disabled="isSaving" @click="onCancel">
         {{ t('common.cancel') }}
       </Button>
-      <Button type="submit" :disabled="isSaving">{{ t('common.save') }}</Button>
+      <Button type="submit" :disabled="isSaving">
+        {{ t(editId ? 'water.fixAndResend' : 'common.save') }}
+      </Button>
     </StickyActionBar>
   </form>
 </template>

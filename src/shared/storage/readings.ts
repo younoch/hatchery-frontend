@@ -108,12 +108,19 @@ export async function countUnsentReadings(): Promise<number> {
   return db.readings.where('status').notEqual('synced').count()
 }
 
-// Local only until the sync engine (Step 21): puts a failed record back in the queue.
-export async function retryFailedReading(id: string): Promise<boolean> {
+// The user fixed a rejected reading: it goes back in the queue with the same id. `attempts`
+// stays, so it is locked again. Returns false if it is not `failed` any more.
+export async function fixFailedReading(id: string, changes: WaterReadingInput): Promise<boolean> {
   return db.transaction('rw', db.readings, async () => {
     const current = await db.readings.get(id)
     if (!current || current.status !== 'failed') return false
-    await db.readings.update(id, { status: 'pending' })
+    await db.readings.update(id, {
+      ...changes,
+      note: changes.note ? changes.note : undefined,
+      status: 'pending',
+      errorCode: undefined,
+      errorField: undefined,
+    })
     return true
   })
 }

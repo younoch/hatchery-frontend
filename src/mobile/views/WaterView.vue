@@ -2,6 +2,7 @@
 import { liveQuery } from 'dexie'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 
 import WaterEntryView from '@/mobile/views/WaterEntryView.vue'
 import WaterHistoryView from '@/mobile/views/WaterHistoryView.vue'
@@ -13,7 +14,9 @@ import { countUnsyncedReadings } from '@/shared/storage/readings'
 
 const { t } = useI18n()
 const { report } = useErrorStore()
-const tab = ref('new')
+const route = useRoute()
+// After fixing a failed reading the user comes back to the history tab.
+const tab = ref(route.query.tab === 'history' ? 'history' : 'new')
 const unsyncedCount = ref(0)
 const items = computed(() => [
   { label: t('water.tabNew'), value: 'new' },
