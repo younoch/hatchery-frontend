@@ -4,6 +4,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import Card from '@/shared/components/Card.vue'
+import ConfirmSheet from '@/shared/components/ConfirmSheet.vue'
 import Metric from '@/shared/components/Metric.vue'
 import StatusBadge from '@/shared/components/StatusBadge.vue'
 import Button from '@/shared/components/ui/Button.vue'
@@ -13,7 +14,7 @@ import PageBody from '@/shared/components/layout/PageBody.vue'
 import { formatReadingTime } from '@/shared/lib/datetime'
 import { rejectionMessageKey } from '@/shared/lib/rejection'
 import type { Reading } from '@/shared/storage/db'
-import { listReadings, retryFailedReading } from '@/shared/storage/readings'
+import { deleteFailedReading, listReadings, retryFailedReading } from '@/shared/storage/readings'
 import { requireUserId } from '@/shared/composables/useCurrentUserId'
 import { useErrorStore } from '@/shared/stores/errorStore'
 import { useTankStore } from '@/shared/stores/tankStore'
@@ -33,6 +34,22 @@ const readings = ref<Reading[]>([])
 let unsubscribe: (() => void) | undefined
 
 const tankName = (id: string) => tankStore.nameOf(id) ?? t('water.unknownTank')
+
+// A failed reading can be deleted after a confirmation; it is not on the server, so nothing is
+// lost there.
+const deleteId = ref<string | null>(null)
+const deleteOpen = ref(false)
+
+function askDelete(id: string) {
+  deleteId.value = id
+  deleteOpen.value = true
+}
+
+async function confirmDelete() {
+  if (deleteId.value) await deleteFailedReading(deleteId.value)
+  deleteOpen.value = false
+  deleteId.value = null
+}
 
 // liveQuery re-runs when the readings table changes, so a new save shows up here at once.
 onMounted(() => {
@@ -90,9 +107,26 @@ onBeforeUnmount(() => unsubscribe?.())
             >
               {{ t('water.fixAndResend') }}
             </Button>
+            <Button
+              v-if="reading.status === 'failed'"
+              type="button"
+              variant="red-outline"
+              size="sm"
+              @click="askDelete(reading.id)"
+            >
+              {{ t('water.delete') }}
+            </Button>
           </FieldGrid>
         </Card>
       </li>
     </CardList>
+    <ConfirmSheet
+      v-model:open="deleteOpen"
+      :title="t('water.deleteTitle')"
+      :message="t('water.deleteMessage')"
+      :confirm-label="t('water.deleteConfirm')"
+      :cancel-label="t('water.deleteCancel')"
+      @confirm="confirmDelete"
+    />
   </PageBody>
 </template>

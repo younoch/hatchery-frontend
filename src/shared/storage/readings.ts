@@ -178,3 +178,14 @@ export async function markPending(ids: string[]): Promise<void> {
 export async function resetSyncingToPending(): Promise<number> {
   return db.readings.where('status').equals('syncing').modify({ status: 'pending' })
 }
+
+// A rejected reading is not on the server, so deleting it loses nothing there. Only a `failed`
+// record can be deleted this way.
+export async function deleteFailedReading(id: string): Promise<boolean> {
+  return db.transaction('rw', db.readings, async () => {
+    const current = await db.readings.get(id)
+    if (!current || current.status !== 'failed') return false
+    await db.readings.delete(id)
+    return true
+  })
+}
