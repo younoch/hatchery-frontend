@@ -40,7 +40,17 @@
     "pending": "Pending",
     "syncing": "Syncing",
     "failed": "Failed",
-    "synced": "Synced"
+    "synced": "Synced",
+    "differentDuplicate": "Some readings were already on the server with different values.",
+    "rejected": {
+      "out_of_range": "A value is out of range. Check the values and fix it.",
+      "recorded_at_in_future": "The time is in the future. Fix the time and the phone clock.",
+      "tank_not_found": "The tank was not found. Choose another tank.",
+      "cannot_fix": "The server could not take this reading. Delete it and enter it again.",
+      "payload_too_large": "This reading is too large to send. Delete it and enter it again.",
+      "general": "A detail of the reading is not valid. Check it and fix it.",
+      "unknown": "The server did not accept this reading."
+    }
   },
   "language": {
     "toggleLabel": "বাংলা"
@@ -135,9 +145,6 @@
       "server": "The server has a problem. Try again later.",
       "unknown": "Something went wrong. Try again."
     }
-  },
-  "sync": {
-    "differentDuplicate": "Some readings were already on the server with different values."
   },
   "api": {
     "errors": {

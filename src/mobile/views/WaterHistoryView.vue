@@ -11,6 +11,7 @@ import CardList from '@/shared/components/layout/CardList.vue'
 import FieldGrid from '@/shared/components/layout/FieldGrid.vue'
 import PageBody from '@/shared/components/layout/PageBody.vue'
 import { formatReadingTime } from '@/shared/lib/datetime'
+import { rejectionMessageKey } from '@/shared/lib/rejection'
 import type { Reading } from '@/shared/storage/db'
 import { listReadings, retryFailedReading } from '@/shared/storage/readings'
 import { requireUserId } from '@/shared/composables/useCurrentUserId'
@@ -76,6 +77,9 @@ onBeforeUnmount(() => unsubscribe?.())
               class="text-caption text-muted-foreground [overflow-wrap:anywhere]"
             >
               {{ reading.note }}
+            </p>
+            <p v-if="reading.status === 'failed'" class="text-caption font-medium text-sync-failed">
+              {{ t(rejectionMessageKey(reading.errorCode)) }}
             </p>
             <Button
               v-if="reading.status === 'failed'"
