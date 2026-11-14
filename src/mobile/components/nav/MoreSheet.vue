@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import Button from '@/shared/components/ui/Button.vue'
 import Sheet from '@/shared/components/ui/Sheet.vue'
 import FieldGrid from '@/shared/components/layout/FieldGrid.vue'
+import { useClearCache } from '@/shared/composables/useClearCache'
 import { useDeviceClass } from '@/shared/composables/useDeviceClass'
 import { useLogout } from '@/shared/composables/useLogout'
 import { usePwa } from '@/shared/composables/usePwa'
@@ -15,11 +16,17 @@ const { t } = useI18n()
 const { toggleDeviceClass } = useDeviceClass()
 const { offlineReady, canInstall, install } = usePwa()
 const { requestLogout } = useLogout()
+const { requestClear } = useClearCache()
 const open = ref(false)
 
 function switchDevice() {
   open.value = false
   toggleDeviceClass()
+}
+
+async function clearCache() {
+  open.value = false
+  await requestClear()
 }
 
 async function logout() {
@@ -46,6 +53,9 @@ async function logout() {
       </Button>
       <Button variant="secondary" class="justify-start" @click="switchDevice">
         {{ t('device.switchToDesktop') }}
+      </Button>
+      <Button variant="secondary" class="justify-start" @click="clearCache">
+        {{ t('cache.action') }}
       </Button>
       <Button variant="red-outline" class="justify-start" @click="logout">
         {{ t('auth.logout') }}

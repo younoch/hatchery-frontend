@@ -164,6 +164,16 @@
       "rate_limited": "Too many attempts. Wait a minute and try again."
     }
   },
+  "cache": {
+    "action": "Clear cache and reload",
+    "needsInternet": "You need internet to clear the cache.",
+    "confirmTitle": "Clear the cache?",
+    "confirmMessage": "{count} readings are not sent yet. They will be deleted if you clear the cache. Clear it anyway?",
+    "confirm": "Clear and reload",
+    "cancel": "Go back",
+    "done": "The data was loaded again.",
+    "failed": "The data could not be loaded. It will load again by itself when the internet is back."
+  },
   "toast": {
     "label": "Notification"
   }
