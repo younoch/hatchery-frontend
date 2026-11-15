@@ -164,6 +164,20 @@
       "rate_limited": "Too many attempts. Wait a minute and try again."
     }
   },
+  "manage": {
+    "title": "Management",
+    "users": "Users",
+    "usersTitle": "Users",
+    "noAccess": "You do not have permission to manage.",
+    "needsInternet": "This page needs internet.",
+    "retry": "Try again",
+    "loading": "Loading…",
+    "loadMore": "Show more",
+    "noUsers": "There are no users.",
+    "noRole": "No role",
+    "inactive": "Inactive",
+    "mustChange": "Must change the password at first sign-in"
+  },
   "cache": {
     "action": "Clear cache and reload",
     "needsInternet": "You need internet to clear the cache.",

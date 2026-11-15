@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 import Button from '@/shared/components/ui/Button.vue'
 import Sheet from '@/shared/components/ui/Sheet.vue'
@@ -8,6 +9,7 @@ import FieldGrid from '@/shared/components/layout/FieldGrid.vue'
 import { useClearCache } from '@/shared/composables/useClearCache'
 import { useDeviceClass } from '@/shared/composables/useDeviceClass'
 import { useLogout } from '@/shared/composables/useLogout'
+import { useManagementEntries } from '@/shared/composables/useManagementEntries'
 import { usePwa } from '@/shared/composables/usePwa'
 
 defineProps<{ bottomOffset?: number }>()
@@ -17,11 +19,18 @@ const { toggleDeviceClass } = useDeviceClass()
 const { offlineReady, canInstall, install } = usePwa()
 const { requestLogout } = useLogout()
 const { requestClear } = useClearCache()
+const router = useRouter()
+const entries = useManagementEntries()
 const open = ref(false)
 
 function switchDevice() {
   open.value = false
   toggleDeviceClass()
+}
+
+function openManagement() {
+  open.value = false
+  void router.push('/m/manage')
 }
 
 async function clearCache() {
@@ -50,6 +59,14 @@ async function logout() {
       </p>
       <Button v-if="canInstall" variant="secondary" class="justify-start" @click="install">
         {{ t('pwa.install') }}
+      </Button>
+      <Button
+        v-if="entries.length > 0"
+        variant="secondary"
+        class="justify-start"
+        @click="openManagement"
+      >
+        {{ t('manage.title') }}
       </Button>
       <Button variant="secondary" class="justify-start" @click="switchDevice">
         {{ t('device.switchToDesktop') }}
