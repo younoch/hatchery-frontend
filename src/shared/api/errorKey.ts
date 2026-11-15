@@ -8,6 +8,10 @@ const CODE_KEYS: Partial<Record<string, string>> = {
   too_short: 'api.errors.too_short',
   weak_password: 'api.errors.weak_password',
   too_long: 'api.errors.too_long',
+  username_taken: 'api.errors.username_taken',
+  email_taken: 'api.errors.email_taken',
+  invalid_format: 'api.errors.invalid_format',
+  required: 'api.errors.required',
   invalid_username: 'api.errors.invalid_username',
   rate_limited: 'api.errors.rate_limited',
 }
@@ -32,4 +36,14 @@ export function errorMessageKey(error: ApiError): string {
     if (key) return key
   }
   return KIND_KEYS[error.kind]
+}
+
+// The same code means something else by field (a password is too short, a name too long).
+const FIELD_CODE_KEYS: Partial<Record<string, string>> = {
+  'name:too_long': 'api.errors.name_too_long',
+}
+
+// The message for one field error of a form (`errors[]` of a 400 validation_failed).
+export function fieldErrorKey(field: string, code: string): string {
+  return FIELD_CODE_KEYS[`${field}:${code}`] ?? CODE_KEYS[code] ?? 'api.errors.invalid_field'
 }

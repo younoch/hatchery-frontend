@@ -160,6 +160,12 @@
       "too_short": "The password is too short.",
       "weak_password": "The password is not strong enough.",
       "too_long": "The password is too long.",
+      "username_taken": "This username is already taken.",
+      "email_taken": "This email is already in use.",
+      "invalid_format": "The format is not valid.",
+      "required": "Fill in this field.",
+      "invalid_field": "This field is not valid.",
+      "name_too_long": "The name is too long.",
       "invalid_username": "The username is not valid.",
       "rate_limited": "Too many attempts. Wait a minute and try again."
     }
