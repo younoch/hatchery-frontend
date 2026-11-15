@@ -25,6 +25,12 @@ const auth = useAuthStore()
 const toast = useToast()
 const router = useRouter()
 const canCreate = computed(() => auth.hasPermission('user:create'))
+const canEdit = computed(() => auth.hasPermission('user:write'))
+
+// The admin's own account cannot be changed here (the backend answers cannot_target_self).
+function edit(id: string): void {
+  void router.push(`/m/manage/users/${id}`)
+}
 
 const { items, meta } = storeToRefs(useUserStore())
 const loading = ref(false)
@@ -90,7 +96,7 @@ onMounted(() => void load(1))
               {{ user.name || user.username }}
             </p>
             <p class="text-caption text-muted-foreground [overflow-wrap:anywhere]">
-                            {{ subtitle(user) }}
+              {{ subtitle(user) }}
             </p>
             <p class="text-caption text-muted-foreground [overflow-wrap:anywhere]">
               {{ user.email }}
@@ -101,6 +107,9 @@ onMounted(() => void load(1))
             <p v-if="user.mustChangePassword" class="text-caption font-medium text-sync-pending">
               {{ t('manage.mustChange') }}
             </p>
+            <Button v-if="canEdit && user.id !== auth.user?.id" variant="secondary" size="sm" @click="edit(user.id)">
+              {{ t('manage.edit') }}
+            </Button>
           </FieldGrid>
         </Card>
       </li>

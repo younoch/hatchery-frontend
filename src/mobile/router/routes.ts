@@ -43,6 +43,11 @@ export const mobileRoutes: RouteRecordRaw[] = [
         meta: { titleKey: 'manage.newUserTitle' },
       },
       {
+        path: 'manage/users/:id',
+        component: () => import('@/mobile/views/UserEditView.vue'),
+        meta: { titleKey: 'manage.editTitle' },
+      },
+      {
         path: ':pathMatch(.*)*',
         component: () => import('@/mobile/views/PlaceholderView.vue'),
         meta: { titleKey: 'nav.waterQuality' },

@@ -201,7 +201,13 @@
     "copyPassword": "Copy the password",
     "copied": "Copied.",
     "copyFailed": "Could not copy. Write it down.",
-    "done": "Done"
+    "done": "Done",
+    "edit": "Edit",
+    "editTitle": "Edit the user",
+    "status": "Status",
+    "active": "Active",
+    "statusHint": "An inactive user can no longer sign in.",
+    "saved": "Changes saved."
   },
   "cache": {
     "action": "Clear cache and reload",
