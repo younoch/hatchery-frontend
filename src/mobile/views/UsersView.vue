@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 import Button from '@/shared/components/ui/Button.vue'
 import Card from '@/shared/components/Card.vue'
@@ -20,6 +21,8 @@ const PAGE_SIZE = 20
 const { t } = useI18n()
 const auth = useAuthStore()
 const toast = useToast()
+const router = useRouter()
+const canCreate = computed(() => auth.hasPermission('user:create'))
 
 const items = ref<ManagedUser[]>([])
 const meta = ref<PaginationMeta | null>(null)
@@ -70,9 +73,19 @@ onMounted(() => void load(1))
     </template>
   </StateMessage>
   <PageBody v-else>
+    <FieldGrid v-if="canCreate" :cols="1">
+      <Button variant="secondary" @click="router.push('/m/manage/users/new')">
+        {{ t('manage.newUser') }}
+      </Button>
+    </FieldGrid>
     <p v-if="loading && items.length === 0" class="text-center text-caption text-muted-foreground">
       {{ t('manage.loading') }}
     </p>
+    <FieldGrid v-if="canCreate" :cols="1">
+      <Button variant="secondary" @click="router.push('/m/manage/users/new')">
+        {{ t('manage.newUser') }}
+      </Button>
+    </FieldGrid>
     <CardList v-else :empty="items.length === 0" empty-key="manage.noUsers">
       <li v-for="user in items" :key="user.id">
         <Card>
