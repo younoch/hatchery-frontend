@@ -166,6 +166,8 @@
       "required": "Fill in this field.",
       "invalid_field": "This field is not valid.",
       "name_too_long": "The name is too long.",
+      "org_admin_protected": "The admin cannot be changed here.",
+      "cannot_target_self": "You cannot change your own account here.",
       "invalid_username": "The username is not valid.",
       "rate_limited": "Too many attempts. Wait a minute and try again."
     }

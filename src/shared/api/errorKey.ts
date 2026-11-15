@@ -12,6 +12,8 @@ const CODE_KEYS: Partial<Record<string, string>> = {
   email_taken: 'api.errors.email_taken',
   invalid_format: 'api.errors.invalid_format',
   required: 'api.errors.required',
+  org_admin_protected: 'api.errors.org_admin_protected',
+  cannot_target_self: 'api.errors.cannot_target_self',
   invalid_username: 'api.errors.invalid_username',
   rate_limited: 'api.errors.rate_limited',
 }
@@ -46,4 +48,22 @@ const FIELD_CODE_KEYS: Partial<Record<string, string>> = {
 // The message for one field error of a form (`errors[]` of a 400 validation_failed).
 export function fieldErrorKey(field: string, code: string): string {
   return FIELD_CODE_KEYS[`${field}:${code}`] ?? CODE_KEYS[code] ?? 'api.errors.invalid_field'
+}
+
+// The messages to show next to the fields of a form: the backend's `errors[]` for the fields this
+// form has, plus `username_taken` and `email_taken`, which the backend answers for the whole request.
+export function fieldMessages(error: ApiError, fields: readonly string[]): Record<string, string> {
+  const messages: Record<string, string> = {}
+  for (const item of error.errors) {
+    if (fields.includes(item.field) && !(item.field in messages)) {
+      messages[item.field] = fieldErrorKey(item.field, item.code)
+    }
+  }
+  if (error.code === 'username_taken' && fields.includes('username')) {
+    messages.username = fieldErrorKey('username', 'username_taken')
+  }
+  if (error.code === 'email_taken' && fields.includes('email')) {
+    messages.email = fieldErrorKey('email', 'email_taken')
+  }
+  return messages
 }
