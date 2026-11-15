@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
@@ -13,8 +14,9 @@ import { ApiError } from '@/shared/api/apiError'
 import { errorMessageKey } from '@/shared/api/errorKey'
 import { fetchUsers } from '@/shared/api/usersApi'
 import { useToast } from '@/shared/composables/useToast'
-import type { ManagedUser, PaginationMeta } from '@/shared/schemas/user.schema'
+import type { ManagedUser } from '@/shared/schemas/user.schema'
 import { useAuthStore } from '@/shared/stores/authStore'
+import { useUserStore } from '@/shared/stores/userStore'
 
 const PAGE_SIZE = 20
 
@@ -24,8 +26,7 @@ const toast = useToast()
 const router = useRouter()
 const canCreate = computed(() => auth.hasPermission('user:create'))
 
-const items = ref<ManagedUser[]>([])
-const meta = ref<PaginationMeta | null>(null)
+const { items, meta } = storeToRefs(useUserStore())
 const loading = ref(false)
 const errorKey = ref<string | null>(null) // shown instead of the list while it is empty
 
@@ -81,11 +82,6 @@ onMounted(() => void load(1))
     <p v-if="loading && items.length === 0" class="text-center text-caption text-muted-foreground">
       {{ t('manage.loading') }}
     </p>
-    <FieldGrid v-if="canCreate" :cols="1">
-      <Button variant="secondary" @click="router.push('/m/manage/users/new')">
-        {{ t('manage.newUser') }}
-      </Button>
-    </FieldGrid>
     <CardList v-else :empty="items.length === 0" empty-key="manage.noUsers">
       <li v-for="user in items" :key="user.id">
         <Card>
