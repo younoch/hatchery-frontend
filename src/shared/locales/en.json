@@ -219,7 +219,11 @@
     "tanks": "Tanks",
     "tanksTitle": "Tanks",
     "newTank": "New tank",
-    "noTanks": "There are no tanks."
+    "noTanks": "There are no tanks.",
+    "tankName": "Tank name",
+    "newTankTitle": "New tank",
+    "editTankTitle": "Edit the tank",
+    "tankStatusHint": "No new readings can be taken in an inactive tank. The earlier readings stay."
   },
   "cache": {
     "action": "Clear cache and reload",

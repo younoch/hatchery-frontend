@@ -54,6 +54,16 @@ export const mobileRoutes: RouteRecordRaw[] = [
       },
       {
         path: 'manage/tanks/new',
+        component: () => import('@/mobile/views/TankFormView.vue'),
+        meta: { titleKey: 'manage.newTankTitle' },
+      },
+      {
+        path: 'manage/tanks/:id',
+        component: () => import('@/mobile/views/TankFormView.vue'),
+        meta: { titleKey: 'manage.editTankTitle' },
+      },
+      {
+        path: 'manage/tanks/new',
         component: () => import('@/mobile/views/PlaceholderView.vue'),
         meta: { titleKey: 'manage.tanksTitle' },
       },
