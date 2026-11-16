@@ -68,6 +68,11 @@ export const mobileRoutes: RouteRecordRaw[] = [
         meta: { titleKey: 'manage.rolesTitle' },
       },
       {
+        path: 'manage/roles/:id',
+        component: () => import('@/mobile/views/RoleEditView.vue'),
+        meta: { titleKey: 'manage.editRoleTitle' },
+      },
+      {
         path: 'manage/tanks/new',
         component: () => import('@/mobile/views/PlaceholderView.vue'),
         meta: { titleKey: 'manage.tanksTitle' },

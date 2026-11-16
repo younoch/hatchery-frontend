@@ -238,7 +238,10 @@
     "rolesTitle": "Roles",
     "noRoles": "There are no roles.",
     "permissionCount": "{count} permissions",
-    "readOnlyRole": "View only, it cannot be changed."
+    "readOnlyRole": "View only, it cannot be changed.",
+    "editRoleTitle": "Edit the role",
+    "cannotGrant": "A permission you do not hold yourself cannot be changed.",
+    "rolesHint": "The change takes effect when the users open the app again or sign in."
   },
   "cache": {
     "action": "Clear cache and reload",

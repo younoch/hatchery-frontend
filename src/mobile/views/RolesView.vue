@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 import Button from '@/shared/components/ui/Button.vue'
 import Card from '@/shared/components/Card.vue'
@@ -18,7 +19,12 @@ import { useRoleStore } from '@/shared/stores/roleStore'
 
 const { t } = useI18n()
 const auth = useAuthStore()
+const router = useRouter()
 const { items } = storeToRefs(useRoleStore())
+
+function edit(id: string): void {
+  void router.push(`/m/manage/roles/${id}`)
+}
 
 const canUse = computed(
   () => auth.canUseOrganization && auth.hasPermission('organization-role:write'),
@@ -76,6 +82,9 @@ onMounted(() => {
             <p v-if="!role.editable" class="text-caption text-muted-foreground">
               {{ t('manage.readOnlyRole') }}
             </p>
+            <Button v-else variant="secondary" size="sm" @click="edit(role.id)">
+              {{ t('manage.edit') }}
+            </Button>
           </FieldGrid>
         </Card>
       </li>
