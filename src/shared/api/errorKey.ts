@@ -12,6 +12,7 @@ const CODE_KEYS: Partial<Record<string, string>> = {
   email_taken: 'api.errors.email_taken',
   invalid_format: 'api.errors.invalid_format',
   required: 'api.errors.required',
+  tank_name_taken: 'api.errors.tank_name_taken',
   org_admin_protected: 'api.errors.org_admin_protected',
   cannot_target_self: 'api.errors.cannot_target_self',
   invalid_username: 'api.errors.invalid_username',
@@ -50,6 +51,13 @@ export function fieldErrorKey(field: string, code: string): string {
   return FIELD_CODE_KEYS[`${field}:${code}`] ?? CODE_KEYS[code] ?? 'api.errors.invalid_field'
 }
 
+// Codes the backend answers for the whole request that belong to one field of the form.
+const RESPONSE_CODE_FIELDS: Record<string, string> = {
+  username_taken: 'username',
+  email_taken: 'email',
+  tank_name_taken: 'name',
+}
+
 // The messages to show next to the fields of a form: the backend's `errors[]` for the fields this
 // form has, plus `username_taken` and `email_taken`, which the backend answers for the whole request.
 export function fieldMessages(error: ApiError, fields: readonly string[]): Record<string, string> {
@@ -59,11 +67,8 @@ export function fieldMessages(error: ApiError, fields: readonly string[]): Recor
       messages[item.field] = fieldErrorKey(item.field, item.code)
     }
   }
-  if (error.code === 'username_taken' && fields.includes('username')) {
-    messages.username = fieldErrorKey('username', 'username_taken')
-  }
-  if (error.code === 'email_taken' && fields.includes('email')) {
-    messages.email = fieldErrorKey('email', 'email_taken')
+  for (const [code, field] of Object.entries(RESPONSE_CODE_FIELDS)) {
+    if (error.code === code && fields.includes(field)) messages[field] = fieldErrorKey(field, code)
   }
   return messages
 }

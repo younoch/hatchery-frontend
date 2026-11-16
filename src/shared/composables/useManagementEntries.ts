@@ -7,6 +7,12 @@ import { useAuthStore } from '@/shared/stores/authStore'
 // when its screen is built.
 const ENTRIES = [
   { id: 'users', permissions: ['user:read'], path: '/m/manage/users', labelKey: 'manage.users' },
+  {
+    id: 'tanks',
+    permissions: ['tank:create', 'tank:write'],
+    path: '/m/manage/tanks',
+    labelKey: 'manage.tanks',
+  },
 ]
 
 export function useManagementEntries() {

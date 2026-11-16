@@ -45,7 +45,22 @@ export const mobileRoutes: RouteRecordRaw[] = [
       {
         path: 'manage/users/:id',
         component: () => import('@/mobile/views/UserEditView.vue'),
-        meta: { titleKey: 'manage.editTitle' },
+        meta: { titleKey: 'manage.usersTitle' },
+      },
+      {
+        path: 'manage/tanks',
+        component: () => import('@/mobile/views/TanksView.vue'),
+        meta: { titleKey: 'manage.tanksTitle' },
+      },
+      {
+        path: 'manage/tanks/new',
+        component: () => import('@/mobile/views/PlaceholderView.vue'),
+        meta: { titleKey: 'manage.tanksTitle' },
+      },
+      {
+        path: 'manage/tanks/:id',
+        component: () => import('@/mobile/views/PlaceholderView.vue'),
+        meta: { titleKey: 'manage.tanksTitle' },
       },
       {
         path: ':pathMatch(.*)*',

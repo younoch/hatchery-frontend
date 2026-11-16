@@ -166,6 +166,7 @@
       "required": "Fill in this field.",
       "invalid_field": "This field is not valid.",
       "name_too_long": "The name is too long.",
+      "tank_name_taken": "A tank with this name already exists.",
       "org_admin_protected": "The admin cannot be changed here.",
       "cannot_target_self": "You cannot change your own account here.",
       "invalid_username": "The username is not valid.",
@@ -214,7 +215,11 @@
     "resetConfirm": "Reset",
     "resetCancel": "Go back",
     "resetDone": "The password was reset.",
-    "resetHint": "Give this new temporary password to the user. It will not be shown again. The user is signed out everywhere right now."
+    "resetHint": "Give this new temporary password to the user. It will not be shown again. The user is signed out everywhere right now.",
+    "tanks": "Tanks",
+    "tanksTitle": "Tanks",
+    "newTank": "New tank",
+    "noTanks": "There are no tanks."
   },
   "cache": {
     "action": "Clear cache and reload",
