@@ -5,6 +5,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 
+import ConfirmSheet from '@/shared/components/ConfirmSheet.vue'
+import TemporaryPasswordCard from '@/shared/components/TemporaryPasswordCard.vue'
 import Button from '@/shared/components/ui/Button.vue'
 import Field from '@/shared/components/ui/Field.vue'
 import Input from '@/shared/components/ui/Input.vue'
@@ -16,8 +18,9 @@ import StickyActionBar from '@/shared/components/layout/StickyActionBar.vue'
 import { ApiError } from '@/shared/api/apiError'
 import { errorMessageKey, fieldMessages } from '@/shared/api/errorKey'
 import { fetchOrganizationRoles } from '@/shared/api/organizationRolesApi'
-import { updateUser } from '@/shared/api/usersApi'
+import { resetUserPassword, updateUser } from '@/shared/api/usersApi'
 import { useToast } from '@/shared/composables/useToast'
+import { generateTemporaryPassword } from '@/shared/lib/tempPassword'
 import type { OrganizationRole } from '@/shared/schemas/organizationRole.schema'
 import { updateUserFormSchema } from '@/shared/schemas/updateUser.schema'
 import type { ManagedUser, UpdateUserInput } from '@/shared/schemas/user.schema'
@@ -39,6 +42,12 @@ const roles = ref<OrganizationRole[]>([])
 const loadingRoles = ref(false)
 const loadErrorKey = ref<string | null>(null)
 const saving = ref(false)
+
+// A reset sets a temporary password that the app shows once; it is never stored.
+const canReset = computed(() => auth.hasPermission('user:reset-password'))
+const resetOpen = ref(false)
+const resetting = ref(false)
+const resetPassword = ref<string | null>(null)
 
 // The `admin` role is not offered. The user's current role stays in the list, so the select shows it.
 const roleOptions = computed(() => {
@@ -93,6 +102,33 @@ async function loadRoles(): Promise<void> {
     loadErrorKey.value = error.kind === 'network' ? 'manage.needsInternet' : errorMessageKey(error)
   } finally {
     loadingRoles.value = false
+  }
+}
+
+async function confirmReset(): Promise<void> {
+  const current = user.value
+  if (!current) return
+  if (!navigator.onLine) {
+    toast.error('manage.needsInternet')
+    resetOpen.value = false
+    return
+  }
+  resetting.value = true
+  const password = generateTemporaryPassword()
+  try {
+    await resetUserPassword(current.id, password)
+    resetPassword.value = password
+  } catch (error) {
+    // Anything that is not an ApiError is a bug: let the global handler report it.
+    if (!(error instanceof ApiError)) throw error
+    if (error.kind === 'session_ended') {
+      await auth.clearSession()
+      return
+    }
+    toast.error(errorMessageKey(error))
+  } finally {
+    resetting.value = false
+    resetOpen.value = false
   }
 }
 
@@ -162,6 +198,14 @@ onMounted(() => {
       <Button :disabled="loadingRoles" @click="loadRoles">{{ t('manage.retry') }}</Button>
     </template>
   </StateMessage>
+  <PageBody v-else-if="resetPassword">
+    <TemporaryPasswordCard
+      :title="t('manage.resetDone')"
+      :hint="t('manage.resetHint')"
+      :password="resetPassword"
+      @done="done"
+    />
+  </PageBody>
   <form
     v-else-if="user"
     class="flex flex-1 flex-col justify-between"
@@ -216,6 +260,15 @@ onMounted(() => {
             />
           </template>
         </Field>
+        <Button
+          v-if="canReset"
+          type="button"
+          variant="red-outline"
+          size="sm"
+          @click="resetOpen = true"
+        >
+          {{ t('manage.resetButton') }}
+        </Button>
       </FieldGrid>
     </PageBody>
     <StickyActionBar>
@@ -225,4 +278,13 @@ onMounted(() => {
       </Button>
     </StickyActionBar>
   </form>
+  <ConfirmSheet
+    v-model:open="resetOpen"
+    :title="t('manage.resetTitle')"
+    :message="t('manage.resetMessage')"
+    :confirm-label="t('manage.resetConfirm')"
+    :cancel-label="t('manage.resetCancel')"
+    :busy="resetting"
+    @confirm="confirmReset"
+  />
 </template>

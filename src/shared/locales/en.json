@@ -207,7 +207,14 @@
     "status": "Status",
     "active": "Active",
     "statusHint": "An inactive user can no longer sign in.",
-    "saved": "Changes saved."
+    "saved": "Changes saved.",
+    "resetButton": "Reset the password",
+    "resetTitle": "Reset the password?",
+    "resetMessage": "A new temporary password will be set for the user. The old password will stop working.",
+    "resetConfirm": "Reset",
+    "resetCancel": "Go back",
+    "resetDone": "The password was reset.",
+    "resetHint": "Give this new temporary password to the user. It will not be shown again."
   },
   "cache": {
     "action": "Clear cache and reload",

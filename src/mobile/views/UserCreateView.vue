@@ -9,7 +9,7 @@ import Button from '@/shared/components/ui/Button.vue'
 import Field from '@/shared/components/ui/Field.vue'
 import Input from '@/shared/components/ui/Input.vue'
 import Select from '@/shared/components/ui/Select.vue'
-import Card from '@/shared/components/Card.vue'
+import TemporaryPasswordCard from '@/shared/components/TemporaryPasswordCard.vue'
 import FieldGrid from '@/shared/components/layout/FieldGrid.vue'
 import PageBody from '@/shared/components/layout/PageBody.vue'
 import StateMessage from '@/shared/components/layout/StateMessage.vue'
@@ -120,16 +120,6 @@ const onSubmit = handleSubmit(async values => {
   }
 })
 
-async function copyPassword(): Promise<void> {
-  if (!created.value) return
-  try {
-    await navigator.clipboard.writeText(created.value.password)
-    toast.success('manage.copied')
-  } catch {
-    toast.error('manage.copyFailed')
-  }
-}
-
 function done(): void {
   void router.replace('/m/manage/users')
 }
@@ -148,22 +138,13 @@ onMounted(() => {
     </template>
   </StateMessage>
   <PageBody v-else-if="created">
-    <Card>
-      <FieldGrid :cols="1">
-        <p class="text-body font-semibold text-foreground">{{ t('manage.created') }}</p>
-        <p class="text-caption text-muted-foreground">{{ t('manage.createdHint') }}</p>
-        <p class="text-caption text-muted-foreground">{{ t('manage.username') }}</p>
-        <p class="text-body font-semibold text-foreground [overflow-wrap:anywhere]">
-          {{ created.username }}
-        </p>
-        <p class="text-caption text-muted-foreground">{{ t('manage.temporaryPassword') }}</p>
-        <p class="text-body font-semibold text-foreground [overflow-wrap:anywhere]">
-          {{ created.password }}
-        </p>
-        <Button @click="copyPassword">{{ t('manage.copyPassword') }}</Button>
-        <Button variant="secondary" @click="done">{{ t('manage.done') }}</Button>
-      </FieldGrid>
-    </Card>
+    <TemporaryPasswordCard
+      :title="t('manage.created')"
+      :hint="t('manage.createdHint')"
+      :username="created.username"
+      :password="created.password"
+      @done="done"
+    />
   </PageBody>
   <form v-else class="flex flex-1 flex-col justify-between" novalidate @submit.prevent="onSubmit">
     <PageBody>

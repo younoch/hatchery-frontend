@@ -29,7 +29,7 @@ export function updateUser(id: string, input: UpdateUserInput) {
   })
 }
 
-// Sets a temporary password; the backend also ends the user's sessions (B→F-35).
+// Sets a temporary password for the user; the admin hands it over.
 export function resetUserPassword(id: string, temporaryPassword: string) {
   return authedRequest({
     method: 'POST',
