@@ -5,6 +5,7 @@ import { httpAuthAdapter } from '@/shared/api/httpAuthAdapter'
 import { getAccessToken, refreshSession, setAccessToken } from '@/shared/api/sessionManager'
 import type { AuthUser, ChangePasswordInput, LoginCredentials } from '@/shared/schemas/auth.schema'
 import { clearAllLocalData } from '@/shared/storage/localData'
+import { useRoleStore } from '@/shared/stores/roleStore'
 import { useUserStore } from '@/shared/stores/userStore'
 import { clearLocalSession, getLocalSession, saveLocalSession } from '@/shared/storage/session'
 export type AuthStatus = 'unknown' | 'authenticated' | 'anonymous'
@@ -50,6 +51,7 @@ export const useAuthStore = defineStore('auth', () => {
     status.value = 'anonymous'
     await clearAllLocalData()
     useUserStore().reset() // the next user must not see this admin's user list
+    useRoleStore().reset()
   }
 
   // A user who must change the password has no local session until the change is done, so an

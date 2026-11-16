@@ -13,6 +13,12 @@ const ENTRIES = [
     path: '/m/manage/tanks',
     labelKey: 'manage.tanks',
   },
+  {
+    id: 'roles',
+    permissions: ['organization-role:write'],
+    path: '/m/manage/roles',
+    labelKey: 'manage.roles',
+  },
 ]
 
 export function useManagementEntries() {
@@ -20,6 +26,6 @@ export function useManagementEntries() {
   return computed(() =>
     auth.canUseOrganization
       ? ENTRIES.filter(entry => entry.permissions.some(key => auth.hasPermission(key)))
-      : [],
+      : []
   )
 }
