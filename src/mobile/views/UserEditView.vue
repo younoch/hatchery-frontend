@@ -21,6 +21,7 @@ import { fetchOrganizationRoles } from '@/shared/api/organizationRolesApi'
 import { resetUserPassword, updateUser } from '@/shared/api/usersApi'
 import { useToast } from '@/shared/composables/useToast'
 import { generateTemporaryPassword } from '@/shared/lib/tempPassword'
+import { isOrgAdmin } from '@/shared/lib/userRole'
 import type { OrganizationRole } from '@/shared/schemas/organizationRole.schema'
 import { updateUserFormSchema } from '@/shared/schemas/updateUser.schema'
 import type { ManagedUser, UpdateUserInput } from '@/shared/schemas/user.schema'
@@ -181,7 +182,7 @@ onMounted(() => {
   if (!canWrite.value) return
   // After a reload the store is empty, and the admin's own account cannot be changed here.
   const current = user.value
-  if (!current || current.id === auth.user?.id) {
+  if (!current || current.id === auth.user?.id || isOrgAdmin(current)) {
     done()
     return
   }

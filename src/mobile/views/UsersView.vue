@@ -14,6 +14,7 @@ import { ApiError } from '@/shared/api/apiError'
 import { errorMessageKey } from '@/shared/api/errorKey'
 import { fetchUsers } from '@/shared/api/usersApi'
 import { useToast } from '@/shared/composables/useToast'
+import { isOrgAdmin } from '@/shared/lib/userRole'
 import type { ManagedUser } from '@/shared/schemas/user.schema'
 import { useAuthStore } from '@/shared/stores/authStore'
 import { useUserStore } from '@/shared/stores/userStore'
@@ -107,7 +108,7 @@ onMounted(() => void load(1))
             <p v-if="user.mustChangePassword" class="text-caption font-medium text-sync-pending">
               {{ t('manage.mustChange') }}
             </p>
-            <Button v-if="canEdit && user.id !== auth.user?.id" variant="secondary" size="sm" @click="edit(user.id)">
+            <Button v-if="canEdit && user.id !== auth.user?.id && !isOrgAdmin(user)" variant="secondary" size="sm" @click="edit(user.id)">
               {{ t('manage.edit') }}
             </Button>
           </FieldGrid>

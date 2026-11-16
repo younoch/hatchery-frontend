@@ -210,11 +210,11 @@
     "saved": "Changes saved.",
     "resetButton": "Reset the password",
     "resetTitle": "Reset the password?",
-    "resetMessage": "A new temporary password will be set for the user. The old password will stop working.",
+    "resetMessage": "A new temporary password will be set for the user. The old password will stop working and the user will be signed out on every device. At the next sign-in the user must choose a new password.",
     "resetConfirm": "Reset",
     "resetCancel": "Go back",
     "resetDone": "The password was reset.",
-    "resetHint": "Give this new temporary password to the user. It will not be shown again."
+    "resetHint": "Give this new temporary password to the user. It will not be shown again. The user is signed out everywhere right now."
   },
   "cache": {
     "action": "Clear cache and reload",
