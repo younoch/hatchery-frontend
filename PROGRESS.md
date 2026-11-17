@@ -55,7 +55,9 @@
 | 21e | Restore the last 30 days of own readings after login, and the clear cache and reload button (backend `GET /readings` delivered, B→F-34) | done | 2026-11-14 |
 | 21f | Use `GET /sync/state`: refetch the tanks and roles only when their marker changes (replaces the 10-minute tank refresh) | not started | - |
 | 22 | Notifications | not started | - |
-| 23 | Dashboard | not started | - |
+| 23a | Dashboard (D3): the user's own readings from the local data, one tank, 7 or 30 days, four line charts and the latest values | not started | - |
+| 23b | Dashboard: the organization's readings for a user with `reading:read-all` (needs the backend, F→B-33) | blocked by backend | - |
+| 28 | Corrections after sync: the author edits and deletes his own reading within the window the server sets, with an offline queue (needs the backend, F→B-33) | blocked by backend | - |
 | 24 | Desktop views | not started | - |
 | 25 | Batch screen | not started | - |
 | 26a | Management: users (list, create with a generated temporary password, edit, activate or deactivate, reset password) | done | 2026-11-16 |
@@ -134,6 +136,7 @@ the 10-minute tank refresh is replaced by it if the backend delivers it.
 - 2026-11-14: Step 26 decisions: (1) only the organization admin's own work is built; everything for the super admin (organizations, transfer-admin, deleting users, a home for the super admin) stays in Swagger, so no call sends `organizationId` and nothing checks `isSuperAdmin`; (2) the screens are users, tanks and roles, reached from a "Management" page opened from the More sheet, with a card for each only when the user holds its permission key; (3) users: create (the app generates a temporary password of 10 letters and digits, shown once with a copy button and editable), edit name and role, activate or deactivate, reset the password; no delete; (4) tanks: create, rename, activate or deactivate; (5) roles: list the organization's roles and toggle permissions, the `admin` row is read-only; (6) the screens work online only and say so when offline; (7) the Bangla labels of the permission keys wait for the backend's answers (F→B-32).
 - 2026-11-14: Step 21e implementation details: (1) the restore after login takes the last 30 days of the user's own readings (pages of 100, `from` the same on every page), adds only ids that are missing locally (as `synced`) and stores a marker in the new Dexie `meta` table (version 4) that logout clears with everything else; a failed run leaves the marker unset, so the next trigger (login, app start, `online`) tries again; a restore that finishes after a logout or a user change stores nothing; (2) the clear cache button (More sheet) clears the readings, tanks and marker but keeps the login session, tries a sync first, asks when readings are still unsent, then fetches the tanks and the readings again.
 - 2026-11-16: Backend facts for the user screens (progress.md, T11b): a password reset sets `mustChangePassword` and revokes all of the user's refresh tokens (the access token lives on, but every endpoint except `GET /users/me` and `PATCH /users/me/password` answers 403 `must_change_password` from the next request); the organization's admin can be reset and changed only by the super admin (403 `permission_denied`, `org_admin_protected`), so the screens hide edit and reset for a user whose role is `admin`; an admin cannot reset or change his own account here (409 `cannot_target_self`). Open risk (parking lot): a user who is signed in when his password is reset gets silent 403s, and when the access token ends the refresh fails and the forced logout clears his unsent readings.
+- 2026-11-17: Owner decisions: (1) no step 21g: a password reset, like any session the server ends, clears the user's unsent readings; accepted for the pilot to keep it simple; (2) the dashboard shows data by permission: a user without `reading:read-all` sees his own readings (the local data), a user with it sees the organization's readings (needs a backend endpoint); (3) corrections after sync are allowed for the author within a window the server sets (option C): edit and delete, which needs backend work (new Step 28) and adds `updatedAt` and `editableUntil` to the readings; (4) D3.js is the chart library (approved as a dependency); (5) the frontend defines the data structure it needs for the charts (`TankChartData`) and asks the backend what it can provide (F→B-33); (6) order: 23a now, then 23b and 28 when the backend delivers, then 27 and the pilot.
 -
 ## Parking lot
 - Switch to single "typescript-eslint" package
@@ -157,7 +160,6 @@ the 10-minute tank refresh is replaced by it if the backend delivers it.
 - `manualChunks` vendor split: the build chunk names are misleading.
 - Save-failure toast (`error.saveFailed`) when saving a reading to Dexie fails.
 - Zod 3.25.76 (frontend) vs Zod 4 (backend): matters only if schemas are ever shared.
-- Decide before Step 23 (dashboard): are corrections after sync allowed? The pilot has no edit after sync.
 - Decide at Step 21: the Dexie version numbers (2 = session; COORDINATION B→F-04 planned tanks as version 3, and the error code of a failed reading also needs a version), where the rejected values are edited (fix-and-resend UI), and where the error code is stored.
 - Owner decision pending in COORDINATION: B→F-11 (a domain for `app.` and `api.`).
 - COORDINATION.md rule 1 `diff` path (`../hatchery-backend`) is wrong on this machine; put in the real backend repo path.
@@ -166,4 +168,3 @@ the 10-minute tank refresh is replaced by it if the backend delivers it.
 - Move the offline banner in MobileShell to `NoticeBanner` (same look, it can reuse it).
 - Local `synced` readings keep `syncedAt: null` until Step 21e restores them from `GET /readings`; check that nothing depends on it.
 - In local development the browser cannot read `Retry-After` unless the backend exposes it in CORS; low priority request for the backend, production is same-origin through the Vercel rewrite.
-- Proposed step 21g: on a runtime 403 `must_change_password` (sync, tanks), read `/users/me` again and send the user to the password change screen at once, so the local readings are kept and sync goes on after the new password (needs the owner's go-ahead).
