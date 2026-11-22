@@ -75,6 +75,21 @@ export async function getLatestReading(
   return rows[0]
 }
 
+// The current user's own readings of one tank between two times (local data), oldest first.
+// `to` is exclusive. A `failed` reading (the server rejected it) is not charted.
+export async function listOwnReadingsForChart(
+  userId: string,
+  tankId: string,
+  from: Date,
+  to: Date
+): Promise<Reading[]> {
+  const rows = await db.readings
+    .where('[createdById+tankId+recordedAt]')
+    .between([userId, tankId, from.toISOString()], [userId, tankId, to.toISOString()], true, false)
+    .toArray()
+  return rows.filter(row => row.status !== 'failed')
+}
+
 // Synced readings older than the retention window are removed. pending/failed are never touched.
 export async function cleanupSyncedReadings(): Promise<number> {
   const cutoff = new Date(Date.now() - SYNCED_RETENTION_DAYS * 86_400_000).toISOString()
@@ -207,27 +222,25 @@ export async function addRestoredReadings(items: ReadingItem[], userId: string):
       await db.readings
         .where('id')
         .anyOf(items.map(item => item.id))
-        .primaryKeys(),
+        .primaryKeys()
     )
     const fresh = items
       .filter(item => !existing.has(item.id))
-      .map(
-        (item): Reading => ({
-          id: item.id,
-          tankId: item.tankId,
-          recordedAt: item.recordedAt,
-          ph: item.ph,
-          temperatureC: item.temperatureC,
-          salinityPpt: item.salinityPpt,
-          oxygenMgL: item.oxygenMgL,
-          ...(item.note ? { note: item.note } : {}),
-          syncedAt: item.syncedAt,
-          status: 'synced',
-          createdById: userId,
-          isLate: false,
-          needsReview: false,
-        }),
-      )
+      .map((item): Reading => ({
+        id: item.id,
+        tankId: item.tankId,
+        recordedAt: item.recordedAt,
+        ph: item.ph,
+        temperatureC: item.temperatureC,
+        salinityPpt: item.salinityPpt,
+        oxygenMgL: item.oxygenMgL,
+        ...(item.note ? { note: item.note } : {}),
+        syncedAt: item.syncedAt,
+        status: 'synced',
+        createdById: userId,
+        isLate: false,
+        needsReview: false,
+      }))
     await db.readings.bulkAdd(fresh)
   })
 }
