@@ -20,6 +20,7 @@
   },
   "nav": {
     "waterQuality": "Water Quality",
+    "dashboard": "Dashboard",
     "main": "Main navigation",
     "more": "More"
   },
@@ -172,6 +173,14 @@
       "invalid_username": "The username is not valid.",
       "rate_limited": "Too many attempts. Wait a minute and try again."
     }
+  },
+  "dashboard": {
+    "tank": "Tank",
+    "range": "Period",
+    "days7": "Last 7 days",
+    "days30": "Last 30 days",
+    "latest": "Latest reading:",
+    "noReadings": "There are no readings for this tank in this period."
   },
   "permission": {
     "userRead": "See the list of users",

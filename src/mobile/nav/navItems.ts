@@ -14,4 +14,10 @@ export const navItems: NavItem[] = [
     to: '/m/water',
     iconPath: 'M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z',
   },
+  {
+    key: 'dashboard',
+    labelKey: 'nav.dashboard',
+    to: '/m/dashboard',
+    iconPath: 'M3 3v18h18M7 15l4-4 3 3 5-6',
+  },
 ]
