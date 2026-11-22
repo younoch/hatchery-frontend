@@ -180,7 +180,9 @@
     "days7": "Last 7 days",
     "days30": "Last 30 days",
     "latest": "Latest reading:",
-    "noReadings": "There are no readings for this tank in this period."
+    "noReadings": "There are no readings for this tank in this period.",
+    "author": "Recorded by",
+    "everyone": "Everyone"
   },
   "permission": {
     "userRead": "See the list of users",

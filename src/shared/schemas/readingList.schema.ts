@@ -19,3 +19,22 @@ export const readingListSchema = z.object({
 })
 
 export type ReadingItem = z.infer<typeof readingItemSchema>
+
+// The organization's readings (`GET /readings/organization`): the same reading plus who recorded it.
+export const readingAuthorSchema = z.object({
+  id: z.string(),
+  username: z.string(),
+  name: z.string().nullable(),
+})
+
+export const orgReadingSchema = readingItemSchema.extend({ createdBy: readingAuthorSchema })
+
+export const orgReadingListSchema = z.object({
+  items: z.array(orgReadingSchema),
+  nextCursor: z.string().nullable(),
+})
+
+// `GET /readings/organization/latest`: the newest reading of each tank that has one, in no order.
+export const orgLatestSchema = z.object({ items: z.array(orgReadingSchema) })
+
+export type OrgReading = z.infer<typeof orgReadingSchema>
