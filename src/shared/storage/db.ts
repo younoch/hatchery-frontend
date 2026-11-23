@@ -19,6 +19,8 @@ export interface Reading {
   attempts?: number // send attempts so far; a reading is editable only while this is 0 (2026-11-13)
   errorCode?: string // `failed` only: the error code the server gave
   errorField?: string // `failed` only: the field that code is about, when the server named one
+  updatedAt?: string // the server's change marker of this reading (B→F-39), for `expectedUpdatedAt`
+  editableUntil?: string | null // until when the author may correct it, set by the server; null: never
 }
 
 // A tank of the user's organization, cached from GET /tanks. `position` keeps the server's order.

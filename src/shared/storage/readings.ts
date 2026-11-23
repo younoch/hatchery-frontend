@@ -215,32 +215,49 @@ export async function deleteFailedReading(id: string): Promise<boolean> {
 
 // Readings restored from the server, stored as `synced`. A record that already exists locally is
 // left alone: it may be a pending or failed reading with local state.
+function readingFromServer(item: ReadingItem, userId: string): Reading {
+  return {
+    id: item.id,
+    tankId: item.tankId,
+    recordedAt: item.recordedAt,
+    ph: item.ph,
+    temperatureC: item.temperatureC,
+    salinityPpt: item.salinityPpt,
+    oxygenMgL: item.oxygenMgL,
+    ...(item.note ? { note: item.note } : {}),
+    syncedAt: item.syncedAt,
+    ...(item.updatedAt ? { updatedAt: item.updatedAt } : {}),
+    editableUntil: item.editableUntil ?? null,
+    status: 'synced',
+    createdById: userId,
+    isLate: false,
+    needsReview: false,
+  }
+}
+
+// Readings from the server. A reading the phone does not have is added as `synced`. A `synced`
+// reading the phone has follows the server: when the server's `updatedAt` is different (or the
+// phone has none), the phone's copy is replaced. A `pending`, `syncing` or `failed` reading is
+// never touched: it carries local state the server does not know.
 export async function addRestoredReadings(items: ReadingItem[], userId: string): Promise<void> {
   if (items.length === 0) return
   await db.transaction('rw', db.readings, async () => {
-    const existing = new Set(
-      await db.readings
-        .where('id')
-        .anyOf(items.map(item => item.id))
-        .primaryKeys()
+    const local = new Map(
+      (
+        await db.readings
+          .where('id')
+          .anyOf(items.map(item => item.id))
+          .toArray()
+      ).map(row => [row.id, row]),
     )
-    const fresh = items
-      .filter(item => !existing.has(item.id))
-      .map((item): Reading => ({
-        id: item.id,
-        tankId: item.tankId,
-        recordedAt: item.recordedAt,
-        ph: item.ph,
-        temperatureC: item.temperatureC,
-        salinityPpt: item.salinityPpt,
-        oxygenMgL: item.oxygenMgL,
-        ...(item.note ? { note: item.note } : {}),
-        syncedAt: item.syncedAt,
-        status: 'synced',
-        createdById: userId,
-        isLate: false,
-        needsReview: false,
-      }))
+    const fresh: Reading[] = []
+    for (const item of items) {
+      const row = local.get(item.id)
+      if (!row) fresh.push(readingFromServer(item, userId))
+      else if (row.status === 'synced' && row.updatedAt !== item.updatedAt) {
+        await db.readings.put(readingFromServer(item, userId))
+      }
+    }
     await db.readings.bulkAdd(fresh)
   })
 }

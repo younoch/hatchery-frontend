@@ -11,6 +11,8 @@ export const readingItemSchema = z.object({
   oxygenMgL: z.number(),
   note: z.string().nullable(),
   syncedAt: z.string(),
+  updatedAt: z.string().optional(),
+  editableUntil: z.string().nullable().optional(),
 })
 
 export const readingListSchema = z.object({
