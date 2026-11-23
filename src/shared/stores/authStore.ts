@@ -61,6 +61,23 @@ export const useAuthStore = defineStore('auth', () => {
     else await saveLocalSession(me)
   }
 
+  // Reads the signed-in user again, for example after a change to his role's permissions, and keeps
+  // the session in step. Returns false when it could not (no token, offline, the server said no):
+  // the caller tries again at the next trigger.
+  async function reloadUser(): Promise<boolean> {
+    const token = getAccessToken()
+    if (!token) return false
+    try {
+      const me = await httpAuthAdapter.fetchMe(token)
+      setSession(me)
+      await persistSession(me)
+      return true
+    } catch (error) {
+      if (error instanceof ApiError) return false
+      throw error
+    }
+  }
+
   async function login(credentials: LoginCredentials): Promise<void> {
     const token = await httpAuthAdapter.login(credentials)
     setAccessToken(token)
@@ -143,6 +160,7 @@ export const useAuthStore = defineStore('auth', () => {
     hasPermission,
     login,
     changePassword,
+    reloadUser,
     bootstrap,
     logout,
     clearSession,
