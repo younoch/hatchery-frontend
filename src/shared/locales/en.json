@@ -192,7 +192,8 @@
     "tankCreate": "Create a tank",
     "tankWrite": "Rename, activate or deactivate a tank",
     "organizationRoleWrite": "Change what a role may do",
-    "readingCreate": "Record and send water readings"
+    "readingCreate": "Record and send water readings",
+    "readingReadAll": "See everybody's readings in the organization (on the dashboard)"
   },
   "manage": {
     "title": "Management",

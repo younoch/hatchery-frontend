@@ -10,17 +10,18 @@ export const ORG_PERMISSIONS = [
   { key: 'tank:write', labelKey: 'permission.tankWrite' },
   { key: 'organization-role:write', labelKey: 'permission.organizationRoleWrite' },
   { key: 'reading:create', labelKey: 'permission.readingCreate' },
+  { key: 'reading:read-all', labelKey: 'permission.readingReadAll' },
 ] as const
 
 const SHOWN = new Set<string>(ORG_PERMISSIONS.map(item => item.key))
 
-// A key the screen shows. The others (the reserved `reading:read-all`) are kept as they are when a
-// role is saved, so a save never drops a key the admin cannot see.
+// A key the screen shows. Any other key a role may hold is kept as it is when a role is saved, so
+// a save never drops a key the admin cannot see.
 export function isShownPermission(key: string): boolean {
   return SHOWN.has(key)
 }
 
-// How many of a role's keys the screen shows (the reserved key is left out).
+// How many of a role's keys the screen shows.
 export function shownPermissionCount(permissions: readonly string[]): number {
   return permissions.filter(key => SHOWN.has(key)).length
 }
