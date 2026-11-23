@@ -1,4 +1,3 @@
-import { ApiError } from '@/shared/api/apiError'
 import { fetchOrganizationReadingsPage } from '@/shared/api/readingsApi'
 import type { OrgReading } from '@/shared/schemas/readingList.schema'
 
@@ -25,5 +24,3 @@ export async function loadOrganizationReadings(
   }
   return all
 }
-
-export { ApiError }
