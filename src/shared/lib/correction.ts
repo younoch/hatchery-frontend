@@ -21,3 +21,26 @@ export function correctionTimeLeftMs(reading: Reading): number {
 export function isCorrectable(reading: Reading): boolean {
   return reading.status === 'synced' && correctionTimeLeftMs(reading) > CORRECTION_MARGIN_MS
 }
+
+
+
+// The reading was changed after it was first synced (on this phone or on another).
+export function isCorrected(reading: Reading): boolean {
+  return (
+    !!reading.updatedAt &&
+    !!reading.syncedAt &&
+    Date.parse(reading.updatedAt) > Date.parse(reading.syncedAt)
+  )
+}
+
+// What is left of the window for the card: whole hours rounded down (never more than there is),
+// under an hour in minutes. Call it only while `isCorrectable` is true.
+export function correctionTimeLeft(reading: Reading): {
+  key: 'water.timeLeftHours' | 'water.timeLeftMinutes'
+  count: number
+} {
+  const ms = correctionTimeLeftMs(reading)
+  const hours = Math.floor(ms / 3_600_000)
+  if (hours >= 1) return { key: 'water.timeLeftHours', count: hours }
+  return { key: 'water.timeLeftMinutes', count: Math.max(1, Math.floor(ms / 60_000)) }
+}

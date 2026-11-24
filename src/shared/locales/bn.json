@@ -115,7 +115,16 @@
     "tabHistoryCount": "ইতিহাস ({count})",
     "historyEmpty": "এখনো কোনো এন্ট্রি নেই।",
     "fixAndResend": "ঠিক করে পাঠান",
-    "editTitle": "রিডিং ঠিক করুন"
+    "editTitle": "রিডিং ঠিক করুন",
+    "corrected": "সংশোধিত",
+    "timeLeftHours": "সংশোধনের জন্য প্রায় {count} ঘণ্টা বাকি",
+    "timeLeftMinutes": "সংশোধনের জন্য প্রায় {count} মিনিট বাকি",
+    "correct": "সংশোধন করুন",
+    "correctionNeedsInternet": "সংশোধনের জন্য ইন্টারনেট লাগবে।",
+    "deleted": "রিডিংটি মুছে ফেলা হয়েছে।",
+    "saveCorrection": "সংশোধন সেভ করুন",
+    "correctionSaved": "সংশোধন সেভ হয়েছে।",
+    "staleReading": "রিডিংটি অন্য ফোনে বদলানো হয়েছে। এখনকার মান: {values}। আপনার লেখা মান ফর্মে আছে, আবার সেভ করলে সেগুলোই বসবে।"
   },
   "auth": {
     "login": {

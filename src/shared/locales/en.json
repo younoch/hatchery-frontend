@@ -115,7 +115,16 @@
     "tabHistoryCount": "History ({count})",
     "historyEmpty": "No entries yet.",
     "fixAndResend": "Fix and resend",
-    "editTitle": "Fix the reading"
+    "editTitle": "Fix the reading",
+    "corrected": "Corrected",
+    "timeLeftHours": "About {count} h left to correct",
+    "timeLeftMinutes": "About {count} min left to correct",
+    "correct": "Correct",
+    "correctionNeedsInternet": "Corrections need internet.",
+    "deleted": "The reading was deleted.",
+    "saveCorrection": "Save the correction",
+    "correctionSaved": "The correction was saved.",
+    "staleReading": "This reading was changed on another phone. Current values: {values}. Your typed values are kept; save again to replace them."
   },
   "auth": {
     "login": {

@@ -12,6 +12,7 @@ import Button from '@/shared/components/ui/Button.vue'
 import CardList from '@/shared/components/layout/CardList.vue'
 import FieldGrid from '@/shared/components/layout/FieldGrid.vue'
 import PageBody from '@/shared/components/layout/PageBody.vue'
+import { correctionTimeLeft, isCorrectable, isCorrected } from '@/shared/lib/correction'
 import { formatReadingTime } from '@/shared/lib/datetime'
 import { isFixable, rejectionMessageKey } from '@/shared/lib/rejection'
 import { deleteFailedReading, listReadings } from '@/shared/storage/readings'
@@ -42,6 +43,27 @@ let unsubscribe: (() => void) | undefined
 
 const tankName = (id: string) => tankStore.nameOf(id) ?? t('water.unknownTank')
 
+// The time left of a window changes while the page stays open: the clock is read again every
+// minute. Reading `tick` makes the functions below follow it.
+const tick = ref(0)
+let tickTimer: number | undefined
+
+function canCorrect(reading: Reading): boolean {
+  void tick.value
+  return isCorrectable(reading)
+}
+
+// One line under the values: "Corrected" and the time left, joined here, not in the template.
+function correctionHint(reading: Reading): string | undefined {
+  const parts: string[] = []
+  if (isCorrected(reading)) parts.push(t('water.corrected'))
+  if (canCorrect(reading)) {
+    const left = correctionTimeLeft(reading)
+    parts.push(t(left.key, { count: left.count }))
+  }
+  return parts.length > 0 ? parts.join(' · ') : undefined
+}
+
 // A failed reading can be deleted after a confirmation; it is not on the server, so nothing is
 // lost there.
 const deleteId = ref<string | null>(null)
@@ -69,9 +91,15 @@ onMounted(() => {
     },
   })
   unsubscribe = () => subscription.unsubscribe()
+  tickTimer = window.setInterval(() => {
+    tick.value += 1
+  }, 60_000)
 })
 
-onBeforeUnmount(() => unsubscribe?.())
+onBeforeUnmount(() => {
+  unsubscribe?.()
+  window.clearInterval(tickTimer)
+})
 </script>
 
 <template>
@@ -101,6 +129,9 @@ onBeforeUnmount(() => unsubscribe?.())
               class="text-caption text-muted-foreground [overflow-wrap:anywhere]"
             >
               {{ reading.note }}
+            </p>
+            <p v-if="correctionHint(reading)" class="text-caption text-muted-foreground">
+              {{ correctionHint(reading) }}
             </p>
             <p v-if="reading.status === 'failed'" class="text-caption font-medium text-sync-failed">
               {{ t(rejectionMessageKey(reading.errorCode)) }}
