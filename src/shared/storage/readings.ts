@@ -281,3 +281,14 @@ export async function addRestoredReadings(items: ReadingItem[], userId: string):
     await db.readings.bulkAdd(fresh)
   })
 }
+
+
+// The server holds this reading with other values than the phone sent (a `duplicate` with
+// `identical: false`): the server's values replace the phone's copy. Only a `synced` reading is
+// replaced; a reading with local state is never touched.
+export async function applyServerReading(item: ReadingItem): Promise<void> {
+  await db.transaction('rw', db.readings, async () => {
+    const row = await db.readings.get(item.id)
+    if (row?.status === 'synced') await db.readings.put(readingFromServer(item, row.createdById))
+  })
+}

@@ -1,9 +1,11 @@
 import { ApiError } from '@/shared/api/apiError'
 import { httpSyncAdapter } from '@/shared/api/httpSyncAdapter'
+import { getReading } from '@/shared/api/readingsApi'
 import type { SyncAdapter } from '@/shared/api/syncAdapter'
 import type { SyncResponse } from '@/shared/schemas/sync.schema'
 import type { Reading } from '@/shared/storage/db'
 import {
+  applyServerReading,
   listPendingForSync,
   markFailed,
   markPending,
@@ -50,7 +52,7 @@ function waitMs(error: ApiError, attempt: number): number {
 async function applyResults(
   chunk: Reading[],
   response: SyncResponse,
-  outcome: SyncOutcome,
+  outcome: SyncOutcome
 ): Promise<ChunkStep> {
   const byIndex = new Map(response.results.map(result => [result.index, result]))
   const synced: SyncedReading[] = []
@@ -97,7 +99,7 @@ async function applyResults(
 async function sendChunk(
   adapter: SyncAdapter,
   chunk: Reading[],
-  outcome: SyncOutcome,
+  outcome: SyncOutcome
 ): Promise<ChunkStep> {
   const ids = chunk.map(reading => reading.id)
   await markSending(ids)
@@ -169,6 +171,20 @@ async function drain(adapter: SyncAdapter, outcome: SyncOutcome): Promise<void> 
   }
 }
 
+// A `duplicate` with other values: the server's reading wins. A reading the server no longer
+// finds (404) is skipped. Any other failure stops the loop; the readings stay `synced` with their
+// old values and the next restore or refetch repairs them (decision 2026-11-24).
+async function takeServerValues(ids: string[]): Promise<void> {
+  for (const id of ids) {
+    try {
+      await applyServerReading(await getReading(id))
+    } catch (error) {
+      if (!(error instanceof ApiError)) throw error
+      if (error.status !== 404) return
+    }
+  }
+}
+
 let running = false // used only when the Web Locks API is missing
 
 // One run at a time, across tabs. Returns null when another run holds the lock.
@@ -182,9 +198,7 @@ async function withLock<T>(task: () => Promise<T>): Promise<T | null> {
       running = false
     }
   }
-  return navigator.locks.request(LOCK_NAME, { ifAvailable: true }, lock =>
-    lock ? task() : null,
-  )
+  return navigator.locks.request(LOCK_NAME, { ifAvailable: true }, lock => (lock ? task() : null))
 }
 
 // Sends every pending reading. The caller decides whether the user may sync at all (signed in,
@@ -198,6 +212,7 @@ export async function runSync(adapter: SyncAdapter = httpSyncAdapter): Promise<S
     // Inside the lock no request is running, so a `syncing` record is left over from a closed app.
     await resetSyncingToPending()
     await drain(adapter, outcome)
+    await takeServerValues(outcome.differentDuplicates)
     return outcome
   })
 }
