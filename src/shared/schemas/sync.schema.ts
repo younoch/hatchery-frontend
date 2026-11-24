@@ -10,6 +10,9 @@ export const syncResultSchema = z.object({
   id: z.string().optional(),
   status: z.enum(['created', 'duplicate', 'rejected']),
   identical: z.boolean().optional(), // duplicate only: the stored values equal the sent ones
+  updatedAt: z.string().optional(), // created and duplicate: the reading's change marker (B→F-40)
+  editableUntil: z.string().nullable().optional(), // the end of the author's correction window
+  deleted: z.boolean().optional(), // duplicate only: the stored reading was deleted
   errors: z.array(fieldErrorSchema).optional(),
 })
 

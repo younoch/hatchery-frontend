@@ -9,7 +9,9 @@ import {
   markPending,
   markSending,
   markSynced,
+  removeLocalReadings,
   resetSyncingToPending,
+  type SyncedReading,
 } from '@/shared/storage/readings'
 
 const LOCK_NAME = 'hatchery-sync'
@@ -51,7 +53,8 @@ async function applyResults(
   outcome: SyncOutcome,
 ): Promise<ChunkStep> {
   const byIndex = new Map(response.results.map(result => [result.index, result]))
-  const synced: string[] = []
+  const synced: SyncedReading[] = []
+  const removed: string[] = [] // a duplicate the server says was deleted: the phone's copy goes
   const unanswered: string[] = []
 
   for (const [index, reading] of chunk.entries()) {
@@ -62,8 +65,16 @@ async function applyResults(
       const first = result.errors?.[0]
       await markFailed(reading.id, first?.code ?? 'rejected', first?.field)
       outcome.failed += 1
+    } else if (result.status === 'duplicate' && result.deleted) {
+      removed.push(reading.id)
     } else {
-      synced.push(reading.id)
+      synced.push({
+        id: reading.id,
+        // For a created reading the server's `updatedAt` is its `syncedAt`.
+        ...(result.status === 'created' && result.updatedAt ? { syncedAt: result.updatedAt } : {}),
+        ...(result.updatedAt ? { updatedAt: result.updatedAt } : {}),
+        ...(result.editableUntil !== undefined ? { editableUntil: result.editableUntil } : {}),
+      })
       if (result.status === 'duplicate' && result.identical === false) {
         outcome.differentDuplicates.push(reading.id)
       }
@@ -71,6 +82,7 @@ async function applyResults(
   }
 
   await markSynced(synced)
+  await removeLocalReadings(removed)
   outcome.synced += synced.length
 
   if (unanswered.length > 0) {

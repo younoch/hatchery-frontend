@@ -161,16 +161,36 @@ export async function markSending(ids: string[]): Promise<void> {
     })
 }
 
-// The server has the readings (created or duplicate).
-export async function markSynced(ids: string[]): Promise<void> {
+// What the server told us about a reading it holds; kept on the local reading (B→F-40).
+export interface SyncedReading {
+  id: string
+  syncedAt?: string // only for a `created` result: the server's `updatedAt` is its `syncedAt`
+  updatedAt?: string
+  editableUntil?: string | null
+}
+
+// The server has the readings (created or duplicate). The correction fields it sent are kept.
+export async function markSynced(items: SyncedReading[]): Promise<void> {
+  if (items.length === 0) return
+  const byId = new Map(items.map(item => [item.id, item]))
   await db.readings
     .where('id')
-    .anyOf(ids)
+    .anyOf([...byId.keys()])
     .modify(reading => {
+      const item = byId.get(reading.id)
       reading.status = 'synced'
       delete reading.errorCode
       delete reading.errorField
+      if (item?.syncedAt) reading.syncedAt = item.syncedAt
+      if (item?.updatedAt) reading.updatedAt = item.updatedAt
+      if (item?.editableUntil !== undefined) reading.editableUntil = item.editableUntil
     })
+}
+
+// A reading the server says was deleted (a `duplicate` with `deleted: true`): the phone's copy goes.
+export async function removeLocalReadings(ids: string[]): Promise<void> {
+  if (ids.length === 0) return
+  await db.readings.bulkDelete(ids)
 }
 
 // The server rejected the reading: it keeps the error code so the card can say why.
