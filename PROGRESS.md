@@ -1,73 +1,73 @@
 # Progress
 
-| Step | Name | Status | Approved on |
-|---|---|---|---|
-| 0 | Orientation | done | 2026-10-03 |
-| 1 | Project setup | done | 2026-10-03 |
-| 2 | Tailwind and shadcn-vue init | done | 2026-10-03 |
-| 3 | Design tokens (Layer 1) | done | 2026-10-04 |
-| 4 | i18n | done | 2026-10-06 |
-| 5 | Folder structure and routing | done | 2026-10-06 |
-| 6 | Button | done | 2026-10-06 |
-| 7 | Field and Input | done | 2026-10-07 |
-| 8 | Sheet and Tabs | done | 2026-10-09 |
-| 9 | Layout components | done | 2026-10-09 |
-| 10a | Styleguide: components | done | 2026-10-09 |
-| 10b | Styleguide: heavy screen | done | 2026-10-10 |
-| 11a | Mobile shell, app bar | done | 2026-10-10 |
-| 11b | Mobile shell, tab bar | done | 2026-10-10 |
-| 11c | Mobile shell, notifications | deferred | - |
-| 12 | Desktop shell | deferred | - |
-| 13 | Swipe navigation | deferred | - |
-| 14-pre | Lazy route imports | done | 2026-10-13 |
-| 14a | PWA: plugin and manifest | done | 2026-10-13 |
-| 14b | PWA: install prompt and offline-ready state | done | 2026-10-13 |
-| 14c | PWA: production test on Vercel (real mobile and desktop) | done | 2026-10-13 |
-| 15 | Schema | done | 2026-10-10 |
-| 16 | Dexie storage layer | done | 2026-10-11 |
-| 17a | Entry screen, form and save | done | 2026-10-11 |
-| 17b | Entry screen, last value | done | 2026-10-12 |
-| 18a | History: sub-tabs and card list | done | 2026-10-12 |
-| 18b | History: StatusBadge and pending count | done | 2026-10-12 |
-| 18c | History: fix-and-resend (local only) | done | 2026-10-12 |
-| 19 | Error handling | done | 2026-10-15 |
-| 20a | Auth: env, types, Zod schemas, AuthAdapter | done | 2026-10-17 |
-| 20b-1 | Auth: request wrapper and httpAuthAdapter | done | 2026-10-17 |
-| 20b-2 | Auth: sessionManager (single-flight refresh, cross-tab lock) | done | 2026-10-17 |
-| 20b-3 | Auth: authedRequest (one refresh and retry on 401) | done | 2026-10-17 |
-| 20c | Auth: store, route guard, login view | done | 2026-10-17 |
-| 20d | Auth: offline local session | done | 2026-10-17 |
-| 20.5 | Global Toast: component, useToast, ToastHost, styleguide, login errors | done | 2026-10-17 |
-| 20.6 | Rename AuthError to ApiError | done | 2026-11-08 |
-| 21d | Backend contract v2 switch: `/users` paths, username login, new `/users/me`, forced password screen, online-only logout, error codes | done | 2026-11-13 |
-| 20.7 | recordedAt guards (future 5 minutes, before 2020) and phone clock warning | done | 2026-11-13 |
-| 21-pre | Align WATER_RANGES with the backend limits | done | 2026-11-13 |
-| 21b | Tanks from the backend (Dexie `tanks` table, UUID tank ids, empty state without an organization) | done | 2026-11-14 |
-| 21-1 | Sync: attempts count, error code and the status helpers on readings | done | 2026-11-14 |
-| 21-2 | Sync: adapter, response schema and Retry-After on ApiError | done | 2026-11-14 |
-| 21-3 | Sync: the engine (chunks, per-item results, retry and stop rules) | done | 2026-11-14 |
-| 21-4 | Sync: triggers (login, app start, online, foreground, after a save) | done | 2026-11-14 |
-| 21-5a | Failed card: reason message from the error code | done | 2026-11-14 |
-| 21-5b | ConfirmSheet and delete of a failed reading | done | 2026-11-14 |
-| 21-5c | Edit mode of the reading form: fix and resend a failed reading | done | 2026-11-14 |
-| 21-5d | Sync before logout | done | 2026-11-14 |
-| 21c | Absorbed into 21 and 21b (real endpoints from the start, no mock) | dropped | - |
-| 21e | Restore the last 30 days of own readings after login, and the clear cache and reload button (backend `GET /readings` delivered, B→F-34) | done | 2026-11-14 |
-| 21f | Use `GET /sync/state`: refetch the tanks and roles only when their marker changes (replaces the 10-minute tank refresh) | done | 2026-11-23 |
-| 22 | Notifications | not started | - |
-| 23a | Dashboard (D3): the user's own readings from the local data, one tank, 7 or 30 days, four line charts and the latest values | done | 2026-11-22 |
-| 23b | Dashboard: the organization's readings for a user with `reading:read-all` (`GET /readings/organization`, delivered in B→F-38) | done | 2026-11-22 |
-| 28a | Corrections after sync: the author edits and deletes his own reading within the window the server sets, online only (`GET/PATCH/DELETE /readings/{id}`, delivered in B→F-39): `updatedAt` and `editableUntil` kept on the reading, from the restore and (T28) from the sync results | done | 2026-11-24 |
-| 28b | Corrections: the API calls and the error messages | not started | - |
-| 28c | Corrections: the buttons on the history card, the edit form for a synced reading, delete and the 409 path | not started | - |
-| 28d | Corrections: refetch the own readings window when the `readings` marker moves | not started | - |
-| 24 | Desktop views | not started | - |
-| 25 | Batch screen | not started | - |
-| 26a | Management: users (list, create with a generated temporary password, edit, activate or deactivate, reset password) | done | 2026-11-16 |
-| 26b | Management: tanks (list, create, rename, activate or deactivate) | done | 2026-11-17 |
-| 26c | Management: roles (the organization's roles and their permissions) | done | 2026-11-17 |
-| 26d | Management entry: the "Management" page opened from the More sheet, one card per permission | done | 2026-11-17 |
-| 27 | Verification pass | not started | - |
+| Step   | Name                                                                                                                                                                                                                                                                                | Status      | Approved on |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ----------- |
+| 0      | Orientation                                                                                                                                                                                                                                                                         | done        | 2026-10-03  |
+| 1      | Project setup                                                                                                                                                                                                                                                                       | done        | 2026-10-03  |
+| 2      | Tailwind and shadcn-vue init                                                                                                                                                                                                                                                        | done        | 2026-10-03  |
+| 3      | Design tokens (Layer 1)                                                                                                                                                                                                                                                             | done        | 2026-10-04  |
+| 4      | i18n                                                                                                                                                                                                                                                                                | done        | 2026-10-06  |
+| 5      | Folder structure and routing                                                                                                                                                                                                                                                        | done        | 2026-10-06  |
+| 6      | Button                                                                                                                                                                                                                                                                              | done        | 2026-10-06  |
+| 7      | Field and Input                                                                                                                                                                                                                                                                     | done        | 2026-10-07  |
+| 8      | Sheet and Tabs                                                                                                                                                                                                                                                                      | done        | 2026-10-09  |
+| 9      | Layout components                                                                                                                                                                                                                                                                   | done        | 2026-10-09  |
+| 10a    | Styleguide: components                                                                                                                                                                                                                                                              | done        | 2026-10-09  |
+| 10b    | Styleguide: heavy screen                                                                                                                                                                                                                                                            | done        | 2026-10-10  |
+| 11a    | Mobile shell, app bar                                                                                                                                                                                                                                                               | done        | 2026-10-10  |
+| 11b    | Mobile shell, tab bar                                                                                                                                                                                                                                                               | done        | 2026-10-10  |
+| 11c    | Mobile shell, notifications                                                                                                                                                                                                                                                         | deferred    | -           |
+| 12     | Desktop shell                                                                                                                                                                                                                                                                       | deferred    | -           |
+| 13     | Swipe navigation                                                                                                                                                                                                                                                                    | deferred    | -           |
+| 14-pre | Lazy route imports                                                                                                                                                                                                                                                                  | done        | 2026-10-13  |
+| 14a    | PWA: plugin and manifest                                                                                                                                                                                                                                                            | done        | 2026-10-13  |
+| 14b    | PWA: install prompt and offline-ready state                                                                                                                                                                                                                                         | done        | 2026-10-13  |
+| 14c    | PWA: production test on Vercel (real mobile and desktop)                                                                                                                                                                                                                            | done        | 2026-10-13  |
+| 15     | Schema                                                                                                                                                                                                                                                                              | done        | 2026-10-10  |
+| 16     | Dexie storage layer                                                                                                                                                                                                                                                                 | done        | 2026-10-11  |
+| 17a    | Entry screen, form and save                                                                                                                                                                                                                                                         | done        | 2026-10-11  |
+| 17b    | Entry screen, last value                                                                                                                                                                                                                                                            | done        | 2026-10-12  |
+| 18a    | History: sub-tabs and card list                                                                                                                                                                                                                                                     | done        | 2026-10-12  |
+| 18b    | History: StatusBadge and pending count                                                                                                                                                                                                                                              | done        | 2026-10-12  |
+| 18c    | History: fix-and-resend (local only)                                                                                                                                                                                                                                                | done        | 2026-10-12  |
+| 19     | Error handling                                                                                                                                                                                                                                                                      | done        | 2026-10-15  |
+| 20a    | Auth: env, types, Zod schemas, AuthAdapter                                                                                                                                                                                                                                          | done        | 2026-10-17  |
+| 20b-1  | Auth: request wrapper and httpAuthAdapter                                                                                                                                                                                                                                           | done        | 2026-10-17  |
+| 20b-2  | Auth: sessionManager (single-flight refresh, cross-tab lock)                                                                                                                                                                                                                        | done        | 2026-10-17  |
+| 20b-3  | Auth: authedRequest (one refresh and retry on 401)                                                                                                                                                                                                                                  | done        | 2026-10-17  |
+| 20c    | Auth: store, route guard, login view                                                                                                                                                                                                                                                | done        | 2026-10-17  |
+| 20d    | Auth: offline local session                                                                                                                                                                                                                                                         | done        | 2026-10-17  |
+| 20.5   | Global Toast: component, useToast, ToastHost, styleguide, login errors                                                                                                                                                                                                              | done        | 2026-10-17  |
+| 20.6   | Rename AuthError to ApiError                                                                                                                                                                                                                                                        | done        | 2026-11-08  |
+| 21d    | Backend contract v2 switch: `/users` paths, username login, new `/users/me`, forced password screen, online-only logout, error codes                                                                                                                                                | done        | 2026-11-13  |
+| 20.7   | recordedAt guards (future 5 minutes, before 2020) and phone clock warning                                                                                                                                                                                                           | done        | 2026-11-13  |
+| 21-pre | Align WATER_RANGES with the backend limits                                                                                                                                                                                                                                          | done        | 2026-11-13  |
+| 21b    | Tanks from the backend (Dexie `tanks` table, UUID tank ids, empty state without an organization)                                                                                                                                                                                    | done        | 2026-11-14  |
+| 21-1   | Sync: attempts count, error code and the status helpers on readings                                                                                                                                                                                                                 | done        | 2026-11-14  |
+| 21-2   | Sync: adapter, response schema and Retry-After on ApiError                                                                                                                                                                                                                          | done        | 2026-11-14  |
+| 21-3   | Sync: the engine (chunks, per-item results, retry and stop rules)                                                                                                                                                                                                                   | done        | 2026-11-14  |
+| 21-4   | Sync: triggers (login, app start, online, foreground, after a save)                                                                                                                                                                                                                 | done        | 2026-11-14  |
+| 21-5a  | Failed card: reason message from the error code                                                                                                                                                                                                                                     | done        | 2026-11-14  |
+| 21-5b  | ConfirmSheet and delete of a failed reading                                                                                                                                                                                                                                         | done        | 2026-11-14  |
+| 21-5c  | Edit mode of the reading form: fix and resend a failed reading                                                                                                                                                                                                                      | done        | 2026-11-14  |
+| 21-5d  | Sync before logout                                                                                                                                                                                                                                                                  | done        | 2026-11-14  |
+| 21c    | Absorbed into 21 and 21b (real endpoints from the start, no mock)                                                                                                                                                                                                                   | dropped     | -           |
+| 21e    | Restore the last 30 days of own readings after login, and the clear cache and reload button (backend `GET /readings` delivered, B→F-34)                                                                                                                                             | done        | 2026-11-14  |
+| 21f    | Use `GET /sync/state`: refetch the tanks and roles only when their marker changes (replaces the 10-minute tank refresh)                                                                                                                                                             | done        | 2026-11-23  |
+| 22     | Notifications                                                                                                                                                                                                                                                                       | not started | -           |
+| 23a    | Dashboard (D3): the user's own readings from the local data, one tank, 7 or 30 days, four line charts and the latest values                                                                                                                                                         | done        | 2026-11-22  |
+| 23b    | Dashboard: the organization's readings for a user with `reading:read-all` (`GET /readings/organization`, delivered in B→F-38)                                                                                                                                                       | done        | 2026-11-22  |
+| 28a    | Corrections after sync: the author edits and deletes his own reading within the window the server sets, online only (`GET/PATCH/DELETE /readings/{id}`, delivered in B→F-39): `updatedAt` and `editableUntil` kept on the reading, from the restore and (T28) from the sync results | done        | 2026-11-24  |
+| 28b    | Corrections: the API calls and the error messages                                                                                                                                                                                                                                   | done        | 2026-11-24  |
+| 28c    | Corrections: the buttons on the history card, the edit form for a synced reading, delete and the 409 path                                                                                                                                                                           | not started | -           |
+| 28d    | Corrections: refetch the own readings window when the `readings` marker moves                                                                                                                                                                                                       | not started | -           |
+| 24     | Desktop views                                                                                                                                                                                                                                                                       | not started | -           |
+| 25     | Batch screen                                                                                                                                                                                                                                                                        | not started | -           |
+| 26a    | Management: users (list, create with a generated temporary password, edit, activate or deactivate, reset password)                                                                                                                                                                  | done        | 2026-11-16  |
+| 26b    | Management: tanks (list, create, rename, activate or deactivate)                                                                                                                                                                                                                    | done        | 2026-11-17  |
+| 26c    | Management: roles (the organization's roles and their permissions)                                                                                                                                                                                                                  | done        | 2026-11-17  |
+| 26d    | Management entry: the "Management" page opened from the More sheet, one card per permission                                                                                                                                                                                         | done        | 2026-11-17  |
+| 27     | Verification pass                                                                                                                                                                                                                                                                   | not started | -           |
 
 ## Decisions log
 
