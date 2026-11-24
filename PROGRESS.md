@@ -57,7 +57,7 @@
 | 22 | Notifications | not started | - |
 | 23a | Dashboard (D3): the user's own readings from the local data, one tank, 7 or 30 days, four line charts and the latest values | done | 2026-11-22 |
 | 23b | Dashboard: the organization's readings for a user with `reading:read-all` (`GET /readings/organization`, delivered in B→F-38) | done | 2026-11-22 |
-| 28a | Corrections after sync: the author edits and deletes his own reading within the window the server sets, online only (`GET/PATCH/DELETE /readings/{id}`, delivered in B→F-39): `updatedAt` and `editableUntil` kept on the reading, from the restore and (T28) from the sync results | not started | - |
+| 28a | Corrections after sync: the author edits and deletes his own reading within the window the server sets, online only (`GET/PATCH/DELETE /readings/{id}`, delivered in B→F-39): `updatedAt` and `editableUntil` kept on the reading, from the restore and (T28) from the sync results | done | 2026-11-24 |
 | 28b | Corrections: the API calls and the error messages | not started | - |
 | 28c | Corrections: the buttons on the history card, the edit form for a synced reading, delete and the 409 path | not started | - |
 | 28d | Corrections: refetch the own readings window when the `readings` marker moves | not started | - |
