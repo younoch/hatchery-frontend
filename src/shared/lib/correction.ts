@@ -44,3 +44,8 @@ export function correctionTimeLeft(reading: Reading): {
   if (hours >= 1) return { key: 'water.timeLeftHours', count: hours }
   return { key: 'water.timeLeftMinutes', count: Math.max(1, Math.floor(ms / 60_000)) }
 }
+
+
+
+// A window that is over, for a reading the server refused to correct (1970: always in the past).
+export const WINDOW_CLOSED_AT = new Date(0).toISOString()

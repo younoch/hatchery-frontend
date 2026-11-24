@@ -193,6 +193,12 @@ export async function removeLocalReadings(ids: string[]): Promise<void> {
   await db.readings.bulkDelete(ids)
 }
 
+// The server refused a correction (`edit_window_closed`: the window is over; `not_author`: the
+// reading is not this user's): the phone stops offering the buttons. `null` hides them for good.
+export async function setEditableUntil(id: string, value: string | null): Promise<void> {
+  await db.readings.update(id, { editableUntil: value })
+}
+
 // The server rejected the reading: it keeps the error code so the card can say why.
 export async function markFailed(
   id: string,

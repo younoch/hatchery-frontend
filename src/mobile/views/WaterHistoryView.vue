@@ -4,6 +4,9 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
+import { ApiError } from '@/shared/api/apiError'
+import { errorMessageKey } from '@/shared/api/errorKey'
+import { deleteReading } from '@/shared/api/readingsApi'
 import Card from '@/shared/components/Card.vue'
 import ConfirmSheet from '@/shared/components/ConfirmSheet.vue'
 import Metric from '@/shared/components/Metric.vue'
@@ -12,12 +15,24 @@ import Button from '@/shared/components/ui/Button.vue'
 import CardList from '@/shared/components/layout/CardList.vue'
 import FieldGrid from '@/shared/components/layout/FieldGrid.vue'
 import PageBody from '@/shared/components/layout/PageBody.vue'
-import { correctionTimeLeft, isCorrectable, isCorrected } from '@/shared/lib/correction'
+import {
+  correctionTimeLeft,
+  isCorrectable,
+  isCorrected,
+  WINDOW_CLOSED_AT,
+} from '@/shared/lib/correction'
 import { formatReadingTime } from '@/shared/lib/datetime'
 import { isFixable, rejectionMessageKey } from '@/shared/lib/rejection'
-import { deleteFailedReading, listReadings } from '@/shared/storage/readings'
+import {
+  deleteFailedReading,
+  listReadings,
+  removeLocalReadings,
+  setEditableUntil,
+} from '@/shared/storage/readings'
 import type { Reading } from '@/shared/storage/db'
 import { requireUserId } from '@/shared/composables/useCurrentUserId'
+import { useToast } from '@/shared/composables/useToast'
+import { useAuthStore } from '@/shared/stores/authStore'
 import { useErrorStore } from '@/shared/stores/errorStore'
 import { useTankStore } from '@/shared/stores/tankStore'
 
@@ -25,6 +40,8 @@ const { t, locale } = useI18n()
 const { report } = useErrorStore()
 const tankStore = useTankStore()
 const router = useRouter()
+const auth = useAuthStore()
+const toast = useToast()
 
 // Fix and resend opens the reading form in edit mode.
 function fix(id: string) {
@@ -74,10 +91,61 @@ function askDelete(id: string) {
   deleteOpen.value = true
 }
 
-async function confirmDelete() {
-  if (deleteId.value) await deleteFailedReading(deleteId.value)
+const deleting = ref(false)
+
+function closeDelete() {
   deleteOpen.value = false
   deleteId.value = null
+}
+
+// The server refused, or the reading is gone: the phone follows what the server said.
+async function onDeleteError(error: ApiError, id: string) {
+  if (error.kind === 'session_ended') {
+    await auth.clearSession()
+    return
+  }
+  if (error.code === 'reading_not_found') await removeLocalReadings([id])
+  else if (error.code === 'edit_window_closed') await setEditableUntil(id, WINDOW_CLOSED_AT)
+  else if (error.code === 'not_author') await setEditableUntil(id, null)
+  toast.error(errorMessageKey(error))
+}
+
+// A failed reading is only on the phone. A synced reading is deleted on the server first (online
+// only) and on the phone after that succeeded.
+async function confirmDelete() {
+  const id = deleteId.value
+  const reading = readings.value.find(row => row.id === id)
+  if (!id || !reading) {
+    closeDelete()
+    return
+  }
+  if (reading.status === 'failed') {
+    await deleteFailedReading(id)
+    closeDelete()
+    return
+  }
+  if (reading.status !== 'synced') {
+    closeDelete()
+    return
+  }
+  if (!navigator.onLine) {
+    toast.error('water.correctionNeedsInternet')
+    closeDelete()
+    return
+  }
+  deleting.value = true
+  try {
+    await deleteReading(id)
+    await removeLocalReadings([id])
+    toast.success('water.deleted')
+  } catch (error) {
+    // Anything that is not an ApiError is a bug: let the global handler report it.
+    if (!(error instanceof ApiError)) throw error
+    await onDeleteError(error, id)
+  } finally {
+    deleting.value = false
+    closeDelete()
+  }
 }
 
 // liveQuery re-runs when the readings table changes, so a new save shows up here at once.
@@ -146,7 +214,7 @@ onBeforeUnmount(() => {
               {{ t('water.fixAndResend') }}
             </Button>
             <Button
-              v-if="reading.status === 'failed'"
+              v-if="reading.status === 'failed' || canCorrect(reading)"
               type="button"
               variant="red-outline"
               size="sm"
@@ -164,6 +232,7 @@ onBeforeUnmount(() => {
       :message="t('water.deleteMessage')"
       :confirm-label="t('water.deleteConfirm')"
       :cancel-label="t('water.deleteCancel')"
+      :busy="deleting"
       @confirm="confirmDelete"
     />
   </PageBody>
