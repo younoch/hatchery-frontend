@@ -5,6 +5,13 @@ import { useRouter } from 'vue-router'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 
+import { ApiError } from '@/shared/api/apiError'
+import { errorMessageKey, fieldMessages } from '@/shared/api/errorKey'
+import {
+  getReading as fetchServerReading,
+  patchReading,
+  type ReadingChanges,
+} from '@/shared/api/readingsApi'
 import Button from '@/shared/components/ui/Button.vue'
 import Field from '@/shared/components/ui/Field.vue'
 import Input from '@/shared/components/ui/Input.vue'
@@ -17,6 +24,7 @@ import PageBody from '@/shared/components/layout/PageBody.vue'
 import StateMessage from '@/shared/components/layout/StateMessage.vue'
 import StickyActionBar from '@/shared/components/layout/StickyActionBar.vue'
 import { CLOCK_SKEW_WARN_MS, clockSkewMs } from '@/shared/lib/clockSkew'
+import { isCorrectable, WINDOW_CLOSED_AT } from '@/shared/lib/correction'
 import { localInputToIso, toLocalInputValue } from '@/shared/lib/datetime'
 import { isFixable, rejectionMessageKey } from '@/shared/lib/rejection'
 import { requestSync } from '@/shared/lib/syncRunner'
@@ -24,15 +32,21 @@ import {
   WATER_RANGES,
   waterErrorParams,
   waterReadingFormSchema,
+  type WaterReadingInput,
 } from '@/shared/schemas/waterQuality.schema'
 import type { Reading } from '@/shared/storage/db'
 import {
+  applyServerReading,
   createReading,
   fixFailedReading,
   getLatestReading,
   getReading,
+  removeLocalReadings,
+  setEditableUntil,
 } from '@/shared/storage/readings'
 import { requireUserId } from '@/shared/composables/useCurrentUserId'
+import { useToast } from '@/shared/composables/useToast'
+import { useAuthStore } from '@/shared/stores/authStore'
 import { useTankStore } from '@/shared/stores/tankStore'
 
 // With `editId` the form fixes a failed reading (edit mode) instead of creating one.
@@ -42,7 +56,25 @@ const { t } = useI18n()
 const router = useRouter()
 const userId = requireUserId()
 const tankStore = useTankStore()
-const editing = ref<Reading>() // the failed reading being fixed
+const auth = useAuthStore()
+const toast = useToast()
+const editing = ref<Reading>() // the reading being fixed (failed) or corrected (synced)
+
+// Correcting a synced reading: what the form is compared with, the `updatedAt` the server must
+// still hold, and (after a 409) the server's current values as text. A 409 moves the first two to
+// the server's reading.
+type Stored = Pick<
+  Reading,
+  'tankId' | 'recordedAt' | 'ph' | 'temperatureC' | 'salinityPpt' | 'oxygenMgL'
+> & { note?: string | null }
+const baseline = ref<Stored>()
+const expectedUpdatedAt = ref<string>()
+const staleValues = ref<string>()
+
+const submitKey = computed(() => {
+  if (!props.editId) return 'common.save'
+  return editing.value?.status === 'synced' ? 'water.saveCorrection' : 'water.fixAndResend'
+})
 
 // Warns only (never blocks) when the phone clock is far from the server's.
 const clockOff = computed(
@@ -197,14 +229,19 @@ watch(
 
 const HISTORY_ROUTE = { path: '/m/water', query: { tab: 'history' } }
 
-// Edit mode: only a failed reading with a fixable code can be fixed; otherwise go back.
+// Edit mode: a failed reading with a fixable code is fixed; a synced reading inside its window is
+// corrected (online only); otherwise go back.
 async function loadForEdit(id: string) {
   const reading = await getReading(id)
-  if (!reading || reading.status !== 'failed' || !isFixable(reading.errorCode)) {
+  const fixable = reading?.status === 'failed' && isFixable(reading.errorCode)
+  const correctable = !!reading && isCorrectable(reading) && !!reading.updatedAt
+  if (!reading || (!fixable && !correctable)) {
     await router.replace(HISTORY_ROUTE)
     return
   }
   editing.value = reading
+  baseline.value = reading
+  expectedUpdatedAt.value = reading.updatedAt
   resetForm({
     values: {
       // tank_not_found: the stored tank is wrong, so the user chooses one.
@@ -238,10 +275,125 @@ function say(key: string) {
   }, 5000)
 }
 
+const CORRECTION_FIELDS = [
+  'tankId',
+  'recordedAt',
+  'ph',
+  'temperatureC',
+  'salinityPpt',
+  'oxygenMgL',
+  'note',
+] as const
+
+// Only the fields that differ from `base` are sent. The form has minute precision, so the time
+// counts as changed only when its minute differs.
+function changedFields(input: WaterReadingInput, base: Stored): ReadingChanges {
+  const changes: ReadingChanges = {}
+  if (input.tankId !== base.tankId) changes.tankId = input.tankId
+  if (
+    toLocalInputValue(new Date(input.recordedAt)) !== toLocalInputValue(new Date(base.recordedAt))
+  ) {
+    changes.recordedAt = input.recordedAt
+  }
+  for (const field of FIELDS) {
+    if (input[field.name] !== base[field.name]) changes[field.name] = input[field.name]
+  }
+  const note = input.note ?? ''
+  if (note !== (base.note ?? '')) changes.note = note === '' ? null : note
+  return changes
+}
+
+// 409: the reading was changed elsewhere. The typed values stay in the form; the server's current
+// reading is written to the phone, shown as text, and the next save is compared with it.
+async function showServerValues(id: string) {
+  try {
+    const server = await fetchServerReading(id)
+    await applyServerReading(server)
+    baseline.value = server
+    expectedUpdatedAt.value = server.updatedAt
+    staleValues.value = FIELDS.map(field => `${t(field.labelKey)} ${server[field.name]}`).join(', ')
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error
+    await onCorrectionError(error, id)
+  }
+}
+
+async function onCorrectionError(error: ApiError, id: string) {
+  if (error.kind === 'session_ended') {
+    await auth.clearSession()
+    return
+  }
+  switch (error.code) {
+    case 'stale_reading':
+      await showServerValues(id)
+      return
+    case 'tank_not_found':
+      setFieldError('tankId', 'sync.rejected.tank_not_found')
+      return
+    case 'edit_window_closed':
+      await setEditableUntil(id, WINDOW_CLOSED_AT)
+      break
+    case 'not_author':
+      await setEditableUntil(id, null)
+      break
+    case 'reading_not_found':
+      await removeLocalReadings([id])
+      break
+    default: {
+      const messages = Object.entries(fieldMessages(error, CORRECTION_FIELDS))
+      if (messages.length === 0) {
+        toast.error(errorMessageKey(error))
+        return
+      }
+      for (const [field, key] of messages) {
+        setFieldError(field as (typeof CORRECTION_FIELDS)[number], key)
+      }
+      return
+    }
+  }
+  // The window is over, the reading is not his or it is gone: nothing more to do in the form.
+  toast.error(errorMessageKey(error))
+  await router.replace(HISTORY_ROUTE)
+}
+
+// Sends the correction of a synced reading (online only).
+async function correct(input: WaterReadingInput) {
+  const id = props.editId
+  const base = baseline.value
+  if (!id || !base) return
+  const updatedAt = expectedUpdatedAt.value
+  if (!updatedAt) {
+    toast.error('auth.error.unknown')
+    return
+  }
+  const changes = changedFields(input, base)
+  if (Object.keys(changes).length === 0) {
+    await router.replace(HISTORY_ROUTE)
+    return
+  }
+  if (!navigator.onLine) {
+    toast.error('water.correctionNeedsInternet')
+    return
+  }
+  try {
+    await applyServerReading(await patchReading(id, updatedAt, changes))
+    toast.success('water.correctionSaved')
+    await router.replace(HISTORY_ROUTE)
+  } catch (error) {
+    // Anything that is not an ApiError is a bug: let the global handler report it.
+    if (!(error instanceof ApiError)) throw error
+    await onCorrectionError(error, id)
+  }
+}
+
 const onSubmit = handleSubmit(async values => {
   isSaving.value = true
   try {
     const input = { ...values, recordedAt: localInputToIso(values.recordedAt) }
+    if (props.editId && editing.value?.status === 'synced') {
+      await correct(input)
+      return
+    }
     if (props.editId) {
       const fixed = await fixFailedReading(props.editId, input)
       if (fixed) void requestSync()
@@ -275,8 +427,11 @@ onBeforeUnmount(() => window.clearTimeout(statusTimer))
     <NoticeBanner v-if="clockOff">
       {{ t(clockAhead ? 'water.clockAhead' : 'water.clockBehind', { minutes: clockOffMinutes }) }}
     </NoticeBanner>
-    <NoticeBanner v-if="editing">
+    <NoticeBanner v-if="editing?.status === 'failed'">
       {{ t(rejectionMessageKey(editing.errorCode)) }}
+    </NoticeBanner>
+    <NoticeBanner v-if="staleValues">
+      {{ t('water.staleReading', { values: staleValues }) }}
     </NoticeBanner>
     <StateMessage v-if="emptyKey">
       {{ t(emptyKey) }}
@@ -331,7 +486,7 @@ onBeforeUnmount(() => window.clearTimeout(statusTimer))
         {{ t('common.cancel') }}
       </Button>
       <Button type="submit" :disabled="isSaving">
-        {{ t(editId ? 'water.fixAndResend' : 'common.save') }}
+        {{ t(submitKey) }}
       </Button>
     </StickyActionBar>
   </form>

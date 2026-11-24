@@ -48,6 +48,15 @@ function fix(id: string) {
   void router.push(`/m/water/edit/${id}`)
 }
 
+// A correction needs the server (online only).
+function correct(id: string) {
+  if (!navigator.onLine) {
+    toast.error('water.correctionNeedsInternet')
+    return
+  }
+  fix(id)
+}
+
 const METRICS = [
   { name: 'ph', labelKey: 'water.ph', unit: undefined },
   { name: 'temperatureC', labelKey: 'water.temperature', unit: '°C' },
@@ -184,18 +193,10 @@ onBeforeUnmount(() => {
               <StatusBadge :status="reading.status" />
             </div>
             <FieldGrid :cols="2">
-              <Metric
-                v-for="metric in METRICS"
-                :key="metric.name"
-                :label="t(metric.labelKey)"
-                :value="reading[metric.name]"
-                :unit="metric.unit"
-              />
+              <Metric v-for="metric in METRICS" :key="metric.name" :label="t(metric.labelKey)"
+                :value="reading[metric.name]" :unit="metric.unit" />
             </FieldGrid>
-            <p
-              v-if="reading.note"
-              class="text-caption text-muted-foreground [overflow-wrap:anywhere]"
-            >
+            <p v-if="reading.note" class="text-caption text-muted-foreground [overflow-wrap:anywhere]">
               {{ reading.note }}
             </p>
             <p v-if="correctionHint(reading)" class="text-caption text-muted-foreground">
@@ -204,36 +205,23 @@ onBeforeUnmount(() => {
             <p v-if="reading.status === 'failed'" class="text-caption font-medium text-sync-failed">
               {{ t(rejectionMessageKey(reading.errorCode)) }}
             </p>
-            <Button
-              v-if="reading.status === 'failed' && isFixable(reading.errorCode)"
-              type="button"
-              variant="secondary"
-              size="sm"
-              @click="fix(reading.id)"
-            >
+            <Button v-if="reading.status === 'failed' && isFixable(reading.errorCode)" type="button" variant="secondary"
+              size="sm" @click="fix(reading.id)">
               {{ t('water.fixAndResend') }}
             </Button>
-            <Button
-              v-if="reading.status === 'failed' || canCorrect(reading)"
-              type="button"
-              variant="red-outline"
-              size="sm"
-              @click="askDelete(reading.id)"
-            >
+            <Button v-if="canCorrect(reading)" type="button" variant="secondary" size="sm" @click="correct(reading.id)">
+              {{ t('water.correct') }}
+            </Button>
+            <Button v-if="reading.status === 'failed' || canCorrect(reading)" type="button" variant="red-outline"
+              size="sm" @click="askDelete(reading.id)">
               {{ t('water.delete') }}
             </Button>
           </FieldGrid>
         </Card>
       </li>
     </CardList>
-    <ConfirmSheet
-      v-model:open="deleteOpen"
-      :title="t('water.deleteTitle')"
-      :message="t('water.deleteMessage')"
-      :confirm-label="t('water.deleteConfirm')"
-      :cancel-label="t('water.deleteCancel')"
-      :busy="deleting"
-      @confirm="confirmDelete"
-    />
+    <ConfirmSheet v-model:open="deleteOpen" :title="t('water.deleteTitle')" :message="t('water.deleteMessage')"
+      :confirm-label="t('water.deleteConfirm')" :cancel-label="t('water.deleteCancel')" :busy="deleting"
+      @confirm="confirmDelete" />
   </PageBody>
 </template>
