@@ -171,7 +171,11 @@
       "org_admin_protected": "The admin cannot be changed here.",
       "cannot_target_self": "You cannot change your own account here.",
       "invalid_username": "The username is not valid.",
-      "rate_limited": "Too many attempts. Wait a minute and try again."
+      "rate_limited": "Too many attempts. Wait a minute and try again.",
+      "edit_window_closed": "The time to correct this reading is over.",
+      "not_author": "Only the person who recorded a reading can correct it.",
+      "stale_reading": "This reading was changed on another phone. Check the current values.",
+      "reading_not_found": "This reading no longer exists."
     }
   },
   "dashboard": {

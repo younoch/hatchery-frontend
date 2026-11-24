@@ -17,6 +17,10 @@ const CODE_KEYS: Partial<Record<string, string>> = {
   cannot_target_self: 'api.errors.cannot_target_self',
   invalid_username: 'api.errors.invalid_username',
   rate_limited: 'api.errors.rate_limited',
+  edit_window_closed: 'api.errors.edit_window_closed',
+  not_author: 'api.errors.not_author',
+  stale_reading: 'api.errors.stale_reading',
+  reading_not_found: 'api.errors.reading_not_found',
 }
 
 // Fallback when the code has no message of its own: the kind decides.
